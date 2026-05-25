@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: Distiller
+  m_EditorClassIdentifier: 
+  deviceName: "\u84B8\u998F\u5668"
+  icon: {fileID: 0}
+  description: 
+  tier: 5
+  builtPrefab: {fileID: 1050122606346516954, guid: 8903d83be3898ba4d87bb64103779cce, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+    inputCount: 2
+    output: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+    outputCount: 1
+    baseTime: 5
+  - input: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
+    inputCount: 5
+    output: {fileID: 11400000, guid: 783c0eda44fed15428b9fecd527c739b, type: 2}
+    outputCount: 3
+    baseTime: 4
+  - input: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+    inputCount: 4
+    output: {fileID: 11400000, guid: 3f7e40ae1cac2ce44b00835a5d63997a, type: 2}
+    outputCount: 1
+    baseTime: 6
+  productionInterval: 5
+  batchSize: 1
+  requiresFuel: 1
+  fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f4d05a2109c7a47bf2aa7e6499fcf2, type: 3}
+  m_Name: "\u5236\u4F5C\u4EBA"
+  m_EditorClassIdentifier: 
+  templateName: "\u5236\u4F5C\u4EBA"
+  description: "\u6E38\u620F\u5236\u4F5C\u4EBA\u3002\u5F00\u5C40\u5373\u5E26AI\u6218\u6597\u4F19\u4F34+\u6D53\u7F29\u94C0\xD710\uFF0C\u521D\u59CB\u667A\u529BLv8\u3002"
+  attributeMods:
+  - attributeType: 0
+    mod: 2
+  - attributeType: 1
+    mod: 2
+  - attributeType: 2
+    mod: 2
+  - attributeType: 3
+    mod: 2
+  skillBoosts:
+  - skillType: 0
+    bonus: 1
+  - skillType: 1
+    bonus: 2
+  - skillType: 2
+    bonus: 1
+  - skillType: 3
+    bonus: 1
+  - skillType: 4
+    bonus: 1
+  - skillType: 6
+    bonus: 3
+  - skillType: 7
+    bonus: 3
+  - skillType: 8
+    bonus: 1
+  - skillType: 9
+    bonus: 8
+  startingEquipment:
+  - {fileID: 11400000, guid: 1775f1da5c9deee4e98beb97af059167, type: 2}
+  - {fileID: 11400000, guid: 48ca6d2691069df429f79e66c9443014, type: 2}
+  startingItems:
+  - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+    count: 10
+  - itemData: {fileID: 11400000, guid: 55e6ebb3e9dd338408eb0e11da79ddce, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: fe2232b0a7fb89b448c41bd2b7d85db8, type: 2}
+    count: 5
+  - itemData: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
+    count: 3
+  startWithAIBot: 1
+  startingAIBotBuildable: {fileID: 11400000, guid: cc4c489141f09f147bbf04b60c9da131, type: 2}

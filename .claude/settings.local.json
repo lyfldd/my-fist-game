@@ -48,7 +48,22 @@
       "Read(//c/Program Files/Unity/Hub/**)",
       "Read(//c/Program Files/**)",
       "Bash(\"D:/unity/2022.3.62t7/Editor/Tuanjie.exe\" -batchmode -quit -nographics -logFile \"compile_log.txt\" -projectPath \".\")",
-      "Bash(git init *)"
+      "Bash(git init *)",
+      "WebSearch",
+      "Bash(ipconfig *)",
+      "Bash(cmd *)",
+      "Bash(ping *)",
+      "Bash(git config *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(curl -I --connect-timeout 10 https://github.com)",
+      "Bash(curl -I --connect-timeout 5 https://140.82.113.4)",
+      "Bash(nslookup github.com 8.8.8.8)",
+      "Bash(timeout 5 bash -c 'echo > /dev/tcp/github.com/22')",
+      "Bash(mkdir -p __TRACKED_VAR__/.ssh)",
+      "Bash(ssh-keygen -t ed25519 -C 2807927453@qq.com -f __TRACKED_VAR__/.ssh/id_ed25519 -N '')",
+      "Bash(ssh *)",
+      "Bash(git *)"
     ]
   }
 }

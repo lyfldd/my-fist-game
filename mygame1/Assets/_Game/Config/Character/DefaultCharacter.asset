@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d44cd8ef63563d240aa50e0e6ff6f0b2, type: 3}
+  m_Name: DefaultCharacter
+  m_EditorClassIdentifier: 
+  attributes:
+  - type: 0
+    defaultValue: 5
+    min: 1
+    max: 10
+  - type: 1
+    defaultValue: 5
+    min: 1
+    max: 10
+  - type: 2
+    defaultValue: 5
+    min: 1
+    max: 10
+  - type: 3
+    defaultValue: 5
+    min: 1
+    max: 10
+  skills:
+  - type: 0
+    level: 1
+  - type: 1
+    level: 0
+  - type: 2
+    level: 0
+  - type: 3
+    level: 0
+  - type: 4
+    level: 0
+  - type: 5
+    level: 0
+  - type: 6
+    level: 0
+  - type: 7
+    level: 0
+  - type: 8
+    level: 0
+  - type: 9
+    level: 0
+  isMale: 1
+  genderMods: []
+  profession: {fileID: 11400000, guid: c43aa97df7e2f2e4ab641e21f2780836, type: 2}

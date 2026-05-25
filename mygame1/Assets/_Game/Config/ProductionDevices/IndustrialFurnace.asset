@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: IndustrialFurnace
+  m_EditorClassIdentifier: 
+  deviceName: "\u5DE5\u4E1A\u7089"
+  icon: {fileID: 0}
+  description: 
+  tier: 5
+  builtPrefab: {fileID: 7969171142488794371, guid: a948452b7cc87124685fbacbaa424483, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: cb3d230cee42ef540b6651f039bdb662, type: 2}
+    inputCount: 3
+    output: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    outputCount: 2
+    baseTime: 4
+  - input: {fileID: 11400000, guid: 5e9c6924925b8294ea414fd644cc1aa9, type: 2}
+    inputCount: 3
+    output: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+    outputCount: 2
+    baseTime: 4
+  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 2
+    output: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    outputCount: 1
+    baseTime: 6
+  - input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
+    inputCount: 4
+    output: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    outputCount: 1
+    baseTime: 5
+  - input: {fileID: 11400000, guid: 5c1a3f7c94a56d64da8d13f4baaa2b11, type: 2}
+    inputCount: 2
+    output: {fileID: 11400000, guid: d9879fac8550bc5439bd481977c3a7be, type: 2}
+    outputCount: 3
+    baseTime: 4
+  - input: {fileID: 11400000, guid: b82c1af6d7753204f95a0c5829407d46, type: 2}
+    inputCount: 3
+    output: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+    outputCount: 2
+    baseTime: 3
+  productionInterval: 5
+  batchSize: 1
+  requiresFuel: 1
+  fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
+  fuelPerCycle: 2
+  acceptsAutomation: 1
+  automationMultiplier: 2

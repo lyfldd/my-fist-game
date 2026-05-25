@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518e29df93df32941ba7eff134a7312e, type: 3}
+  m_Name: Buildable_CanningMachine
+  m_EditorClassIdentifier: 
+  displayName: "\u7F50\u5934\u5C01\u88C5\u673A"
+  description: "\u98DF\u54C1\u7F50\u88C5\u8BBE\u5907\u3002\u53EF\u5C06\u7096\u83DC\u5C01\u88C5\u4E3A\u53EF\u957F\u671F\u4FDD\u5B58\u7684\u7F50\u5934\u3002"
+  icon: {fileID: 0}
+  category: 5
+  previewPrefab: {fileID: 0}
+  builtPrefab: {fileID: 0}
+  placementSize: {x: 1.5, y: 1.5, z: 1.5}
+  snapSize: 1
+  buildDuration: 8
+  requiredTool: {fileID: 0}
+  materials:
+  - itemData: {fileID: 11400000, guid: 5e7f6e99c182b4c4db9179cf82c30a5f, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    count: 6
+  - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 44cc5e357208c3c4fa5ad3424733fe87, type: 2}
+    count: 2
+  skillRequirements:
+  - skill: 7
+    level: 2
+  hungerDrainPerSec: 0
+  thirstDrainPerSec: 0
+  staminaDrainPerSec: 0
+  maxHealth: 100
+  blocksNavMesh: 1
+  deconstructReturnRate: 0.5
+  powerSupplyRadius: 0
+  powerOutput: 0
+  powerSourceType: 0
+  powerRequiresFuel: 0
+  powerFuelPerHour: 1
+  powerFuelItemName: 
+  powerFuelItemData: {fileID: 0}
+  powerDaytimeOnly: 0
+  powerRequiresOpenAir: 0
+  powerRequiresWater: 0
+  powerNoiseRadius: 10
+  powerRequired: 0
+  powerAllowCoal: 0
+  powerCoalPower: 0
+  powerElectricSpeedMul: 2
+  isWorkstation: 0
+  workstationTier: 0
+  productionDeviceRef: {fileID: 11400000, guid: cee2d9669f79fa44181c1a2c211f96ea, type: 2}

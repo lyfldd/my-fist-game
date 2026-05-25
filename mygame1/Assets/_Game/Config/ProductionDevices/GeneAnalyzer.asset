@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: GeneAnalyzer
+  m_EditorClassIdentifier: 
+  deviceName: "\u57FA\u56E0\u5206\u6790\u53F0"
+  icon: {fileID: 0}
+  description: 
+  tier: 8
+  builtPrefab: {fileID: 4583984094485115508, guid: 6daa0187e03d7164f95cfb31916dd968, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: 4556fab139e4c6848ae655f93cb18d76, type: 2}
+    inputCount: 3
+    output: {fileID: 11400000, guid: 5518e5f20db5cf544a401104019444af, type: 2}
+    outputCount: 1
+    baseTime: 20
+  - input: {fileID: 11400000, guid: 21f0ffe9522fe4b44a996d6247509c5c, type: 2}
+    inputCount: 1
+    output: {fileID: 11400000, guid: 21f0ffe9522fe4b44a996d6247509c5c, type: 2}
+    outputCount: 2
+    baseTime: 20
+  productionInterval: 15
+  batchSize: 1
+  requiresFuel: 0
+  fuelItem: {fileID: 0}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

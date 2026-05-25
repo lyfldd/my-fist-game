@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc35678326b098458937d0366d8984e, type: 3}
+  m_Name: "\u7A7F\u7532\u5F39"
+  m_EditorClassIdentifier: 
+  recipeName: "\u7A7F\u7532\u5F39"
+  icon: {fileID: 0}
+  description: 
+  category: 5
+  requiredStation: 5
+  skillRequirements:
+  - skill: 1
+    level: 6
+  materials:
+  - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: e00357cbb5a67844ea7ef50cfcf11b55, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 797cfce063fe1874a91837156274af89, type: 2}
+    count: 5
+  - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+    count: 2
+  resultItem: {fileID: 11400000, guid: 42f930138ba713548bb7240ef802515b, type: 2}
+  resultCount: 5
+  craftTime: 6
+  xpReward: 35
+  canDeconstruct: 0
+  deconstructReturnRate: 0.5

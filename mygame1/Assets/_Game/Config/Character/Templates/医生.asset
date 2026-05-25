@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f4d05a2109c7a47bf2aa7e6499fcf2, type: 3}
+  m_Name: "\u533B\u751F"
+  m_EditorClassIdentifier: 
+  templateName: "\u533B\u751F"
+  description: "\u6218\u5730\u533B\u751F\uFF0C\u7CBE\u901A\u533B\u7597\uFF0C\u5F00\u5C40\u5927\u91CF\u836F\u54C1\u3002"
+  attributeMods: []
+  skillBoosts:
+  - skillType: 4
+    bonus: 4
+  - skillType: 9
+    bonus: 2
+  startingEquipment:
+  - {fileID: 11400000, guid: 1775f1da5c9deee4e98beb97af059167, type: 2}
+  startingItems:
+  - itemData: {fileID: 11400000, guid: 55e6ebb3e9dd338408eb0e11da79ddce, type: 2}
+    count: 5
+  - itemData: {fileID: 11400000, guid: 98142218b77bd154cab23a4bc3eb49b9, type: 2}
+    count: 5
+  - itemData: {fileID: 11400000, guid: ad8b22f2679061a43a5a81e8f04e22a5, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: c5b0c1f4d0ef8a4439c87bb08853a63a, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: fe2232b0a7fb89b448c41bd2b7d85db8, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
+    count: 3

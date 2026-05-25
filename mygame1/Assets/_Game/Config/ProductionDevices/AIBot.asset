@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: AIBot
+  m_EditorClassIdentifier: 
+  deviceName: "AI\u673A\u5668\u4EBA"
+  icon: {fileID: 0}
+  description: 
+  tier: 8
+  builtPrefab: {fileID: 2893305008436004792, guid: 79f30206c5b7a44409b1075f7f7d32f6, type: 3}
+  recipes: []
+  productionInterval: 0
+  batchSize: 0
+  requiresFuel: 0
+  fuelItem: {fileID: 0}
+  fuelPerCycle: 1
+  acceptsAutomation: 0
+  automationMultiplier: 2

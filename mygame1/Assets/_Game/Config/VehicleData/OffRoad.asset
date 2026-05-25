@@ -1,0 +1,31 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e86fa6af1eec5f44783d96f885ab4a3f, type: 3}
+  m_Name: OffRoad
+  m_EditorClassIdentifier: 
+  vehicleName: "OffRoad \u8D8A\u91CE\u8F66"
+  category: 0
+  maxSpeed: 12
+  motorTorque: 1000
+  brakingForce: 3000
+  maxSteerAngle: 35
+  reverseTorque: 500
+  mass: 1800
+  suspensionDamper: 2500
+  fuelCapacity: 50
+  fuelConsumptionRate: 0.03
+  trunkWidth: 4
+  trunkHeight: 3
+  driverSeatOffset: {x: 0.22500001, y: 1.424633, z: 0.4735763}
+  exitOffset: {x: 0, y: 0, z: 1.4207289}
+  colliderCenter: {x: 0, y: 0, z: 0}
+  colliderSize: {x: 4.275, y: 2.082156, z: 2.2494874}

@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: PrecisionAssembly
+  m_EditorClassIdentifier: 
+  deviceName: "\u7CBE\u5BC6\u88C5\u914D\u53F0"
+  icon: {fileID: 0}
+  description: 
+  tier: 8
+  builtPrefab: {fileID: 1946468266604860773, guid: f04633783bc58064090ade58eb95a933, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+    inputCount: 3
+    output: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+    outputCount: 1
+    baseTime: 10
+  - input: {fileID: 11400000, guid: 9207d954ab17788429f12e0c8233f1d3, type: 2}
+    inputCount: 2
+    output: {fileID: 11400000, guid: c0128cf8b31bdc048b87330dca405c4c, type: 2}
+    outputCount: 1
+    baseTime: 12
+  productionInterval: 10
+  batchSize: 1
+  requiresFuel: 0
+  fuelItem: {fileID: 0}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

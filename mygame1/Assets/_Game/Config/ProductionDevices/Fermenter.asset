@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: Fermenter
+  m_EditorClassIdentifier: 
+  deviceName: "\u53D1\u9175\u7F50"
+  icon: {fileID: 0}
+  description: 
+  tier: 4
+  builtPrefab: {fileID: 2866498013244288910, guid: 22ff41ed0f818cc43b64f4600e4885d7, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: f7f15f1b873d50b4db982012268e212a, type: 2}
+    inputCount: 5
+    output: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+    outputCount: 2
+    baseTime: 6
+  - input: {fileID: 11400000, guid: ff9f65330505e0041972e6663a8c733d, type: 2}
+    inputCount: 4
+    output: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+    outputCount: 1
+    baseTime: 8
+  - input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
+    inputCount: 6
+    output: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+    outputCount: 1
+    baseTime: 8
+  productionInterval: 6
+  batchSize: 1
+  requiresFuel: 0
+  fuelItem: {fileID: 0}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

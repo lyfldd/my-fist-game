@@ -1,0 +1,2196 @@
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
+using _Game.Core;
+using _Game.Config;
+using _Game.Systems.Inventory;
+using _Game.Systems.Character;
+using Inv = _Game.Systems.Inventory.Inventory;
+
+namespace _Game.UI
+{
+    /// <summary>
+    /// 背包 UI（双面板）
+    /// - Tab = 总览（显示所有容器）
+    /// - V = 循环切换容器（胸挂→上衣→腰带→裤子→背包→循环）
+    /// - ESC = 关闭所有面板
+    /// </summary>
+    public class InventoryUI : MonoBehaviour
+    {
+        [Header("总览面板（Tab）")]
+        public GameObject overviewPanel;            // 总览面板
+        public Text overviewInfoText;
+        public GameObject overviewGridContainer;    // 总览的格子容器
+
+        [Header("快捷面板（V 循环切换）")]
+        public GameObject quickPanel;
+        public Text quickInfoText;
+        public GameObject quickGridContainer;
+
+        [Header("浮动提示")]
+        public Text floatingToastText;
+
+        [Header("外观")]
+        public Color emptyColor = new Color(0.2f, 0.2f, 0.2f);
+        public Color occupiedColor = new Color(0.3f, 0.7f, 0.3f);
+        public Color overloadColor = new Color(0.8f, 0.3f, 0.3f);
+
+        private Inv _inventory;
+
+        private GameObject _survivalHUDGo;
+        private GameObject _quickItemBarGo;
+
+        // V 循环顺序
+        private static readonly EquipSlot[] CycleOrder = new EquipSlot[]
+        {
+            EquipSlot.Vest, EquipSlot.Tops, EquipSlot.Belt,
+            EquipSlot.Pants, EquipSlot.Backpack
+        };
+        // 兜底检索顺序（按这个顺序找第一个可用容器）
+        private static readonly EquipSlot[] FallbackOrder = new EquipSlot[]
+        {
+            EquipSlot.Tops, EquipSlot.Vest, EquipSlot.Belt,
+            EquipSlot.Pants, EquipSlot.Backpack
+        };
+        private int _cycleIndex = 0;
+        private EquipSlot _lastQuickSlot = EquipSlot.Tops;  // V 最后打开的容器
+        private float _overviewScrollY;
+        private float _overviewContentHeight;
+        private RectTransform _overviewScrollContent;
+
+        void Start()
+        {
+            _inventory = FindObjectOfType<Inv>();
+
+            // 确保 EventSystem 存在（拖拽必需）
+            if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+            {
+                var esGo = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem));
+                esGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+            }
+
+            // 确保 Canvas 有 GraphicRaycaster
+            var canvas = GetComponentInParent<Canvas>();
+            if (canvas != null && canvas.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
+                canvas.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
+
+            // 自动创建拖拽管理器
+            if (DragDropManager.Instance == null)
+            {
+                var ddGo = new GameObject("DragDropManager", typeof(DragDropManager));
+                DontDestroyOnLoad(ddGo);
+            }
+
+            // 查找其他 UI 对象
+            _survivalHUDGo = GameObject.Find("SurvivalHUD");
+            _quickItemBarGo = GameObject.Find("QuickItemBar");
+
+            // 禁用 ScrollRect（与物品拖拽冲突）
+            if (overviewPanel != null)
+            {
+                var sr = overviewPanel.GetComponent<UnityEngine.UI.ScrollRect>();
+                if (sr != null) sr.enabled = false;
+            }
+
+            // 两个面板默认都隐藏
+            if (overviewPanel != null) overviewPanel.SetActive(false);
+            if (quickPanel != null) quickPanel.SetActive(false);
+            if (floatingToastText != null) floatingToastText.gameObject.SetActive(false);
+
+            // 默认上衣
+            _inventory.ActiveContainer = _inventory.GetContainer(EquipSlot.Tops);
+
+            EventBus.Subscribe<InventoryChanged>(OnInventoryChanged);
+            EventBus.Subscribe<InventoryViewChangedEvent>(OnViewChanged);
+            EventBus.Subscribe<CharacterStatsChanged>(OnCharacterStatsChanged);
+        }
+
+        void OnEnable()
+        {
+            InputRouter.BindKey(KeyCode.Escape, InputPriority.UI, HandleEsc, this);
+            InputRouter.BindKey(KeyCode.Tab, InputPriority.UI, HandleTab, this);
+            InputRouter.BindKey(KeyCode.V, InputPriority.UI, HandleV, this);
+        }
+
+        void OnDisable() { InputRouter.UnbindAll(this); }
+
+        bool HandleEsc()
+        {
+            bool anyOpen = false;
+            if (overviewPanel != null && overviewPanel.activeSelf)
+            { overviewPanel.SetActive(false); SetOtherUIVisible(true); anyOpen = true; }
+            if (quickPanel != null && quickPanel.activeSelf)
+            { quickPanel.SetActive(false); anyOpen = true; }
+            if (anyOpen)
+            {
+                if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
+                return true;
+            }
+            return false;
+        }
+
+        bool HandleTab()
+        {
+            if (overviewPanel == null) return false;
+
+            // 打开背包时关闭建造模式
+            ExitBuildModeIfActive();
+
+            if (quickPanel != null && quickPanel.activeSelf)
+                quickPanel.SetActive(false);
+
+            bool wasActive = overviewPanel.activeSelf;
+            overviewPanel.SetActive(!wasActive);
+            SetOtherUIVisible(wasActive);
+            if (!wasActive)
+                ShowOverview();
+            else if (DragDropManager.Instance != null)
+                DragDropManager.Instance.DeselectItem();
+            return true;
+        }
+
+        bool HandleV()
+        {
+            // 打开背包时关闭建造模式
+            ExitBuildModeIfActive();
+
+            bool overviewActive = overviewPanel != null && overviewPanel.activeSelf;
+            if (overviewActive) return false; // 总览打开时 V 不生效
+            bool isOpen = quickPanel != null && quickPanel.activeSelf;
+            if (isOpen)
+                CycleToNextContainer();
+            else
+                OpenContainer(_lastQuickSlot);
+            return true;
+        }
+
+        void ExitBuildModeIfActive()
+        {
+            var bmc = Object.FindObjectOfType<_Game.Systems.Building.BuildModeController>();
+            if (bmc != null && bmc.IsBuildMode)
+                bmc.ForceExit();
+        }
+
+        void Update()
+        {
+            // 总览打开时：滚轮滚动，仅鼠标在面板区域内生效（拖拽时不滚动）
+            bool overviewActive = overviewPanel != null && overviewPanel.activeSelf;
+            if (overviewActive && _overviewContentHeight > 0
+                && !(DragDropManager.Instance != null && DragDropManager.Instance.IsDragging)
+                && IsMouseOverOverviewPanel())
+            {
+                float scroll = Input.GetAxis("Mouse ScrollWheel") * 60f;
+                if (Mathf.Abs(scroll) > 0.01f)
+                {
+                    _overviewScrollY = Mathf.Clamp(_overviewScrollY - scroll, 0, _overviewContentHeight);
+                    if (_overviewScrollContent != null)
+                        _overviewScrollContent.anchoredPosition = new Vector2(0, _overviewScrollY);
+                }
+            }
+        }
+
+        bool IsMouseOverOverviewPanel()
+        {
+            if (overviewPanel == null) return false;
+            return RectTransformUtility.RectangleContainsScreenPoint(
+                overviewPanel.GetComponent<RectTransform>(), Input.mousePosition);
+        }
+
+        void OnDestroy()
+        {
+            EventBus.Unsubscribe<InventoryChanged>(OnInventoryChanged);
+            EventBus.Unsubscribe<InventoryViewChangedEvent>(OnViewChanged);
+            EventBus.Unsubscribe<CharacterStatsChanged>(OnCharacterStatsChanged);
+        }
+
+        void OnInventoryChanged(InventoryChanged evt)
+        {
+            if (_inventory == null) return;
+
+            // 浮动提示
+            if (floatingToastText != null)
+            {
+                string msg = evt.Action switch
+                {
+                    "overload_warning" => $"负重超载！{evt.ItemName} 太重了",
+                    "slot_full" => $"空间不够！放不下 {evt.ItemName}",
+                    "belt_full" => $"腰带空间不足！放不下 {evt.ItemName}",
+                    _ => ""
+                };
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    floatingToastText.gameObject.SetActive(true);
+                    floatingToastText.text = msg;
+                    CancelInvoke(nameof(HideToast));
+                    Invoke(nameof(HideToast), 2.5f);
+                }
+            }
+
+            // 刷新当前打开的面板
+            if (overviewPanel != null && overviewPanel.activeSelf)
+                ShowOverview();
+            else if (quickPanel != null && quickPanel.activeSelf)
+                ShowQuickView();
+        }
+
+        void OnViewChanged(InventoryViewChangedEvent evt)
+        {
+            if (_inventory == null) return;
+
+            // 总面板打开时，刷新内容区（保留标签栏）
+            if (overviewPanel != null && overviewPanel.activeSelf)
+            {
+                ClearContainer(overviewGridContainer);
+                ShowEquipTabContent();
+            }
+        }
+
+        void HideToast()
+        {
+            if (floatingToastText != null)
+                floatingToastText.gameObject.SetActive(false);
+        }
+
+        // ===== 总览面板（Tab） =====
+
+        // 当前选中的标签
+        private string _currentTab = "装备容器";
+        private static readonly string[] TabNames = { "装备容器", "角色", "制作", "地图", "设置" };
+
+        public void ShowOverview()
+        {
+            if (overviewGridContainer == null || _inventory == null) return;
+
+            // 标签栏放在 OverviewPanel 上（gridContainer 的父级）
+            Transform root = overviewGridContainer.transform.parent;
+            // 移除旧的标签栏（如果存在）
+            var oldBar = root.Find("TopTabBar");
+            if (oldBar != null) GameObject.DestroyImmediate(oldBar.gameObject);
+
+            // ---- 顶部标签栏（固定高度 40px） ----
+            CreateTopTabBar(root);
+
+            // 调整网格容器起始位置（紧挨标签栏底部）
+            var gridRt = overviewGridContainer.GetComponent<RectTransform>();
+            gridRt.offsetMax = new Vector2(gridRt.offsetMax.x, -45);  // 40px 标签栏 + 5px 间距
+
+            // ---- 下方内容区（gridContainer 显示内容） ----
+            ClearContainer(overviewGridContainer);
+
+            // 清空旧的拖拽格子注册
+            if (DragDropManager.Instance != null)
+                DragDropManager.Instance.ClearCells();
+            var glg = overviewGridContainer.GetComponent<GridLayoutGroup>();
+            if (glg != null) DestroyImmediate(glg);
+            var vlg = overviewGridContainer.GetComponent<VerticalLayoutGroup>();
+            if (vlg != null) DestroyImmediate(vlg);
+
+            switch (_currentTab)
+            {
+                case "装备容器": ShowEquipTabContent(); break;
+                case "角色": ShowCharacterTabContent(); break;
+                default: ShowPlaceholderTab(_currentTab); break;
+            }
+        }
+
+        void CreateTopTabBar(Transform root)
+        {
+            var bar = new GameObject("TopTabBar", typeof(Image), typeof(RectTransform));
+            bar.transform.SetParent(root, false);
+            var barImg = bar.GetComponent<Image>();
+            barImg.color = new Color(0.1f, 0.1f, 0.15f, 0.9f);
+
+            var barRt = bar.GetComponent<RectTransform>();
+            // 锚定到顶部
+            barRt.anchorMin = new Vector2(0, 1);
+            barRt.anchorMax = new Vector2(1, 1);
+            barRt.offsetMin = new Vector2(10, -40);
+            barRt.offsetMax = new Vector2(-10, 0);
+
+            var hlg = bar.AddComponent<HorizontalLayoutGroup>();
+            hlg.childAlignment = TextAnchor.MiddleCenter;
+            hlg.spacing = 6;
+            hlg.childForceExpandWidth = true;
+            hlg.childForceExpandHeight = true;
+            hlg.padding = new RectOffset(8, 8, 4, 4);
+
+            foreach (var name in TabNames)
+            {
+                bool isActive = name == _currentTab;
+                var btnObj = new GameObject($"Tab_{name}", typeof(Image), typeof(Button));
+                btnObj.transform.SetParent(bar.transform, false);
+
+                var img = btnObj.GetComponent<Image>();
+                img.color = isActive ? new Color(0.3f, 0.5f, 0.8f, 0.9f) : new Color(0.15f, 0.15f, 0.15f, 0.8f);
+                img.raycastTarget = true;
+
+                var textObj = new GameObject("Label", typeof(Text));
+                textObj.transform.SetParent(btnObj.transform, false);
+                var textRt = textObj.GetComponent<RectTransform>();
+                textRt.anchorMin = Vector2.zero;
+                textRt.anchorMax = Vector2.one;
+                textRt.offsetMin = Vector2.zero;
+                textRt.offsetMax = Vector2.zero;
+
+                var text = textObj.GetComponent<Text>();
+                text.text = name;
+                text.fontSize = 14;
+                text.alignment = TextAnchor.MiddleCenter;
+                text.color = isActive ? Color.white : new Color(0.5f, 0.5f, 0.5f);
+
+                var btn = btnObj.GetComponent<Button>();
+                var capturedName = name;
+                btn.onClick.AddListener(() => OnTabClicked(capturedName));
+            }
+        }
+
+        void OnTabClicked(string tabName)
+        {
+            _currentTab = tabName;
+            if (tabName != "装备容器" && tabName != "角色")
+            {
+                ShowToast($"{tabName} 开发中...");
+            }
+            else
+            {
+                SetOtherUIVisible(false);
+            }
+            ShowOverview();
+        }
+
+        void ShowEquipTabContent()
+        {
+            if (_inventory == null || overviewGridContainer == null) return;
+
+            var gridRt = overviewGridContainer.GetComponent<RectTransform>();
+            float pw = gridRt.rect.width;
+            float ph = gridRt.rect.height;
+            float m = 8f;
+            float sp = 4f;
+            float labelH = 16f;
+
+            var view = _inventory != null ? _inventory.BuildViewData() : new InventoryViewData();
+
+            // 创建内容容器（可滚动，gridRt 本身用 fill anchor 不动）
+            var scrollContent = MakeRect("ScrollContent", gridRt, 0, 0, pw, ph);
+            // 不裁剪内容
+            var scrollImg = scrollContent.gameObject.AddComponent<Image>();
+            scrollImg.color = new Color(0, 0, 0, 0);  // 透明
+            scrollImg.raycastTarget = false;
+            _overviewScrollY = 0;
+            _overviewContentHeight = 0;
+
+            // 后续所有内容都画在 scrollContent 上
+
+            // ====== 3 大区域 ======
+            // Zone 1 (左): 人物轮廓 + 装备槽位
+            // Zone 2 (中): 装备容器网格 + C5
+            // Zone 3 (右): 背包 + 属性
+
+            float z1w = pw * 0.38f;
+            float z2w = pw * 0.40f;
+            float z3w = pw - z1w - z2w - m * 2 - sp * 2;
+
+            float z1x = m;
+            float z2x = z1x + z1w + sp;
+            float z3x = z2x + z2w + sp;
+
+            // === Zone 1: 人物(左) + 装备槽位(右) ===
+            float col0w = z1w * 0.45f;
+            var previewBg = MakeRect("PreviewBg", scrollContent, z1x, 0, col0w, ph - m * 2);
+            CreateBodyPreview(previewBg.transform, view);
+
+            float col1x = z1x + col0w;
+            float col1w = z1w - col0w;
+            DrawEquipSlots(scrollContent, col1x, col1w, view, m, ph);
+
+            // === Zone 2: 装备容器网格 — 先搭骨架再填充 ===
+            var zone2 = MakeRect("Zone2", scrollContent, z2x, 0, z2w, ph - m * 2);
+            
+            // 获取所有装备容器
+            var topsCon = _inventory.GetContainer(EquipSlot.Tops);
+            var pantsCon = _inventory.GetContainer(EquipSlot.Pants);
+            var beltCon = _inventory.GetContainer(EquipSlot.Belt);
+            var vestCon = _inventory.GetContainer(EquipSlot.Vest);
+            
+            float z2HalfW = z2w * 0.5f - 2;
+            var z2Left = MakeRect("Z2_Left", zone2, 0, 0, z2HalfW, ph - m * 2);
+            var z2Right = MakeRect("Z2_Right", zone2, z2w * 0.5f + 2, 0, z2HalfW, ph - m * 2);
+            float cs = 32f;    // cell size
+            
+            // === 左列：上衣口袋 + 裤子口袋 ===
+            float ly = -m;
+            DrawEquipArea(z2Left, GetEquipName(view, EquipSlot.Tops), topsCon,
+                ref ly, z2HalfW, cs, labelH, view, EquipSlot.Tops);
+            ly -= sp;
+            DrawEquipArea(z2Left, GetEquipName(view, EquipSlot.Pants), pantsCon,
+                ref ly, z2HalfW, cs, labelH, view, EquipSlot.Pants);
+            float leftBottom = ly;
+            
+            // === 右列：腰带 + 胸挂 ===
+            float ry = -m;
+            DrawEquipArea(z2Right, GetEquipName(view, EquipSlot.Belt), beltCon,
+                ref ry, z2HalfW, cs, labelH, view, EquipSlot.Belt);
+            ry -= sp;
+            DrawEquipArea(z2Right, GetEquipName(view, EquipSlot.Vest), vestCon,
+                ref ry, z2HalfW, cs, labelH, view, EquipSlot.Vest);
+            float rightBottom = ry;
+            
+            // === C5 占位区 ===
+            float z2LowestY = Mathf.Min(leftBottom, rightBottom) - m;
+            float c5H = Mathf.Abs(-(ph - m * 2) - z2LowestY);
+            if (c5H > 30f)
+            {
+                var c5Rt = MakeRect("C5_Placeholder", zone2, 0, z2LowestY, z2w, c5H);
+                var c5Img = c5Rt.gameObject.AddComponent<Image>();
+                c5Img.color = new Color(0.1f, 0.1f, 0.12f, 0.5f);
+                c5Img.raycastTarget = false;
+                var c5Txt = MakeChildText("C5Label", c5Rt, 0, 0, z2w, 20f);
+                c5Txt.text = "C5 (预留)";
+                c5Txt.fontSize = 12;
+                c5Txt.color = new Color(0.3f, 0.3f, 0.3f);
+                c5Txt.alignment = TextAnchor.MiddleCenter;
+            }
+
+            // === Zone 3: 背包(骨架式) + 属性 ===
+            var zone3 = MakeRect("Zone3", scrollContent, z3x, 0, z3w, ph - m * 2);
+            float c4y = -m;
+            var backpackCon = _inventory.GetContainer(EquipSlot.Backpack);
+            if (backpackCon != null)
+            {
+                DrawEquipArea(zone3, GetEquipName(view, EquipSlot.Backpack), backpackCon,
+                    ref c4y, z3w, 32f, labelH, view, EquipSlot.Backpack);
+            }
+            else
+            {
+                c4y -= 20f;
+            }
+
+            // 属性面板
+            float statsY = c4y - m;
+            float statsH = Mathf.Abs(-(ph - m * 2) - statsY);
+            if (statsH > 30f)
+            {
+                var statsRt = MakeRect("StatsArea", zone3, 0, statsY, z3w, statsH);
+                var statsImg = statsRt.gameObject.AddComponent<Image>();
+                statsImg.color = new Color(0.12f, 0.12f, 0.15f, 0.6f);
+                statsImg.raycastTarget = false;
+
+                float curY = -m * 0.5f;
+                CreateStatRow(statsRt.transform, "护甲", view.totalArmor.ToString("F0"), z3w, 20f, 0, curY);
+                curY -= 22f;
+                CreateStatRow(statsRt.transform, "保暖", view.totalWarmth.ToString("F1") + " \xB0C", z3w, 20f, 0, curY);
+            }
+
+            // 计算内容总高度并存储引用
+            float lowestY = 0;
+            foreach (Transform child in scrollContent)
+            {
+                var rt = child as RectTransform;
+                if (rt == null) continue;
+                float bottomY = rt.anchoredPosition.y - rt.sizeDelta.y;
+                if (bottomY < lowestY) lowestY = bottomY;
+            }
+            _overviewContentHeight = Mathf.Max(0, Mathf.Abs(lowestY) + m - ph);
+            _overviewScrollContent = scrollContent;
+            // 设置内容容器高度自动适配
+            scrollContent.sizeDelta = new Vector2(pw, Mathf.Abs(lowestY) + m + ph);
+
+            if (DragDropManager.Instance != null)
+                DragDropManager.Instance.RefreshSelectionBorder();
+        }
+
+        /// <summary>
+        /// 绘制装备槽位（头、上衣/胸挂/防弹、裤、腰、背）
+        /// 每个槽位是 2×2 格子，双击卸下
+        /// </summary>
+        void DrawEquipSlots(RectTransform parent, float colX, float colW, InventoryViewData view, float m, float ph)
+        {
+            float cell = Mathf.Min(colW * 0.3f, 44f);
+            float labelH = 14f;
+            float gap = 4f;
+
+            float tripleCell = Mathf.Min(colW * 0.28f, 38f);
+            float tripleRowW = tripleCell * 3 + 4f * 2;
+            float tripleStartX = colX + (colW - tripleRowW) * 0.5f;
+
+            float curY = -m - labelH;
+
+            // 装备区背景
+            var equipBg = MakeRect("EquipBg", parent, colX, -m, colW, ph - m * 2);
+            var bgImg = equipBg.gameObject.AddComponent<Image>();
+            bgImg.color = new Color(0.08f, 0.08f, 0.1f, 0.5f);
+            bgImg.raycastTarget = false;
+            equipBg.SetAsFirstSibling();
+
+            // 检查腰带是否已装备（决定小刀/手枪位是否解锁）
+            bool beltEquipped = view.equippedNames != null
+                && view.equippedNames.ContainsKey(EquipSlot.Belt)
+                && !string.IsNullOrEmpty(view.equippedNames[EquipSlot.Belt]);
+
+            // 画每个槽位
+            DrawOneSlot(parent, "头", EquipSlot.Head, view,
+                colX + (colW - cell) * 0.5f, curY, cell, labelH, false);
+            curY -= cell + labelH + gap;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var slotLabel = new[] { "上衣", "胸挂", "防弹" }[i];
+                var eqSlot = new[] { EquipSlot.Tops, EquipSlot.Vest, EquipSlot.BodyArmor }[i];
+                float sx = tripleStartX + i * (tripleCell + 4f);
+                DrawOneSlot(parent, slotLabel, eqSlot, view, sx, curY, tripleCell, labelH, false);
+            }
+            curY -= tripleCell + labelH + gap;
+
+            DrawOneSlot(parent, "裤", EquipSlot.Pants, view,
+                colX + (colW - cell) * 0.5f, curY, cell, labelH, false);
+            curY -= cell + labelH + gap;
+
+            DrawOneSlot(parent, "腰", EquipSlot.Belt, view,
+                colX + (colW - cell) * 0.5f, curY, cell, labelH, false);
+            curY -= cell + labelH + gap;
+
+            // 武器槽（主武+副武一行排列，小刀+手枪一行排列）
+            float weaponCell = Mathf.Min(colW * 0.38f, 42f);
+            float weaponRowW = weaponCell * 2 + 4f;
+            float weaponStartX = colX + (colW - weaponRowW) * 0.5f;
+
+            DrawOneSlot(parent, "主武", EquipSlot.RightHand, view,
+                weaponStartX, curY, weaponCell, labelH, false);
+            DrawOneSlot(parent, "副武", EquipSlot.LeftHand, view,
+                weaponStartX + weaponCell + 4f, curY, weaponCell, labelH, false);
+            curY -= weaponCell + labelH + gap;
+
+            DrawOneSlot(parent, "小刀", EquipSlot.KnifeBelt, view,
+                weaponStartX, curY, weaponCell, labelH, !beltEquipped);
+            DrawOneSlot(parent, "手枪", EquipSlot.SidearmBelt, view,
+                weaponStartX + weaponCell + 4f, curY, weaponCell, labelH, !beltEquipped);
+            curY -= weaponCell + labelH + gap;
+
+            DrawOneSlot(parent, "背", EquipSlot.Backpack, view,
+                colX + (colW - cell) * 0.5f, curY, cell, labelH, false);
+        }
+
+        void DrawOneSlot(RectTransform parent, string slotName, EquipSlot slot, InventoryViewData view,
+            float x, float y, float sz, float labelH, bool locked = false)
+        {
+            bool hasItem = !locked && view.equippedNames != null && view.equippedNames.ContainsKey(slot)
+                && !string.IsNullOrEmpty(view.equippedNames[slot]);
+            string equipName = hasItem ? view.equippedNames[slot] : "";
+
+            // 文字在上层
+            var lbl = MakeChildText("L_" + slotName, parent, x, y, sz, labelH);
+            lbl.text = locked ? $"{slotName}(锁)" : slotName;
+            lbl.fontSize = 10;
+            lbl.color = locked ? new Color(0.3f, 0.3f, 0.3f) : new Color(0.6f, 0.6f, 0.6f);
+            lbl.alignment = TextAnchor.MiddleCenter;
+
+            // 格子在下层（紧贴文字下方）
+            float cellY = y + labelH;
+            var cellRt = MakeRect(slotName + "_slot", parent, x, cellY, sz, sz);
+            var cellImg = cellRt.gameObject.AddComponent<Image>();
+            cellImg.color = locked ? new Color(0.06f, 0.06f, 0.08f, 0.6f) : new Color(0.12f, 0.12f, 0.15f, 0.9f);
+            cellImg.raycastTarget = true;
+
+            if (locked) return; // 锁定不响应任何操作
+
+            if (hasItem)
+            {
+                var nTxt = MakeChildText("N", cellRt, 0, 0, sz, sz);
+                nTxt.text = equipName;
+                nTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(sz * 0.16f, 8f, 12f));
+                nTxt.alignment = TextAnchor.MiddleCenter;
+                nTxt.color = Color.white;
+                nTxt.resizeTextForBestFit = true;
+                nTxt.resizeTextMinSize = 6;
+                nTxt.resizeTextMaxSize = nTxt.fontSize;
+            }
+
+            var btn = cellRt.gameObject.AddComponent<Button>();
+            btn.onClick.AddListener(() => OnEquipSlotDoubleClick(slot));
+
+            var container = _inventory?.GetContainer(slot);
+            if (DragDropManager.Instance != null)
+            {
+                if (container != null)
+                    DragDropManager.Instance.RegisterEquipSlot(cellRt, container, 0, 0, slot);
+                else if (Inv.IsWeaponSlot(slot))
+                    DragDropManager.Instance.RegisterEquipSlot(cellRt, null, 0, 0, slot);
+            }
+        }
+
+        /// <summary> 双击装备槽卸下回背包 </summary>
+        void OnEquipSlotDoubleClick(EquipSlot slot)
+        {
+            if (_inventory == null) return;
+            var item = _inventory.UnequipSlot(slot);
+            if (item != null)
+                SpawnEquipDrop(item, slot);
+            RefreshOverview();
+        }
+
+        /// <summary> 在玩家面前丢出装备物品（不经过背包容器）</summary>
+        void SpawnEquipDrop(ItemData item, EquipSlot slot)
+        {
+            if (item == null) return;
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+
+            var go = new GameObject($"World_{item.itemName}");
+            go.transform.position = player.transform.position + player.transform.forward * 1.2f + Vector3.up * 0.1f;
+            var wi = go.AddComponent<_Game.Systems.WorldContainer.WorldItem>();
+            wi.itemData = item;
+            wi.count = 1;
+        }
+
+        /// <summary> 创建文字子对象（无Image，同MakeRect风格）</summary>
+        Text MakeChildText(string name, RectTransform parent, float x, float y, float w, float h)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0, 1);
+            rt.sizeDelta = new Vector2(w, h);
+            rt.anchoredPosition = new Vector2(x, y);
+            var txt = go.AddComponent<Text>();
+            txt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            txt.raycastTarget = false;
+            return txt;
+        }
+
+        /// <summary> 创建一个 RectTransform 子对象（绝对定位，top-left 对齐）</summary>
+        RectTransform MakeRect(string name, RectTransform parent, float x, float y, float w, float h)
+        {
+            var go = new GameObject(name, typeof(RectTransform));
+            go.transform.SetParent(parent, false);
+            var rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0, 1);
+            rt.sizeDelta = new Vector2(w, h);
+            rt.anchoredPosition = new Vector2(x, y);
+            return rt;
+        }
+
+        /// <summary> 精确坐标绘制容器格子（GridLayoutGroup 废弃版）</summary>
+        float BuildContainerGrid(Transform parent, InventoryContainer container,
+            float parentW, ref float y, bool isGrid, float cellSize, float spacing, float labelH,
+            bool isHardOverloaded = false, string equippedItemName = null)
+        {
+            if (container == null) return y;
+            string displayName = container.containerName;
+            float used = container.UsedCells;
+            float total = container.TotalCells;
+
+            // 容器标签
+            string labelSuffix = "";
+            if (!string.IsNullOrEmpty(equippedItemName))
+                labelSuffix = $" ({equippedItemName})";
+            else if (total > 0)
+                labelSuffix = $"  {used}/{total}";
+            var label = MakeRect("L_" + displayName, parent.GetComponent<RectTransform>(), 0, y, parentW, labelH);
+            var labelTxt = label.gameObject.AddComponent<Text>();
+            labelTxt.text = total > 0 ? $"{displayName}{labelSuffix}" : displayName;
+            labelTxt.font = GetFont();
+            labelTxt.fontSize = 12;
+            labelTxt.alignment = TextAnchor.MiddleLeft;
+            labelTxt.color = new Color(0.6f, 0.6f, 0.6f);
+            y -= labelH;
+
+            if (total == 0)
+            {
+                // 未装备
+                var emptyRt = MakeRect("Empty", parent.GetComponent<RectTransform>(), 0, y, parentW, cellSize);
+                var emptyTxt = emptyRt.gameObject.AddComponent<Text>();
+                emptyTxt.text = "未装备";
+                emptyTxt.font = GetFont();
+                emptyTxt.fontSize = 10;
+                emptyTxt.color = new Color(0.4f, 0.4f, 0.4f);
+                emptyTxt.alignment = TextAnchor.MiddleCenter;
+                y -= cellSize + 1;
+                return y;
+            }
+
+            Color fillColor = isHardOverloaded ? overloadColor : occupiedColor;
+            Color equipColor = new Color(0.15f, 0.35f, 0.25f, 0.9f);
+
+            if (isGrid)
+            {
+                // 网格：每格精确坐标，独立着色
+                for (int cy = 0; cy < container.gridHeight; cy++)
+                    for (int cx = 0; cx < container.gridWidth; cx++)
+                    {
+                        float cellX = cx * (cellSize + spacing);
+                        float cellY = y - cy * (cellSize + spacing);
+
+                        var cellRt = MakeRect("G_" + cx + "_" + cy,
+                            parent.GetComponent<RectTransform>(), cellX, cellY, cellSize, cellSize);
+                        var cellImg = cellRt.gameObject.AddComponent<Image>();
+                        cellImg.raycastTarget = true;
+
+                        bool occupied = false;
+                        PlacedItem? placedAt = null;
+                        foreach (var p in container.placedItems)
+                            if (cx >= p.gridX && cx < p.gridX + p.GridWidth &&
+                                cy >= p.gridY && cy < p.gridY + p.GridHeight)
+                            { occupied = true; placedAt = p; break; }
+
+                        bool isEquipSlot = !occupied && !string.IsNullOrEmpty(equippedItemName)
+                            && container.gridWidth == 1 && container.gridHeight == 1;
+                        cellImg.color = occupied ? fillColor : (isEquipSlot ? equipColor : emptyColor);
+
+                        if (DragDropManager.Instance != null)
+                            DragDropManager.Instance.RegisterCellRect(cellRt, container, cx, cy);
+
+                        if (isEquipSlot)
+                        {
+                            // 显示已装备物品（不注册拖拽，暂不支持从装备槽拖出）
+                            var nameRt = MakeRect("EQ_" + equippedItemName,
+                                parent.GetComponent<RectTransform>(), cellX, cellY, cellSize, cellSize);
+                            nameRt.SetAsLastSibling();
+                            var nameImg = nameRt.gameObject.AddComponent<Image>();
+                            nameImg.color = equipColor;
+                            nameImg.raycastTarget = false;
+
+                            var txtObj = new GameObject("Name", typeof(Text));
+                            txtObj.transform.SetParent(nameRt, false);
+                            var txtRt = txtObj.GetComponent<RectTransform>();
+                            txtRt.anchorMin = Vector2.zero;
+                            txtRt.anchorMax = Vector2.one;
+                            txtRt.offsetMin = Vector2.zero;
+                            txtRt.offsetMax = Vector2.zero;
+                            var equipTxt = txtObj.GetComponent<Text>();
+                            equipTxt.text = equippedItemName;
+                            equipTxt.font = GetFont();
+                            equipTxt.fontSize = 8;
+                            equipTxt.alignment = TextAnchor.MiddleCenter;
+                            equipTxt.color = Color.white;
+                            equipTxt.resizeTextForBestFit = true;
+                            equipTxt.resizeTextMinSize = 7;
+                            equipTxt.resizeTextMaxSize = 11;
+                        }
+                        else if (occupied && placedAt.HasValue && !placedAt.Value.isGhost
+                            && placedAt.Value.gridX == cx && placedAt.Value.gridY == cy)
+                        {
+                            var item = placedAt.Value;
+
+                            // --- 物品名称/数量覆盖层（兄弟节点，与cell同级）---
+                            float overlayW = item.GridWidth * cellSize + (item.GridWidth - 1) * spacing;
+                            float overlayH = item.GridHeight * cellSize + (item.GridHeight - 1) * spacing;
+
+                            var overlayRt = MakeRect("OV_" + item.itemData.itemName,
+                                parent.GetComponent<RectTransform>(), cellX, cellY, overlayW, overlayH);
+                            overlayRt.SetAsLastSibling();
+
+                            var overlayImg = overlayRt.gameObject.AddComponent<Image>();
+                            overlayImg.color = fillColor;
+                            overlayImg.raycastTarget = false;
+
+                            float nameH = overlayH * 0.65f;
+                            var nameRt = MakeRect("Name", overlayRt, 0, 0, overlayW, nameH);
+                            var nameTxt = nameRt.gameObject.AddComponent<Text>();
+                            nameTxt.text = item.itemData.itemName;
+                            nameTxt.font = GetFont();
+                            nameTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayW * 0.16f, 8f, 18f));
+                            nameTxt.alignment = TextAnchor.MiddleCenter;
+                            nameTxt.color = Color.white;
+                            nameTxt.fontStyle = FontStyle.Bold;
+                            nameTxt.raycastTarget = false;
+                            nameTxt.resizeTextForBestFit = true;
+                            nameTxt.resizeTextMinSize = 7;
+                            nameTxt.resizeTextMaxSize = nameTxt.fontSize;
+
+                            // 数量 xN
+                            {
+                                float cntW = overlayW * 0.55f;
+                                float cntH = overlayH * 0.4f;
+                                float cntX = overlayW - cntW;
+                                float cntY = -(overlayH - cntH);
+                                var cntRt = MakeRect("Count", overlayRt, cntX, cntY, cntW, cntH);
+                                var cntTxt = cntRt.gameObject.AddComponent<Text>();
+                                cntTxt.text = $"x{item.count}";
+                                cntTxt.font = GetFont();
+                                cntTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayH * 0.28f, 8f, 14f));
+                                cntTxt.alignment = TextAnchor.LowerRight;
+                                cntTxt.color = Color.yellow;
+                                cntTxt.fontStyle = FontStyle.Bold;
+                                cntTxt.raycastTarget = false;
+                                cntTxt.resizeTextForBestFit = true;
+                                cntTxt.resizeTextMinSize = 7;
+                                cntTxt.resizeTextMaxSize = cntTxt.fontSize;
+                            }
+
+                            var drag = cellRt.gameObject.AddComponent<ItemDragHandler>();
+                            drag.Setup(item, container, cx, cy, overlayRt);
+
+                        }
+                    }
+                y -= container.gridHeight * (cellSize + spacing);
+            }
+            else
+            {
+                // 横条：显示所有网格格子（一行排开）
+                int totalCells = container.gridWidth * container.gridHeight;
+                for (int i = 0; i < totalCells; i++)
+                {
+                    int cx = i % container.gridWidth;
+                    int cy = i / container.gridWidth;
+                    float cellX = i * (cellSize + spacing);
+                    float cellY = y;
+
+                    var slotRt = MakeRect("H_" + displayName + "_" + i,
+                        parent.GetComponent<RectTransform>(), cellX, cellY, cellSize, cellSize);
+                    var slotImg = slotRt.gameObject.AddComponent<Image>();
+                    slotImg.raycastTarget = true;
+
+                    bool occupied = false;
+                    PlacedItem? placedAt = null;
+                    foreach (var p in container.placedItems)
+                        if (cx >= p.gridX && cx < p.gridX + p.GridWidth &&
+                            cy >= p.gridY && cy < p.gridY + p.GridHeight)
+                        { occupied = true; placedAt = p; break; }
+
+                    slotImg.color = occupied ? fillColor : emptyColor;
+
+                    if (DragDropManager.Instance != null)
+                        DragDropManager.Instance.RegisterCellRect(slotRt, container, cx, cy);
+
+                    if (occupied && placedAt.HasValue && !placedAt.Value.isGhost && placedAt.Value.gridX == cx && placedAt.Value.gridY == cy)
+                    {
+                        if (placedAt.Value.itemData.icon != null)
+                        {
+                            var iconObj = new GameObject("Icon", typeof(Image));
+                            iconObj.transform.SetParent(slotRt, false);
+                            var iconRt = iconObj.GetComponent<RectTransform>();
+                            iconRt.anchorMin = Vector2.zero;
+                            iconRt.anchorMax = Vector2.one;
+                            iconRt.offsetMin = Vector2.zero;
+                            iconRt.offsetMax = Vector2.zero;
+                            var iconImg = iconObj.GetComponent<Image>();
+                            iconImg.sprite = placedAt.Value.itemData.icon;
+                            iconImg.preserveAspect = true;
+                        }
+
+                        var drag = slotRt.gameObject.AddComponent<ItemDragHandler>();
+                        drag.Setup(placedAt.Value, container, placedAt.Value.gridX, placedAt.Value.gridY);
+                    }
+                }
+
+                y -= cellSize + spacing;
+            }
+
+            return y;
+        }
+
+        /// <summary>
+        /// 绘制装备区域（骨架+填充两遍式）
+        /// 先画标签和空网格骨架，再填充已放置物品
+        /// </summary>
+        void DrawEquipArea(RectTransform parent, string equipName, InventoryContainer container,
+            ref float y, float parentW, float cellSize, float labelH, InventoryViewData view, EquipSlot slot)
+        {
+            if (container == null) return;
+            string displayName = container.containerName;
+            int gh = container.gridHeight;
+            int gw = container.gridWidth;
+            float spacing = 1f;
+            bool hasItem = !string.IsNullOrEmpty(equipName);
+
+            // 第一遍：骨架（标签 + 空网格背景）
+            // --- 标签 ---
+            string labelText = displayName;
+            if (hasItem) labelText += $" ({equipName})";
+            else if (container.TotalCells > 0) labelText += $"  {container.UsedCells}/{container.TotalCells}";
+            
+            var labelRt = MakeRect("LB_" + displayName, parent, 0, y, parentW, labelH);
+            var labelImg = labelRt.gameObject.AddComponent<Image>();
+            labelImg.color = new Color(0.10f, 0.10f, 0.12f, 0.8f);
+            labelImg.raycastTarget = false;
+            var labelTxtObj = new GameObject("LTxt", typeof(Text));
+            labelTxtObj.transform.SetParent(labelRt, false);
+            var ltRt = labelTxtObj.GetComponent<RectTransform>();
+            ltRt.anchorMin = Vector2.zero;
+            ltRt.anchorMax = Vector2.one;
+            ltRt.offsetMin = Vector2.zero;
+            ltRt.offsetMax = Vector2.zero;
+            var lt = labelTxtObj.GetComponent<Text>();
+            lt.text = labelText;
+            lt.font = GetFont();
+            lt.fontSize = 12;
+            lt.alignment = TextAnchor.MiddleLeft;
+            lt.color = hasItem ? new Color(0.7f, 0.8f, 0.7f) : new Color(0.5f, 0.5f, 0.5f);
+            
+            y -= labelH;
+
+            // --- 网格骨架 ---
+            // 先画整个区域的暗色背景
+            float gridAreaH = gh * cellSize + (gh - 1) * spacing;
+            var bgRt = MakeRect("BG_" + displayName, parent, 0, y, parentW, gridAreaH);
+            var bgImg = bgRt.gameObject.AddComponent<Image>();
+            bgImg.color = new Color(0.06f, 0.06f, 0.08f, 0.6f);
+            bgImg.raycastTarget = false;
+
+            // 画每个格子（空槽位，暗色）
+            for (int cy = 0; cy < gh; cy++)
+            {
+                for (int cx = 0; cx < gw; cx++)
+                {
+                    float cellX = cx * (cellSize + spacing);
+                    float cellY = y - cy * (cellSize + spacing);
+                    
+                    var cellRt = MakeRect("C_" + displayName + "_" + cx + "_" + cy,
+                        parent, cellX, cellY, cellSize, cellSize);
+                    var cellImg = cellRt.gameObject.AddComponent<Image>();
+                    cellImg.color = new Color(0.12f, 0.12f, 0.15f, 0.9f);
+                    cellImg.raycastTarget = true;
+
+                    if (DragDropManager.Instance != null)
+                        DragDropManager.Instance.RegisterCellRect(cellRt, container, cx, cy);
+
+                    // 第二遍：填充已有物品
+                    bool occupied = false;
+                    PlacedItem? placedAt = null;
+                    foreach (var p in container.placedItems)
+                    {
+                        if (cx >= p.gridX && cx < p.gridX + p.GridWidth &&
+                            cy >= p.gridY && cy < p.gridY + p.GridHeight)
+                        {
+                            if (p.gridX == cx && p.gridY == cy)
+                            { occupied = true; placedAt = p; }
+                            cellImg.color = new Color(0.2f, 0.25f, 0.2f, 0.9f);
+                            break;
+                        }
+                    }
+
+                    // 装备了物品但网格为空（1x1装备槽，双击脱下用）
+                    bool isEquipSlot = !occupied && hasItem && gw == 1 && gh == 1;
+                    if (isEquipSlot)
+                        cellImg.color = new Color(0.15f, 0.3f, 0.2f, 0.9f);
+
+                    if (occupied && placedAt.HasValue && !placedAt.Value.isGhost
+                        && placedAt.Value.gridX == cx && placedAt.Value.gridY == cy)
+                    {
+                        var item = placedAt.Value;
+
+                        float overlayW = item.GridWidth * cellSize + (item.GridWidth - 1) * spacing;
+                        float overlayH = item.GridHeight * cellSize + (item.GridHeight - 1) * spacing;
+                        var overlayRt = MakeRect("OV_" + item.itemData.itemName,
+                            parent, cellX, cellY, overlayW, overlayH);
+                        overlayRt.SetAsLastSibling();
+                        var oImg = overlayRt.gameObject.AddComponent<Image>();
+                        oImg.color = view.isHardOverloaded
+                            ? new Color(0.4f, 0.2f, 0.2f, 0.9f)
+                            : new Color(0.25f, 0.3f, 0.2f, 0.9f);
+                        oImg.raycastTarget = false;
+
+                        float nameH = overlayH * 0.65f;
+                        var nameRt = MakeRect("Name", overlayRt, 0, 0, overlayW, nameH);
+                        var nTxt = nameRt.gameObject.AddComponent<Text>();
+                        nTxt.text = item.itemData.itemName;
+                        nTxt.font = GetFont();
+                        nTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayW * 0.16f, 8f, 18f));
+                        nTxt.alignment = TextAnchor.MiddleCenter;
+                        nTxt.color = Color.white;
+                        nTxt.fontStyle = FontStyle.Bold;
+                        nTxt.raycastTarget = false;
+                        nTxt.resizeTextForBestFit = true;
+                        nTxt.resizeTextMinSize = 7;
+                        nTxt.resizeTextMaxSize = nTxt.fontSize;
+
+                        float cntW = overlayW * 0.55f;
+                        float cntH = overlayH * 0.4f;
+                        float cntX = overlayW - cntW;
+                        float cntY2 = -(overlayH - cntH);
+                        var cntRt = MakeRect("Cnt", overlayRt, cntX, cntY2, cntW, cntH);
+                        var cTxt = cntRt.gameObject.AddComponent<Text>();
+                        cTxt.text = $"x{item.count}";
+                        cTxt.font = GetFont();
+                        cTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayH * 0.28f, 8f, 14f));
+                        cTxt.alignment = TextAnchor.LowerRight;
+                        cTxt.color = Color.yellow;
+                        cTxt.fontStyle = FontStyle.Bold;
+                        cTxt.raycastTarget = false;
+                        cTxt.resizeTextForBestFit = true;
+                        cTxt.resizeTextMinSize = 7;
+                        cTxt.resizeTextMaxSize = cTxt.fontSize;
+
+                        var drag = cellRt.gameObject.AddComponent<ItemDragHandler>();
+                        drag.Setup(item, container, cx, cy, overlayRt);
+
+                    }
+                }
+            }
+            y -= gridAreaH;
+        }
+
+        void AddSelectionBorder(RectTransform overlayRt, float w, float h)
+        {
+            int bw = 2;
+            var top = MakeRect("SelTop", overlayRt, 0, 0, w, bw);
+            top.gameObject.AddComponent<Image>().color = Color.white;
+            top.GetComponent<Image>().raycastTarget = false;
+
+            var bot = MakeRect("SelBot", overlayRt, 0, -(h - bw), w, bw);
+            bot.gameObject.AddComponent<Image>().color = Color.white;
+            bot.GetComponent<Image>().raycastTarget = false;
+
+            var left = MakeRect("SelLeft", overlayRt, 0, -bw, bw, h - bw * 2);
+            left.gameObject.AddComponent<Image>().color = Color.white;
+            left.GetComponent<Image>().raycastTarget = false;
+
+            var right = MakeRect("SelRight", overlayRt, w - bw, -bw, bw, h - bw * 2);
+            right.gameObject.AddComponent<Image>().color = Color.white;
+            right.GetComponent<Image>().raycastTarget = false;
+        }
+
+        void CreatePlaceholderSlot(Transform parent, string text, Color bgColor)
+        {
+            var obj = new GameObject($"PH_{text}", typeof(Image), typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            var img = obj.GetComponent<Image>();
+            img.color = bgColor;
+
+            var txtObj = new GameObject("Label", typeof(Text));
+            txtObj.transform.SetParent(obj.transform, false);
+            var txtRt = txtObj.GetComponent<RectTransform>();
+            txtRt.anchorMin = Vector2.zero;
+            txtRt.anchorMax = Vector2.one;
+            txtRt.offsetMin = Vector2.zero;
+            txtRt.offsetMax = Vector2.zero;
+            var txt = txtObj.GetComponent<Text>();
+            txt.text = text;
+            txt.fontSize = 12;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = new Color(0.6f, 0.6f, 0.6f);
+        }
+
+        void CreateSideMiniGrid(Transform parent, InventoryContainer container)
+        {
+            // 容器名
+            var nameObj = new GameObject($"N_{container.containerName}", typeof(Text));
+            nameObj.transform.SetParent(parent, false);
+            var nameTxt = nameObj.GetComponent<Text>();
+            nameTxt.text = $"{container.containerName}  {container.UsedCells}/{container.TotalCells}";
+            nameTxt.fontSize = 11;
+            nameTxt.alignment = TextAnchor.MiddleCenter;
+            nameTxt.color = Color.white;
+
+            // 网格
+            var gridObj = new GameObject($"G_{container.containerName}", typeof(RectTransform));
+            gridObj.transform.SetParent(parent, false);
+            var grid = gridObj.AddComponent<GridLayoutGroup>();
+            grid.childAlignment = TextAnchor.MiddleCenter;
+
+            float spacing = 1f;
+            float cell = Mathf.Floor(22f);
+
+            grid.cellSize = new Vector2(cell, cell);
+            grid.spacing = new Vector2(spacing, spacing);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = container.gridWidth;
+
+            float gridW = cell * container.gridWidth + spacing * (container.gridWidth - 1);
+            float gridH = cell * container.gridHeight + spacing * (container.gridHeight - 1);
+            var gr = gridObj.GetComponent<RectTransform>();
+            gr.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, gridW);
+            gr.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, gridH);
+
+            Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+            for (int y = 0; y < container.gridHeight; y++)
+                for (int x = 0; x < container.gridWidth; x++)
+                {
+                    var cellObj = new GameObject($"c_{x}_{y}", typeof(Image));
+                    cellObj.transform.SetParent(gridObj.transform, false);
+                    var cellImg = cellObj.GetComponent<Image>();
+                    bool occupied = false;
+                    PlacedItem? placedAt = null;
+                    foreach (var p in container.placedItems)
+                        if (x >= p.gridX && x < p.gridX + p.GridWidth &&
+                            y >= p.gridY && y < p.gridY + p.GridHeight)
+                        { occupied = true; placedAt = p; break; }
+                    cellImg.color = occupied ? fillColor : emptyColor;
+
+                    if (DragDropManager.Instance != null)
+                        DragDropManager.Instance.RegisterCellRect(cellObj.GetComponent<RectTransform>(), container, x, y);
+
+                    if (occupied && placedAt.HasValue && !placedAt.Value.isGhost
+                        && placedAt.Value.gridX == x && placedAt.Value.gridY == y)
+                    {
+                        var drag = cellObj.AddComponent<ItemDragHandler>();
+                        drag.Setup(placedAt.Value, container, x, y);
+                    }
+                }
+        }
+
+        /// <summary>
+        /// 横向物品条（上衣/裤子专用，每个已放置物品显示一格）
+        /// </summary>
+        void CreateHorizontalStrip(Transform parent, InventoryContainer container)
+        {
+            var nameObj = new GameObject($"NH_{container.containerName}", typeof(Text));
+            nameObj.transform.SetParent(parent, false);
+            var nameTxt = nameObj.GetComponent<Text>();
+            nameTxt.text = $"{container.containerName}  {container.UsedCells}/{container.TotalCells}";
+            nameTxt.fontSize = 11;
+            nameTxt.alignment = TextAnchor.MiddleCenter;
+            nameTxt.color = Color.white;
+
+            int itemCount = container.placedItems.Count;
+            int displayCount = Mathf.Max(itemCount, 1);
+            float cellSize = 28f;
+            float spacing = 2f;
+            float totalW = displayCount * cellSize + (displayCount - 1) * spacing;
+
+            var stripObj = new GameObject($"HS_{container.containerName}", typeof(RectTransform));
+            stripObj.transform.SetParent(parent, false);
+            var stripRt = stripObj.GetComponent<RectTransform>();
+            stripRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, totalW);
+            stripRt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, cellSize);
+
+            var glg = stripObj.AddComponent<GridLayoutGroup>();
+            glg.cellSize = new Vector2(cellSize, cellSize);
+            glg.spacing = new Vector2(spacing, 0);
+            glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            glg.constraintCount = displayCount;
+
+            Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+            foreach (var p in container.placedItems)
+            {
+                if (p.isGhost) continue;
+
+                var slotObj = new GameObject("HSlot", typeof(Image));
+                slotObj.transform.SetParent(stripObj.transform, false);
+                var img = slotObj.GetComponent<Image>();
+                img.color = fillColor;
+
+                if (p.itemData != null && p.itemData.icon != null)
+                {
+                    var iconObj = new GameObject("HIcon", typeof(Image));
+                    iconObj.transform.SetParent(slotObj.transform, false);
+                    var iconRt = iconObj.GetComponent<RectTransform>();
+                    iconRt.anchorMin = Vector2.zero;
+                    iconRt.anchorMax = Vector2.one;
+                    iconRt.offsetMin = Vector2.zero;
+                    iconRt.offsetMax = Vector2.zero;
+                    var iconImg = iconObj.GetComponent<Image>();
+                    iconImg.sprite = p.itemData.icon;
+                    iconImg.preserveAspect = true;
+                }
+
+                // 添加拖拽
+                var drag = slotObj.AddComponent<ItemDragHandler>();
+                drag.Setup(p, container, p.gridX, p.gridY);
+            }
+
+            if (itemCount == 0)
+            {
+                var emptySlot = new GameObject("HEmpty", typeof(Image));
+                emptySlot.transform.SetParent(stripObj.transform, false);
+                emptySlot.GetComponent<Image>().color = emptyColor;
+            }
+        }
+
+        void CreateBottomBackpackGrid(Transform parent, InventoryContainer container, float cell, float spacing, float margin)
+        {
+            var gridObj = new GameObject("BackpackGrid", typeof(RectTransform));
+            gridObj.transform.SetParent(parent, false);
+
+            var grid = gridObj.AddComponent<GridLayoutGroup>();
+            grid.childAlignment = TextAnchor.MiddleCenter;
+
+            grid.cellSize = new Vector2(cell, cell);
+            grid.spacing = new Vector2(spacing, spacing);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = container.gridWidth;
+
+            float gridW = cell * container.gridWidth + spacing * (container.gridWidth - 1);
+            float gridH = cell * container.gridHeight + spacing * (container.gridHeight - 1);
+            var gr = gridObj.GetComponent<RectTransform>();
+            gr.anchorMin = new Vector2(0.5f, 0);
+            gr.anchorMax = new Vector2(0.5f, 0);
+            gr.pivot = new Vector2(0.5f, 0);
+            gr.sizeDelta = new Vector2(gridW, gridH);
+            gr.anchoredPosition = new Vector2(0, margin);
+
+            Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+            for (int y = 0; y < container.gridHeight; y++)
+                for (int x = 0; x < container.gridWidth; x++)
+                {
+                    var cellObj = new GameObject($"c_{x}_{y}", typeof(Image));
+                    cellObj.transform.SetParent(gridObj.transform, false);
+                    var cellImg = cellObj.GetComponent<Image>();
+                    bool occupied = false;
+                    PlacedItem? placedAt = null;
+                    foreach (var p in container.placedItems)
+                        if (x >= p.gridX && x < p.gridX + p.GridWidth &&
+                            y >= p.gridY && y < p.gridY + p.GridHeight)
+                        { occupied = true; placedAt = p; break; }
+                    cellImg.color = occupied ? fillColor : emptyColor;
+
+                    if (DragDropManager.Instance != null)
+                        DragDropManager.Instance.RegisterCellRect(cellObj.GetComponent<RectTransform>(), container, x, y);
+
+                    if (occupied && placedAt.HasValue && !placedAt.Value.isGhost
+                        && placedAt.Value.gridX == x && placedAt.Value.gridY == y)
+                    {
+                        var drag = cellObj.AddComponent<ItemDragHandler>();
+                        drag.Setup(placedAt.Value, container, x, y);
+                    }
+                }
+        }
+
+        // ===== 玩家预览（纯UI身体轮廓，替代Camera）=====
+
+        void CreateBodyPreview(Transform parent, InventoryViewData view)
+        {
+            var parentRt = parent.GetComponent<RectTransform>();
+            float pw = parentRt.rect.width;
+            float ph = parentRt.rect.height;
+            float m = 6f;
+            float cx = pw / 2f;
+
+            // 身体轮廓背景
+            var bodyRt = MakeRect("BodyBg", parentRt, pw * 0.1f, -m, pw * 0.8f, ph - m * 2);
+            var bodyImg = bodyRt.gameObject.AddComponent<Image>();
+            bodyImg.color = new Color(0.12f, 0.12f, 0.15f, 0.6f);
+            bodyImg.raycastTarget = false;
+
+            // 头部（头盔）
+            float headW = pw * 0.35f;
+            float headH = ph * 0.15f;
+            var headRt = MakeRect("Head", parentRt, cx - headW / 2f, -m, headW, headH);
+            var headImg = headRt.gameObject.AddComponent<Image>();
+            headImg.color = new Color(0.2f, 0.2f, 0.25f, 0.7f);
+            headImg.raycastTarget = false;
+            var headTxt = AddLabel(headRt, GetEquipName(view, EquipSlot.Head, "无头盔"));
+            headTxt.color = string.IsNullOrEmpty(GetEquipName(view, EquipSlot.Head)) ? new Color(0.4f, 0.4f, 0.4f) : Color.white;
+
+            // 身体（胸挂+上衣）
+            float torsoY = -m - headH - 4;
+            float torsoW = pw * 0.65f;
+            float torsoH = ph * 0.35f;
+            var torsoRt = MakeRect("Torso", parentRt, cx - torsoW / 2f, torsoY, torsoW, torsoH);
+            var torsoImg = torsoRt.gameObject.AddComponent<Image>();
+            torsoImg.color = new Color(0.22f, 0.22f, 0.28f, 0.7f);
+            torsoImg.raycastTarget = false;
+            string torsoText = "";
+            string vestName = GetEquipName(view, EquipSlot.Vest);
+            string topName = GetEquipName(view, EquipSlot.Tops);
+            if (!string.IsNullOrEmpty(vestName)) torsoText += vestName;
+            if (!string.IsNullOrEmpty(topName))
+                torsoText += (string.IsNullOrEmpty(torsoText) ? "" : "\n") + topName;
+            if (string.IsNullOrEmpty(torsoText)) torsoText = "无胸甲";
+            var torsoLabel = AddLabel(torsoRt, torsoText);
+            torsoLabel.fontSize = 10;
+            torsoLabel.color = torsoText == "无胸甲" ? new Color(0.4f, 0.4f, 0.4f) : Color.white;
+
+            // 腰带
+            float beltY = torsoY - torsoH - 4;
+            float beltW = pw * 0.5f;
+            float beltH = ph * 0.08f;
+            var beltRt = MakeRect("Belt", parentRt, cx - beltW / 2f, beltY, beltW, beltH);
+            var beltImg = beltRt.gameObject.AddComponent<Image>();
+            beltImg.color = new Color(0.2f, 0.2f, 0.25f, 0.7f);
+            beltImg.raycastTarget = false;
+            var beltTxt = AddLabel(beltRt, GetEquipName(view, EquipSlot.Belt, "无腰带"));
+            beltTxt.color = string.IsNullOrEmpty(GetEquipName(view, EquipSlot.Belt)) ? new Color(0.4f, 0.4f, 0.4f) : Color.white;
+
+            // 腿部（裤子）
+            float legsY = beltY - beltH - 4;
+            float legsW = pw * 0.5f;
+            float legsH = ph * 0.22f;
+            var legsRt = MakeRect("Legs", parentRt, cx - legsW / 2f, legsY, legsW, legsH);
+            var legsImg = legsRt.gameObject.AddComponent<Image>();
+            legsImg.color = new Color(0.2f, 0.2f, 0.25f, 0.7f);
+            legsImg.raycastTarget = false;
+            var legsTxt = AddLabel(legsRt, GetEquipName(view, EquipSlot.Pants, "无裤子"));
+            legsTxt.color = string.IsNullOrEmpty(GetEquipName(view, EquipSlot.Pants)) ? new Color(0.4f, 0.4f, 0.4f) : Color.white;
+
+            // 背包（身体右侧小标签）
+            float bpX = cx + torsoW / 2f + 6;
+            float bpY = torsoY + torsoH * 0.3f;
+            float bpW = pw * 0.2f;
+            float bpH = ph * 0.15f;
+            var bpRt = MakeRect("Backpack", parentRt, bpX, bpY, bpW, bpH);
+            var bpImg = bpRt.gameObject.AddComponent<Image>();
+            bpImg.color = new Color(0.15f, 0.15f, 0.2f, 0.7f);
+            bpImg.raycastTarget = false;
+            var bpTxt = AddLabel(bpRt, GetEquipName(view, EquipSlot.Backpack, "无"));
+            bpTxt.fontSize = 8;
+            bpTxt.color = string.IsNullOrEmpty(GetEquipName(view, EquipSlot.Backpack)) ? new Color(0.4f, 0.4f, 0.4f) : Color.white;
+        }
+
+        /// <summary> 从 ViewData 获取装备名（字典安全读取）</summary>
+        string GetEquipName(InventoryViewData view, EquipSlot slot, string fallback = null)
+        {
+            if (view.equippedNames != null && view.equippedNames.TryGetValue(slot, out var name))
+                return name;
+            return fallback ?? "";
+        }
+
+        /// <summary> 在 RectTransform 上添加居中文本 </summary>
+        Text AddLabel(RectTransform rt, string text)
+        {
+            var obj = new GameObject("Label", typeof(Text));
+            obj.transform.SetParent(rt, false);
+            var txtRt = obj.GetComponent<RectTransform>();
+            txtRt.anchorMin = Vector2.zero;
+            txtRt.anchorMax = Vector2.one;
+            txtRt.offsetMin = Vector2.zero;
+            txtRt.offsetMax = Vector2.zero;
+            var txt = obj.GetComponent<Text>();
+            txt.text = text;
+            txt.font = GetFont();
+            txt.fontSize = 9;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = Color.white;
+            txt.resizeTextForBestFit = true;
+            txt.resizeTextMinSize = 6;
+            txt.resizeTextMaxSize = 11;
+            return txt;
+        }
+
+        void OnCharacterStatsChanged(CharacterStatsChanged evt)
+        {
+            if (overviewPanel != null && overviewPanel.activeSelf && _currentTab == "角色")
+                ShowOverview();
+        }
+
+        // ===== 角色面板 =====
+
+        void ShowCharacterTabContent()
+        {
+            if (overviewGridContainer == null) return;
+            var xpSys = SurvivalXPSystem.Instance;
+            if (xpSys == null) return;
+
+            var gridRt = overviewGridContainer.GetComponent<RectTransform>();
+            float pw = gridRt.rect.width;
+            float ph = gridRt.rect.height;
+            float m = 8f;
+            float sp = 6f;
+
+            var content = MakeRect("CharContent", gridRt, 0, 0, pw, ph);
+            var cImg = content.gameObject.AddComponent<Image>();
+            cImg.color = new Color(0, 0, 0, 0);
+            cImg.raycastTarget = false;
+
+            float leftW = pw * 0.38f;
+            float rightW = pw - leftW - m - sp;
+            float leftX = m;
+            float rightX = leftX + leftW + sp;
+
+            var leftPanel = MakeRect("LeftPanel", content, leftX, -m, leftW, ph - m * 2);
+            var lpImg = leftPanel.gameObject.AddComponent<Image>();
+            lpImg.color = new Color(0.08f, 0.08f, 0.1f, 0.6f);
+            lpImg.raycastTarget = false;
+
+            var rightPanel = MakeRect("RightPanel", content, rightX, -m, rightW, ph - m * 2);
+            var rpImg = rightPanel.gameObject.AddComponent<Image>();
+            rpImg.color = new Color(0.08f, 0.08f, 0.1f, 0.6f);
+            rpImg.raycastTarget = false;
+
+            // ===== 左面板 =====
+            float ly = -m;
+
+            // -- 职业 --
+            var pc = FindObjectOfType<PlayerCharacter>();
+            string profName = "无职业";
+            if (pc != null && pc.characterData != null && pc.characterData.profession != null)
+                profName = pc.characterData.profession.templateName;
+            var profLabel = MakeChildText("Prof", leftPanel, m, ly, leftW - m * 2, 22f);
+            profLabel.text = $"职业: {profName}";
+            profLabel.fontSize = 14;
+            profLabel.color = new Color(0.9f, 0.8f, 0.4f);
+            profLabel.fontStyle = FontStyle.Bold;
+            ly -= 28f;
+
+            // -- 经验条 + 兑换 --
+            float barH = 22f;
+            int curXP = xpSys.TotalXP;
+            int perPoint = GameConstants.XP_PER_SKILL_POINT;
+            float fill = Mathf.Clamp01((float)curXP / perPoint);
+            float barW = leftW - m * 2;
+
+            var xpLabel = MakeChildText("XPLabel", leftPanel, m, ly, barW, 16f);
+            xpLabel.text = $"生存经验: {curXP} / {perPoint}";
+            xpLabel.fontSize = 12;
+            xpLabel.color = new Color(0.7f, 0.7f, 0.7f);
+            ly -= 18f;
+
+            // XP 进度条
+            var barBg = MakeRect("XPBarBg", leftPanel, m, ly, barW, barH);
+            var barBgImg = barBg.gameObject.AddComponent<Image>();
+            barBgImg.color = new Color(0.15f, 0.15f, 0.15f);
+            barBgImg.raycastTarget = false;
+            var barFill = MakeRect("XPBarFill", barBg, 0, 0, barW * fill, barH);
+            var barFillImg = barFill.gameObject.AddComponent<Image>();
+            barFillImg.color = new Color(0.2f, 0.6f, 0.9f);
+            barFillImg.raycastTarget = false;
+            ly -= barH + 4f;
+
+            // 兑换按钮
+            var convBtnRt = MakeRect("ConvertBtn", leftPanel, m, ly, barW, 28f);
+            var convBtnImg = convBtnRt.gameObject.AddComponent<Image>();
+            bool canConvert = curXP >= perPoint;
+            convBtnImg.color = canConvert ? new Color(0.25f, 0.55f, 0.25f) : new Color(0.15f, 0.15f, 0.15f);
+            convBtnImg.raycastTarget = true;
+            var convBtn = convBtnRt.gameObject.AddComponent<Button>();
+            convBtn.onClick.AddListener(() => {
+                if (xpSys.ConvertXPToPoints() > 0)
+                {
+                    ShowToast("兑换成功！");
+                    ShowOverview();
+                }
+            });
+            var convTxt = MakeChildText("ConvTxt", convBtnRt, 0, 0, barW, 28f);
+            convTxt.text = canConvert ? $"兑换技能点 ({curXP / perPoint}点)" : "经验不足，无法兑换";
+            convTxt.fontSize = 13;
+            convTxt.alignment = TextAnchor.MiddleCenter;
+            convTxt.color = canConvert ? Color.white : new Color(0.4f, 0.4f, 0.4f);
+            ly -= 36f;
+
+            // 可用技能点
+            int avail = xpSys.AvailablePoints;
+            var ptsLabel = MakeChildText("PtsLabel", leftPanel, m, ly, barW, 20f);
+            ptsLabel.text = $"可用技能点: {avail}";
+            ptsLabel.fontSize = 14;
+            ptsLabel.color = avail > 0 ? new Color(0.4f, 0.9f, 0.5f) : new Color(0.5f, 0.5f, 0.5f);
+            ptsLabel.fontStyle = FontStyle.Bold;
+            ly -= 28f;
+
+            // 分隔线
+            var sep1 = MakeRect("Sep1", leftPanel, m, ly, barW, 2f);
+            sep1.gameObject.AddComponent<Image>().color = new Color(0.25f, 0.25f, 0.3f);
+            ly -= 10f;
+
+            // -- 属性 --
+            var attrHeader = MakeChildText("AttrHeader", leftPanel, m, ly, barW, 18f);
+            attrHeader.text = "身体属性";
+            attrHeader.fontSize = 13;
+            attrHeader.color = new Color(0.8f, 0.8f, 0.8f);
+            attrHeader.fontStyle = FontStyle.Bold;
+            ly -= 22f;
+
+            var attrTypes = new[] { AttributeType.力量, AttributeType.敏捷, AttributeType.体质, AttributeType.耐力 };
+            var attrNames = new[] { "力量", "敏捷", "体质", "耐力" };
+            for (int i = 0; i < 4; i++)
+            {
+                int val = xpSys.GetAttributeValue(attrTypes[i]);
+                int cost = xpSys.GetAttributeUpgradeCost(attrTypes[i]);
+                bool canUp = cost > 0 && avail >= cost && val < 10;
+
+                float rowW = barW;
+                var nameTxt = MakeChildText("AN_" + i, leftPanel, m, ly, rowW * 0.35f, 24f);
+                nameTxt.text = attrNames[i];
+                nameTxt.fontSize = 13;
+                nameTxt.color = Color.white;
+
+                // 数值条
+                float valBarW = rowW * 0.35f;
+                var vBg = MakeRect("AVBg_" + i, leftPanel, m + rowW * 0.35f, ly + 2f, valBarW, 20f);
+                vBg.gameObject.AddComponent<Image>().color = new Color(0.12f, 0.12f, 0.12f);
+                var vFill = MakeRect("AVFill_" + i, vBg, 0, 0, valBarW * val / 10f, 20f);
+                var vFillImg = vFill.gameObject.AddComponent<Image>();
+                vFillImg.color = new Color(0.7f, 0.3f, 0.3f);
+                vFillImg.raycastTarget = false;
+                var vTxt = MakeChildText("AVTxt_" + i, vBg, 0, 0, valBarW, 20f);
+                vTxt.text = $"{val}/10";
+                vTxt.fontSize = 11;
+                vTxt.alignment = TextAnchor.MiddleCenter;
+                vTxt.color = Color.white;
+
+                // 升级按钮
+                float btnX = m + rowW * 0.7f;
+                float btnW = rowW * 0.3f;
+                var upBtnRt = MakeRect("AUp_" + i, leftPanel, btnX, ly + 2f, btnW, 20f);
+                var upBtnImg = upBtnRt.gameObject.AddComponent<Image>();
+                upBtnImg.color = canUp ? new Color(0.25f, 0.5f, 0.25f) : new Color(0.12f, 0.12f, 0.12f);
+                upBtnImg.raycastTarget = true;
+                var upBtn = upBtnRt.gameObject.AddComponent<Button>();
+                int capturedI = i;
+                upBtn.onClick.AddListener(() => {
+                    if (xpSys.SpendAttributePoint(attrTypes[capturedI]))
+                        FlashGreen(upBtnRt, () => ShowOverview());
+                });
+                var upTxt = MakeChildText("AUTxt_" + i, upBtnRt, 0, 0, btnW, 20f);
+                upTxt.text = cost > 0 ? $"+{cost}点" : "满";
+                upTxt.fontSize = 10;
+                upTxt.alignment = TextAnchor.MiddleCenter;
+                upTxt.color = canUp ? Color.white : new Color(0.4f, 0.4f, 0.4f);
+
+                ly -= 26f;
+            }
+
+            // ===== 右面板 =====
+            float ry = -m;
+            var skillHeader = MakeChildText("SkillHeader", rightPanel, m, ry, rightW - m * 2, 20f);
+            skillHeader.text = "技能";
+            skillHeader.fontSize = 14;
+            skillHeader.color = new Color(0.8f, 0.8f, 0.8f);
+            skillHeader.fontStyle = FontStyle.Bold;
+            ry -= 24f;
+
+            var allSkills = new[] {
+                SkillType.近战专精, SkillType.枪械专精, SkillType.防御专精,
+                SkillType.资源采集, SkillType.医疗生存, SkillType.野外求生,
+                SkillType.工匠制作, SkillType.建造拆解, SkillType.汽车改造,
+                SkillType.智力
+            };
+            var skillNames = new[] { "近战", "枪械", "防御", "采集", "医疗", "求生", "工匠", "建造", "汽改", "智力" };
+
+            string currentCat = "";
+            float skillRowH = 28f;
+            float catHeaderH = 18f;
+
+            for (int i = 0; i < allSkills.Length; i++)
+            {
+                var sk = allSkills[i];
+                string cat = SkillCostTable.GetCategoryName(sk);
+                if (cat != currentCat)
+                {
+                    currentCat = cat;
+                    ry -= 4f;
+                    var catLabel = MakeChildText("Cat_" + cat, rightPanel, m, ry, rightW - m * 2, catHeaderH);
+                    catLabel.text = cat;
+                    catLabel.fontSize = 12;
+                    catLabel.color = new Color(0.5f, 0.7f, 0.9f);
+                    catLabel.fontStyle = FontStyle.Bold;
+                    ry -= catHeaderH + 2f;
+                }
+
+                int lv = xpSys.GetSkillLevel(sk);
+                int scost = xpSys.GetSkillUpgradeCost(sk);
+                bool canUpSkill = scost > 0 && avail >= scost && lv < 10;
+
+                float nameW = rightW * 0.15f;
+                float barW2 = rightW * 0.38f;
+                float lvW = rightW * 0.12f;
+                float btnW2 = rightW * 0.22f;
+                float gap = 4f;
+
+                float curX = m;
+
+                // 技能名
+                var snTxt = MakeChildText("SN_" + i, rightPanel, curX, ry + 4f, nameW - gap, 20f);
+                snTxt.text = skillNames[i];
+                snTxt.fontSize = 12;
+                snTxt.color = Color.white;
+                curX += nameW;
+
+                // 进度条
+                var sBg = MakeRect("SBg_" + i, rightPanel, curX, ry + 6f, barW2 - gap, 16f);
+                sBg.gameObject.AddComponent<Image>().color = new Color(0.1f, 0.1f, 0.1f);
+                var sFill = MakeRect("SFill_" + i, sBg, 0, 0, (barW2 - gap) * lv / 10f, 16f);
+                var sFillImg = sFill.gameObject.AddComponent<Image>();
+                sFillImg.color = new Color(0.3f, 0.6f, 0.35f);
+                sFillImg.raycastTarget = false;
+                var sLvTxt = MakeChildText("SLvTxt_" + i, sBg, 0, 0, barW2 - gap, 16f);
+                sLvTxt.text = $"Lv.{lv}";
+                sLvTxt.fontSize = 10;
+                sLvTxt.alignment = TextAnchor.MiddleCenter;
+                sLvTxt.color = Color.white;
+                curX += barW2;
+
+                // 升级按钮
+                var sUpRt = MakeRect("SUp_" + i, rightPanel, curX, ry + 6f, btnW2 - gap, 16f);
+                var sUpImg = sUpRt.gameObject.AddComponent<Image>();
+                sUpImg.color = canUpSkill ? new Color(0.25f, 0.5f, 0.25f) : new Color(0.1f, 0.1f, 0.1f);
+                sUpImg.raycastTarget = true;
+                var sUpBtn = sUpRt.gameObject.AddComponent<Button>();
+                int capturedIdx = i;
+                sUpBtn.onClick.AddListener(() => {
+                    if (xpSys.SpendPoint(allSkills[capturedIdx]))
+                        FlashGreen(sUpRt, () => ShowOverview());
+                });
+                var sUpTxt = MakeChildText("SUTxt_" + i, sUpRt, 0, 0, btnW2 - gap, 16f);
+                if (lv >= 10)
+                    sUpTxt.text = "MAX";
+                else if (scost > 0)
+                    sUpTxt.text = $"{scost}点";
+                else
+                    sUpTxt.text = "--";
+                sUpTxt.fontSize = 9;
+                sUpTxt.alignment = TextAnchor.MiddleCenter;
+                sUpTxt.color = canUpSkill ? Color.white : new Color(0.4f, 0.4f, 0.4f);
+
+                ry -= skillRowH;
+            }
+
+            // 存储滚动信息
+            _overviewContentHeight = Mathf.Max(0, Mathf.Abs(ry) - ph + m * 2);
+            _overviewScrollContent = content;
+            content.sizeDelta = new Vector2(pw, Mathf.Abs(ry) + m * 2 + ph);
+        }
+
+        void FlashGreen(RectTransform target, System.Action onComplete = null)
+        {
+            StartCoroutine(FlashGreenRoutine(target, onComplete));
+        }
+
+        System.Collections.IEnumerator FlashGreenRoutine(RectTransform target, System.Action onComplete)
+        {
+            if (target == null) yield break;
+            var images = target.GetComponentsInChildren<Image>();
+            var origColors = new Color[images.Length];
+            for (int i = 0; i < images.Length; i++)
+                origColors[i] = images[i].color;
+
+            for (int i = 0; i < images.Length; i++)
+                images[i].color = new Color(0.2f, 0.9f, 0.3f);
+
+            yield return new WaitForSeconds(0.15f);
+
+            for (int i = 0; i < images.Length; i++)
+            {
+                if (images[i] != null)
+                    images[i].color = origColors[i];
+            }
+
+            onComplete?.Invoke();
+        }
+
+        void ShowPlaceholderTab(string tabName)
+        {
+            var phObj = new GameObject("Placeholder", typeof(Text));
+            phObj.transform.SetParent(overviewGridContainer.transform, false);
+            var phText = phObj.GetComponent<Text>();
+            phText.text = $"<color=grey><b>{tabName}</b> 开发中...</color>";
+            phText.fontSize = 18;
+            phText.alignment = TextAnchor.MiddleCenter;
+            phText.color = Color.gray;
+        }
+
+        void CreateMiniGrid(InventoryContainer container)
+        {
+            // 标题行
+            var titleObj = new GameObject($"T_{container.containerName}", typeof(Text));
+            titleObj.transform.SetParent(overviewGridContainer.transform, false);
+            var titleText = titleObj.GetComponent<Text>();
+            titleText.text = $"<b>{container.containerName}</b>  {container.UsedCells}/{container.TotalCells}";
+            titleText.fontSize = 13;
+            titleText.alignment = TextAnchor.MiddleCenter;
+            titleText.color = Color.white;
+
+            // 网格容器
+            var gridObj = new GameObject($"G_{container.containerName}", typeof(RectTransform));
+            gridObj.transform.SetParent(overviewGridContainer.transform, false);
+
+            var grid = gridObj.AddComponent<GridLayoutGroup>();
+            grid.childAlignment = TextAnchor.MiddleCenter;
+
+            float containerWidth = overviewGridContainer.GetComponent<RectTransform>().rect.width - 20;
+            float spacing = 1f;
+            float cell = Mathf.Floor((containerWidth - spacing * (container.gridWidth - 1)) / container.gridWidth);
+
+            // 上衣和裤子缩小
+            if (container.equipSlot == EquipSlot.Tops || container.equipSlot == EquipSlot.Pants)
+                cell = Mathf.Floor(cell * 0.6f);
+
+            int gw = container.gridWidth;
+            int gh = container.gridHeight;
+
+            grid.cellSize = new Vector2(cell, cell);
+            grid.spacing = new Vector2(spacing, spacing);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = gw;
+
+            float gridW = cell * gw + spacing * (gw - 1);
+            float gridH = cell * gh + spacing * (gh - 1);
+            var rt = gridObj.GetComponent<RectTransform>();
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, gridW);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, gridH);
+
+            Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+            for (int y = 0; y < gh; y++)
+                for (int x = 0; x < gw; x++)
+                {
+                    var cellObj = new GameObject($"c_{x}_{y}", typeof(Image));
+                    cellObj.transform.SetParent(gridObj.transform, false);
+                    var img = cellObj.GetComponent<Image>();
+
+                    bool occupied = false;
+                    foreach (var p in container.placedItems)
+                        if (x >= p.gridX && x < p.gridX + p.GridWidth &&
+                            y >= p.gridY && y < p.gridY + p.GridHeight)
+                        { occupied = true; break; }
+
+                    img.color = occupied ? fillColor : emptyColor;
+                }
+        }
+
+        // ===== 快捷面板（V 循环） =====
+
+        void CycleToNextContainer()
+        {
+            for (int i = 0; i < CycleOrder.Length; i++)
+            {
+                _cycleIndex = (_cycleIndex + 1) % CycleOrder.Length;
+                var slot = CycleOrder[_cycleIndex];
+                var container = _inventory.GetContainer(slot);
+
+                if (container != null && container.TotalCells > 0)
+                {
+                    _inventory.ActiveContainer = container;
+                    _lastQuickSlot = slot;
+
+                    if (quickPanel != null && quickGridContainer != null)
+                    {
+                        quickPanel.SetActive(true);
+                        ShowQuickView();
+                    }
+                    return;
+                }
+            }
+            ShowToast("没有可用的容器！");
+        }
+
+        void OpenContainer(EquipSlot slot)
+        {
+            var container = _inventory.GetContainer(slot);
+            if (container == null || container.TotalCells == 0)
+            {
+                // 上次记录的装备不见了，按上衣→胸挂→腰带→裤子→背包找第一个可用的
+                container = GetFirstFallbackContainer();
+                if (container == null)
+                {
+                    ShowToast("没有可用的容器！");
+                    return;
+                }
+            }
+
+            _inventory.ActiveContainer = container;
+            _lastQuickSlot = container.equipSlot;
+
+            if (quickPanel != null && quickGridContainer != null)
+            {
+                quickPanel.SetActive(true);
+                ShowQuickView();
+            }
+        }
+
+        void ShowQuickView()
+        {
+            if (_inventory == null) return;
+            var container = _inventory.ActiveContainer;
+            if (container == null || quickGridContainer == null) return;
+
+            // 清空 + 重建网格
+            ClearContainer(quickGridContainer);
+
+            var glg = quickGridContainer.GetComponent<GridLayoutGroup>();
+            if (glg != null) DestroyImmediate(glg);
+            var vlg = quickGridContainer.GetComponent<VerticalLayoutGroup>();
+            if (vlg != null) DestroyImmediate(vlg);
+
+            var grid = quickGridContainer.AddComponent<GridLayoutGroup>();
+            grid.childAlignment = TextAnchor.MiddleCenter;
+
+            Rect rect = quickGridContainer.GetComponent<RectTransform>().rect;
+            float spacing = 2f;
+            float cellSize = Mathf.Floor(Mathf.Min(
+                (rect.width - spacing * (container.gridWidth - 1)) / container.gridWidth,
+                (rect.height - spacing * (container.gridHeight - 1)) / container.gridHeight
+            ));
+
+            grid.cellSize = new Vector2(cellSize, cellSize);
+            grid.spacing = new Vector2(spacing, spacing);
+            grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            grid.constraintCount = container.gridWidth;
+
+            Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+
+            // 先创建所有背景格子
+            for (int y = 0; y < container.gridHeight; y++)
+                for (int x = 0; x < container.gridWidth; x++)
+                {
+                    var cellObj = new GameObject($"Cell_{x}_{y}", typeof(Image));
+                    cellObj.transform.SetParent(quickGridContainer.transform, false);
+
+                    bool occupied = false;
+                    foreach (var p in container.placedItems)
+                        if (x >= p.gridX && x < p.gridX + p.GridWidth &&
+                            y >= p.gridY && y < p.gridY + p.GridHeight)
+                        { occupied = true; break; }
+
+                    var img = cellObj.GetComponent<Image>();
+                    img.color = occupied ? fillColor : emptyColor;
+                }
+
+            // 在物品的左上角格子显示图标
+            foreach (var p in container.placedItems)
+            {
+                if (p.itemData == null || p.itemData.icon == null) continue;
+
+                // 找到物品左上角的格子作为父节点
+                int iconX = p.gridX;
+                int iconY = p.gridY;
+                int iconIndex = iconY * container.gridWidth + iconX;
+                if (iconIndex >= quickGridContainer.transform.childCount) continue;
+
+                Transform cell = quickGridContainer.transform.GetChild(iconIndex);
+                var iconObj = new GameObject("Icon", typeof(Image));
+                iconObj.transform.SetParent(cell, false);
+                var iconRt = iconObj.GetComponent<RectTransform>();
+                iconRt.anchorMin = Vector2.zero;
+                iconRt.anchorMax = Vector2.one;
+                iconRt.offsetMin = Vector2.zero;
+                iconRt.offsetMax = Vector2.zero;
+
+                var iconImg = iconObj.GetComponent<Image>();
+                iconImg.sprite = p.itemData.icon;
+                iconImg.preserveAspect = true;
+            }
+
+            // 标题
+            if (quickInfoText != null)
+            {
+                string info = $"<b>{container.containerName}</b>  ({container.UsedCells}/{container.TotalCells})\n";
+                info += $"负重: {_inventory.CurrentWeight:F1}/{_inventory.maxWeight}";
+                if (_inventory.IsOverloaded)
+                    info += $" <color=yellow>({_inventory.OverloadRatio * 100f:F0}%)</color>";
+                quickInfoText.text = info;
+            }
+
+            if (DragDropManager.Instance != null)
+                DragDropManager.Instance.RefreshSelectionBorder();
+        }
+
+        // ===== 工具 =====
+
+        void ClearContainer(GameObject container)
+        {
+            foreach (Transform child in container.transform)
+                Destroy(child.gameObject);
+        }
+
+        void RefreshOverview()
+        {
+            ShowOverview();
+        }
+
+        public void ShowToast(string msg)
+        {
+            if (floatingToastText == null) return;
+            floatingToastText.gameObject.SetActive(true);
+            floatingToastText.text = msg;
+            CancelInvoke(nameof(HideToast));
+            Invoke(nameof(HideToast), 2.5f);
+        }
+
+        InventoryContainer GetFirstFallbackContainer()
+        {
+            foreach (var slot in FallbackOrder)
+            {
+                var c = _inventory.GetContainer(slot);
+                if (c != null && c.TotalCells > 0) return c;
+            }
+            return null;
+        }
+
+        // ===== 其他UI隐藏/显示 =====
+
+        void SetOtherUIVisible(bool visible)
+        {
+            if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
+            if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
+        }
+
+        // ===== 固定布局辅助方法 =====
+
+        /// <summary> 在指定位置创建一个容器区块 </summary>
+        float CreateContainerAt(Transform parent, InventoryContainer c, EquipSlot slot,
+            float parentW, ref float y, bool isGrid, float cellSize, float spacing, float labelH)
+        {
+            if (c == null) return y;
+            string displayName = c.containerName;
+            float used = c.UsedCells;
+            float total = c.TotalCells;
+
+            // 容器标题
+            var nameObj = new GameObject($"N_{displayName}", typeof(Text));
+            nameObj.transform.SetParent(parent, false);
+            var nameRt = nameObj.GetComponent<RectTransform>();
+            nameRt.anchorMin = new Vector2(0, 1);
+            nameRt.anchorMax = new Vector2(0, 1);
+            nameRt.pivot = new Vector2(0, 1);
+            nameRt.sizeDelta = new Vector2(parentW, labelH);
+            nameRt.anchoredPosition = new Vector2(0, y);
+
+            var nameTxt = nameObj.GetComponent<Text>();
+            nameTxt.text = total > 0 ? $"{displayName}  {used}/{total}" : displayName;
+            nameTxt.fontSize = 11;
+            nameTxt.alignment = TextAnchor.MiddleLeft;
+            nameTxt.color = Color.white;
+
+            y -= labelH;
+
+            if (total == 0)
+            {
+                // 空容器显示占位文字
+                var emptyObj = new GameObject("Empty", typeof(Text));
+                emptyObj.transform.SetParent(parent, false);
+                var emptyRt = emptyObj.GetComponent<RectTransform>();
+                emptyRt.anchorMin = new Vector2(0, 1);
+                emptyRt.anchorMax = new Vector2(0, 1);
+                emptyRt.pivot = new Vector2(0, 1);
+                emptyRt.sizeDelta = new Vector2(parentW, cellSize);
+                emptyRt.anchoredPosition = new Vector2(0, y);
+                var emptyTxt = emptyObj.GetComponent<Text>();
+                emptyTxt.text = "未装备";
+                emptyTxt.fontSize = 10;
+                emptyTxt.color = new Color(0.4f, 0.4f, 0.4f);
+                y -= cellSize + spacing;
+                return y;
+            }
+
+            if (isGrid)
+            {
+                // 网格显示
+                var gridObj = new GameObject($"G_{displayName}", typeof(RectTransform));
+                gridObj.transform.SetParent(parent, false);
+                var gridRt = gridObj.GetComponent<RectTransform>();
+                gridRt.anchorMin = new Vector2(0, 1);
+                gridRt.anchorMax = new Vector2(0, 1);
+                gridRt.pivot = new Vector2(0, 1);
+
+                float gw = c.gridWidth * cellSize + (c.gridWidth - 1) * spacing;
+                float gh = c.gridHeight * cellSize + (c.gridHeight - 1) * spacing;
+                gridRt.sizeDelta = new Vector2(gw, gh);
+                gridRt.anchoredPosition = new Vector2(0, y);
+
+                var glg = gridObj.AddComponent<GridLayoutGroup>();
+                glg.cellSize = new Vector2(cellSize, cellSize);
+                glg.spacing = new Vector2(spacing, spacing);
+                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                glg.constraintCount = c.gridWidth;
+
+                Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+                for (int cy = 0; cy < c.gridHeight; cy++)
+                    for (int cx = 0; cx < c.gridWidth; cx++)
+                    {
+                        var cellObj = new GameObject($"c_{cx}_{cy}", typeof(Image));
+                        cellObj.transform.SetParent(gridObj.transform, false);
+                        var cellImg = cellObj.GetComponent<Image>();
+                        bool occupied = false;
+                        PlacedItem? placedAt = null;
+                        foreach (var p in c.placedItems)
+                            if (cx >= p.gridX && cx < p.gridX + p.GridWidth &&
+                                cy >= p.gridY && cy < p.gridY + p.GridHeight)
+                            { occupied = true; placedAt = p; break; }
+                        cellImg.color = occupied ? fillColor : emptyColor;
+
+                        if (DragDropManager.Instance != null)
+                            DragDropManager.Instance.RegisterCellRect(cellObj.GetComponent<RectTransform>(), c, cx, cy);
+
+                        if (occupied && placedAt.HasValue && !placedAt.Value.isGhost
+                            && placedAt.Value.gridX == cx && placedAt.Value.gridY == cy)
+                        {
+                            var drag = cellObj.AddComponent<ItemDragHandler>();
+                            drag.Setup(placedAt.Value, c, cx, cy);
+                            CreateItemNameOverlay(cellObj, placedAt.Value, cellSize, spacing);
+                        }
+                    }
+
+                y -= gh + spacing;
+            }
+            else
+            {
+                // 横条显示
+                var stripObj = new GameObject($"HS_{displayName}", typeof(RectTransform));
+                stripObj.transform.SetParent(parent, false);
+                var stripRt = stripObj.GetComponent<RectTransform>();
+                stripRt.anchorMin = new Vector2(0, 1);
+                stripRt.anchorMax = new Vector2(0, 1);
+                stripRt.pivot = new Vector2(0, 1);
+
+                int itemCount = c.placedItems.Count;
+                int displayCount = Mathf.Max(itemCount, 1);
+                float totalW = displayCount * cellSize + (displayCount - 1) * spacing;
+                stripRt.sizeDelta = new Vector2(totalW, cellSize);
+                stripRt.anchoredPosition = new Vector2(0, y);
+
+                var glg = stripObj.AddComponent<GridLayoutGroup>();
+                glg.cellSize = new Vector2(cellSize, cellSize);
+                glg.spacing = new Vector2(spacing, 0);
+                glg.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                glg.constraintCount = displayCount;
+
+                Color fillColor = _inventory.IsHardOverloaded ? overloadColor : occupiedColor;
+                foreach (var p in c.placedItems)
+                {
+                    // 跳过幽灵占位格
+                    if (p.isGhost) continue;
+
+                    var slotObj = new GameObject("HSlot", typeof(Image));
+                    slotObj.transform.SetParent(stripObj.transform, false);
+                    var img = slotObj.GetComponent<Image>();
+                    img.color = fillColor;
+
+                    if (p.itemData != null && p.itemData.icon != null)
+                    {
+                        var iconObj = new GameObject("Icon", typeof(Image));
+                        iconObj.transform.SetParent(slotObj.transform, false);
+                        var iconRt = iconObj.GetComponent<RectTransform>();
+                        iconRt.anchorMin = Vector2.zero;
+                        iconRt.anchorMax = Vector2.one;
+                        iconRt.offsetMin = Vector2.zero;
+                        iconRt.offsetMax = Vector2.zero;
+                        var iconImg = iconObj.GetComponent<Image>();
+                        iconImg.sprite = p.itemData.icon;
+                        iconImg.preserveAspect = true;
+                    }
+
+                    var drag = slotObj.AddComponent<ItemDragHandler>();
+                    drag.Setup(p, c, p.gridX, p.gridY);
+
+                    // 横条物品名称
+                    var snObj = new GameObject("ItemName", typeof(Text));
+                    snObj.transform.SetParent(slotObj.transform, false);
+                    var snRt = snObj.GetComponent<RectTransform>();
+                    snRt.anchorMin = Vector2.zero;
+                    snRt.anchorMax = Vector2.one;
+                    snRt.offsetMin = Vector2.zero;
+                    snRt.offsetMax = Vector2.zero;
+                    var snTxt = snObj.GetComponent<Text>();
+                    snTxt.text = p.itemData != null ? p.itemData.itemName : "";
+                    snTxt.fontSize = 9;
+                    snTxt.alignment = TextAnchor.LowerCenter;
+                    nameTxt.color = Color.white;
+                }
+
+                if (itemCount == 0)
+                {
+                    var emptySlot = new GameObject("Empty", typeof(Image));
+                    emptySlot.transform.SetParent(stripObj.transform, false);
+                    emptySlot.GetComponent<Image>().color = emptyColor;
+                }
+
+                y -= cellSize + spacing;
+            }
+
+            return y;
+        }
+
+        /// <summary> 在指定坐标创建占位格子（头盔/防弹衣）</summary>
+        void CreatePlaceholderSlotAt(Transform parent, string text, Color bgColor,
+            float w, float h, float x, float y)
+        {
+            var obj = new GameObject($"PH_{text}", typeof(Image), typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            var rt = obj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0, 1);
+            rt.sizeDelta = new Vector2(w, h);
+            rt.anchoredPosition = new Vector2(x, y);
+            var img = obj.GetComponent<Image>();
+            img.color = bgColor;
+
+            var txtObj = new GameObject("Label", typeof(Text));
+            txtObj.transform.SetParent(obj.transform, false);
+            var txtRt = txtObj.GetComponent<RectTransform>();
+            txtRt.anchorMin = Vector2.zero;
+            txtRt.anchorMax = Vector2.one;
+            txtRt.offsetMin = Vector2.zero;
+            txtRt.offsetMax = Vector2.zero;
+            var txt = txtObj.GetComponent<Text>();
+            txt.text = text;
+            txt.fontSize = 12;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = new Color(0.6f, 0.6f, 0.6f);
+        }
+
+        /// <summary> 在物品格子上创建名称覆盖（按物品实际占用格子数） </summary>
+        void CreateItemNameOverlay(GameObject cellObj, PlacedItem item, float cellSize, float spacing)
+        {
+            var nameObj = new GameObject("ItemName", typeof(Text));
+            nameObj.transform.SetParent(cellObj.transform, false);
+
+            float extraW = (item.GridWidth - 1) * (cellSize + spacing);
+            float extraH = (item.GridHeight - 1) * (cellSize + spacing);
+
+            var nameRt = nameObj.GetComponent<RectTransform>();
+            nameRt.anchorMin = new Vector2(0, 1);
+            nameRt.anchorMax = new Vector2(0, 1);
+            nameRt.pivot = new Vector2(0, 1);
+            nameRt.sizeDelta = new Vector2(cellSize + extraW, cellSize + extraH);
+            nameRt.anchoredPosition = Vector2.zero;
+
+            var nameTxt = nameObj.GetComponent<Text>();
+            nameTxt.text = item.itemData.itemName;
+            nameTxt.font = GetFont();
+            nameTxt.fontSize = 10;
+            nameTxt.alignment = TextAnchor.MiddleCenter;
+            nameTxt.color = Color.white;
+            nameTxt.fontStyle = FontStyle.Bold;
+            nameTxt.resizeTextForBestFit = true;
+            nameTxt.resizeTextMinSize = 7;
+            nameTxt.resizeTextMaxSize = 12;
+        }
+
+        /// <summary> 中栏：显示装备名称文本 </summary>
+        void CreateEquipNameText(Transform parent, string slotName, string equippedItemName, float w, float h, float x, float y)
+        {
+            var obj = new GameObject($"EN_{slotName}", typeof(Image), typeof(RectTransform));
+            obj.transform.SetParent(parent, false);
+            var rt = obj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0, 1);
+            rt.sizeDelta = new Vector2(w, h);
+            rt.anchoredPosition = new Vector2(x, y);
+            var img = obj.GetComponent<Image>();
+            img.color = new Color(0.2f, 0.2f, 0.3f, 0.6f);
+
+            var txtObj = new GameObject("Label", typeof(Text));
+            txtObj.transform.SetParent(obj.transform, false);
+            var txtRt = txtObj.GetComponent<RectTransform>();
+            txtRt.anchorMin = Vector2.zero;
+            txtRt.anchorMax = Vector2.one;
+            txtRt.offsetMin = Vector2.zero;
+            txtRt.offsetMax = Vector2.zero;
+            var txt = txtObj.GetComponent<Text>();
+            string display = string.IsNullOrEmpty(equippedItemName) ? slotName + "\n(未装备)" : slotName + "\n" + equippedItemName;
+            txt.text = display;
+            txt.fontSize = 12;
+            txt.alignment = TextAnchor.MiddleCenter;
+            txt.color = string.IsNullOrEmpty(equippedItemName) ? new Color(0.5f, 0.5f, 0.5f) : Color.white;
+        }
+
+        /// <summary> 数值展示区：创建一行标签+值（坐标定位，扩展用）</summary>
+        void CreateStatRow(Transform parent, string label, string value, float colW, float rowH, float x, float y)
+        {
+            // 数值标签
+            var labelRt = MakeRect("SL_" + label, parent.GetComponent<RectTransform>(),
+                x, y, colW * 0.5f, rowH);
+            var labelTxt = labelRt.gameObject.AddComponent<Text>();
+            labelTxt.text = label;
+            labelTxt.font = GetFont();
+            labelTxt.fontSize = 12;
+            labelTxt.alignment = TextAnchor.MiddleLeft;
+            labelTxt.color = new Color(0.7f, 0.7f, 0.7f);
+
+            // 数值
+            var valRt = MakeRect("SV_" + label, parent.GetComponent<RectTransform>(),
+                x + colW * 0.5f, y, colW * 0.5f, rowH);
+            var valTxt = valRt.gameObject.AddComponent<Text>();
+            valTxt.text = value;
+            valTxt.font = GetFont();
+            valTxt.fontSize = 12;
+            valTxt.alignment = TextAnchor.MiddleRight;
+            valTxt.color = Color.white;
+            valTxt.fontStyle = FontStyle.Bold;
+        }
+
+        private Font GetFont()
+        {
+            Font font;
+            try { font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { font = null; }
+            if (font == null) font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            return font;
+        }
+    }
+}

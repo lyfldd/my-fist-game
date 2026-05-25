@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e017c72099b9ba74e872c8c1e78b1c6e, type: 3}
+  m_Name: CabinetLoot
+  m_EditorClassIdentifier: 
+  entries:
+  - itemData: {fileID: 11400000, guid: fdac2887f7b2d8f4f8566bf42bea3303, type: 2}
+    weight: 6
+    minCount: 1
+    maxCount: 3
+  - itemData: {fileID: 11400000, guid: 55e6ebb3e9dd338408eb0e11da79ddce, type: 2}
+    weight: 5
+    minCount: 1
+    maxCount: 2
+  - itemData: {fileID: 11400000, guid: 98142218b77bd154cab23a4bc3eb49b9, type: 2}
+    weight: 4
+    minCount: 1
+    maxCount: 1
+  - itemData: {fileID: 11400000, guid: 6f415d83634f407459ff3580b939df6d, type: 2}
+    weight: 4
+    minCount: 1
+    maxCount: 3
+  - itemData: {fileID: 11400000, guid: 9b786aa785ee3424d9a7fb87cbb65894, type: 2}
+    weight: 3
+    minCount: 1
+    maxCount: 2
+  - itemData: {fileID: 11400000, guid: 1775f1da5c9deee4e98beb97af059167, type: 2}
+    weight: 3
+    minCount: 1
+    maxCount: 1
+  - itemData: {fileID: 11400000, guid: 02014aecdfa9cf445aa6e727cce492bf, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1
+  - itemData: {fileID: 11400000, guid: 48ca6d2691069df429f79e66c9443014, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1
+  - itemData: {fileID: 11400000, guid: d22dc82f5953c6540874462767d92828, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1
+  - itemData: {fileID: 11400000, guid: ad8b22f2679061a43a5a81e8f04e22a5, type: 2}
+    weight: 2
+    minCount: 1
+    maxCount: 1

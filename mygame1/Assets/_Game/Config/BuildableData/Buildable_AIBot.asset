@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518e29df93df32941ba7eff134a7312e, type: 3}
+  m_Name: Buildable_AIBot
+  m_EditorClassIdentifier: 
+  displayName: "AI\u673A\u5668\u4EBA"
+  description: "\u81EA\u4E3BAI\u6218\u6597\u4F19\u4F34\u3002\u8DDF\u968F\u73A9\u5BB6\uFF0C\u81EA\u52A8\u62FE\u53D6\u6218\u5229\u54C1(200kg\u8D1F\u91CD)\uFF0C\u7535\u51FB\u9632\u5FA1\u3002\u96501\u53F0/\u4EBA\u3002\u6D88\u8017\u7535\u6C60\u7EC4\u9A71\u52A8\uFF0C\u53EF\u989D\u5916\u52A0\u5165\u6D53\u7F29\u94C0\u542F\u52A8\u589E\u5F3A\u6A21\u5F0F(\u7535\u51FB\u4F24\u5BB3+50%\u3001\u79FB\u901F+30%)\u3002\u53CC\u8FDB\u5EA6\u6761\uFF1A\u7535\u91CF+\u6838\u71C3\u6599\u3002"
+  icon: {fileID: 0}
+  category: 6
+  previewPrefab: {fileID: 0}
+  builtPrefab: {fileID: 0}
+  placementSize: {x: 1.5, y: 2, z: 1.5}
+  snapSize: 1
+  buildDuration: 30
+  requiredTool: {fileID: 0}
+  materials:
+  - itemData: {fileID: 11400000, guid: 0b58d8455c4405b43810bf897332e8b5, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 2c0aac9308b74b74c83bbccdd237006f, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 9110aa8e5c9fc8b4590be7b2cf81b161, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 9456b7cb27bf9db489242b144929d6b6, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 7a5fbeadda5bd304996b9e2505f1968e, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+    count: 5
+  - itemData: {fileID: 11400000, guid: cb1ad6dc6447f2043b6112d714c8ae2e, type: 2}
+    count: 8
+  - itemData: {fileID: 11400000, guid: c0128cf8b31bdc048b87330dca405c4c, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+    count: 2
+  - itemData: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
+    count: 5
+  skillRequirements:
+  - skill: 7
+    level: 10
+  - skill: 9
+    level: 10
+  hungerDrainPerSec: 0
+  thirstDrainPerSec: 0
+  staminaDrainPerSec: 3
+  maxHealth: 500
+  blocksNavMesh: 1
+  deconstructReturnRate: 0.5
+  powerSupplyRadius: 0
+  powerOutput: 0
+  powerSourceType: 0
+  powerRequiresFuel: 0
+  powerFuelPerHour: 1
+  powerFuelItemName: 
+  powerFuelItemData: {fileID: 0}
+  powerDaytimeOnly: 0
+  powerRequiresOpenAir: 0
+  powerRequiresWater: 0
+  powerNoiseRadius: 10
+  powerRequired: 0
+  powerAllowCoal: 0
+  powerCoalPower: 0
+  powerElectricSpeedMul: 2
+  isWorkstation: 0
+  workstationTier: 0
+  productionDeviceRef: {fileID: 11400000, guid: 945abb7ef28089d4795f3d5db1d9576f, type: 2}

@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f4d05a2109c7a47bf2aa7e6499fcf2, type: 3}
+  m_Name: "\u6D88\u9632\u5458"
+  m_EditorClassIdentifier: 
+  templateName: "\u6D88\u9632\u5458"
+  description: "\u6D88\u9632\u5458\u51FA\u8EAB\uFF0C\u529B\u5927\u4F53\u58EE\uFF0C\u8FD1\u6218\u89C1\u957F\u3002"
+  attributeMods:
+  - attributeType: 0
+    mod: 2
+  - attributeType: 2
+    mod: 1
+  skillBoosts:
+  - skillType: 0
+    bonus: 2
+  - skillType: 2
+    bonus: 1
+  startingEquipment: []
+  startingItems:
+  - itemData: {fileID: 11400000, guid: 55e6ebb3e9dd338408eb0e11da79ddce, type: 2}
+    count: 2
+  - itemData: {fileID: 11400000, guid: fe2232b0a7fb89b448c41bd2b7d85db8, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
+    count: 2

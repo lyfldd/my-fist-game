@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: CanningMachine
+  m_EditorClassIdentifier: 
+  deviceName: "\u7F50\u5934\u5C01\u88C5\u673A"
+  icon: {fileID: 0}
+  description: 
+  tier: 4
+  builtPrefab: {fileID: 6689915254760250499, guid: 30cd4214e5ba47048879946e616c32a6, type: 3}
+  recipes:
+  - input: {fileID: 11400000, guid: 5edbb25917cdcf94bb70bce30f6bba87, type: 2}
+    inputCount: 1
+    output: {fileID: 11400000, guid: 72a9e1568de489b4a8bcbdd2867b9b8f, type: 2}
+    outputCount: 1
+    baseTime: 5
+  productionInterval: 5
+  batchSize: 1
+  requiresFuel: 1
+  fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

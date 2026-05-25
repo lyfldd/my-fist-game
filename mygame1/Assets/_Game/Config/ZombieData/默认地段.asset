@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 637fd9e05447b4145ad849905a79d697, type: 3}
+  m_Name: "\u9ED8\u8BA4\u5730\u6BB5"
+  m_EditorClassIdentifier: 
+  zoneName: "\u9ED8\u8BA4\u5730\u6BB5"
+  initialMin: 2
+  initialMax: 5
+  maxPerChunk: 10
+  respawnInterval: 120
+  minSpawnDistFromPlayer: 25
+  maxPerRespawnBatch: 2
+  typeWeights:
+  - data: {fileID: 11400000, guid: 352d46cb6cf536a4083b3b13819e38ad, type: 2}
+    weight: 60
+  - data: {fileID: 11400000, guid: fc50a5cb27fde964d8f82407771dada9, type: 2}
+    weight: 25
+  - data: {fileID: 11400000, guid: e87c0ab0ea84b2c41b7b3292588b9978, type: 2}
+    weight: 15
