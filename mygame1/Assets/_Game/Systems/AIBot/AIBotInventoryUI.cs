@@ -4,8 +4,7 @@ using _Game.Config;
 namespace _Game.Systems.AIBot
 {
     /// <summary>
-    /// AI机器人独立背包窗口。OnGUI 渲染，静态 Show/Hide。
-    /// 6×5格(30格)，200kg负重。
+    /// AI机器人独立背包窗口。6×5格(30格)，200kg负重。使用 GUI.Window 支持拖动。
     /// </summary>
     public class AIBotInventoryUI : MonoBehaviour
     {
@@ -19,8 +18,11 @@ namespace _Game.Systems.AIBot
 
         const float CELL_SIZE = 48f;
         const float CELL_GAP = 4f;
+        const int WINDOW_ID = 910;
 
         GUIStyle _headerStyle, _normalStyle, _slotStyle, _slotOccupiedStyle, _btnStyle;
+        GUIStyle _windowStyle;
+        Texture2D _winBg;
         bool _stylesInit;
 
         public static void Show(AIBot bot, AIBotInventory inventory)
@@ -33,6 +35,8 @@ namespace _Game.Systems.AIBot
             _instance._bot = bot;
             _instance._inventory = inventory;
             _instance._visible = true;
+            // 重置位置，下次 OnGUI 居中
+            _instance._panelRect = new Rect(0, 0, 0, 0);
         }
 
         public static void Hide()
@@ -51,20 +55,21 @@ namespace _Game.Systems.AIBot
             float w = Mathf.Max(gridW, 380f);
             float h = gridH;
 
-            float x = (Screen.width - w) * 0.5f;
-            float y = (Screen.height - h) * 0.5f;
-            _panelRect = new Rect(x, y, w, h);
+            // 首次或重置后居中
+            if (_panelRect.width < 1f)
+                _panelRect = new Rect((Screen.width - w) * 0.5f, (Screen.height - h) * 0.5f, w, h);
 
-            GUI.color = new Color(0.05f, 0.05f, 0.08f, 0.93f);
-            GUI.DrawTexture(_panelRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _panelRect = GUI.Window(WINDOW_ID, _panelRect, InventoryWindowFunc,
+                "AI机器人 背包", _windowStyle);
 
-            GUILayout.BeginArea(_panelRect);
-            GUILayout.Space(8);
+            // 点窗口外关闭
+            if (Event.current.type == EventType.MouseDown &&
+                !_panelRect.Contains(Event.current.mousePosition))
+                Hide();
+        }
 
-            GUILayout.Label("AI机器人 背包", _headerStyle);
-            GUILayout.Space(4);
-
+        void InventoryWindowFunc(int id)
+        {
             // 负重条
             GUILayout.BeginHorizontal();
             GUILayout.Label($"负重: {_inventory.CurrentWeight:F1}kg / {AIBotInventory.MAX_WEIGHT}kg", _normalStyle);
@@ -79,9 +84,8 @@ namespace _Game.Systems.AIBot
             GUILayout.EndHorizontal();
             GUILayout.Space(6);
 
-            // 格子网格（视口比内容小才能滚动）
-            float gridContentH = AIBotInventory.GRID_HEIGHT * (CELL_SIZE + CELL_GAP) + 40f;
-            float viewportH = Mathf.Min(gridContentH - 20f, 260f);
+            // 格子网格
+            float viewportH = Mathf.Min(AIBotInventory.GRID_HEIGHT * (CELL_SIZE + CELL_GAP), 260f);
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(viewportH));
             DrawGrid();
             GUILayout.EndScrollView();
@@ -90,18 +94,16 @@ namespace _Game.Systems.AIBot
             if (GUILayout.Button("关闭", _btnStyle, GUILayout.Height(32)))
                 Hide();
 
-            GUILayout.EndArea();
-
-            // 点面板外关闭
-            if (Event.current.type == EventType.MouseDown &&
-                !_panelRect.Contains(Event.current.mousePosition))
-                Hide();
+            GUI.DragWindow(new Rect(0, 0, 10000, 22));
         }
 
         void DrawGrid()
         {
             float startX = 10f;
-            float startY = 80f;
+            float startY = 4f;
+
+            // 获取窗口在屏幕上的位置，用于修正 tooltip 坐标
+            Vector2 windowPos = GUIUtility.GUIToScreenPoint(Vector2.zero);
 
             var slots = _inventory.GetAllSlots();
             for (int row = 0; row < AIBotInventory.GRID_HEIGHT; row++)
@@ -116,21 +118,20 @@ namespace _Game.Systems.AIBot
                     float cy = startY + row * (CELL_SIZE + CELL_GAP);
                     Rect cellRect = new Rect(cx, cy, CELL_SIZE, CELL_SIZE);
 
-                    // 格子背景
                     GUI.color = new Color(0.2f, 0.2f, 0.25f, 0.9f);
                     GUI.DrawTexture(cellRect, Texture2D.whiteTexture);
                     GUI.color = Color.white;
 
                     if (slot.itemData != null)
                     {
-                        // 物品名缩写
                         string label = slot.itemData.itemName.Length > 4
                             ? slot.itemData.itemName.Substring(0, 4)
                             : slot.itemData.itemName;
                         GUI.Label(cellRect, $"{label}\n×{slot.count}", _slotOccupiedStyle);
 
-                        // 悬停提示
-                        if (cellRect.Contains(Event.current.mousePosition))
+                        // 修正：mousePosition 是屏幕坐标，cellRect 是窗口本地坐标
+                        Vector2 localMouse = Event.current.mousePosition - windowPos;
+                        if (cellRect.Contains(localMouse))
                         {
                             Vector2 tooltipPos = Event.current.mousePosition + new Vector2(15, -10);
                             float tw = 160f, th = 36f;
@@ -178,6 +179,20 @@ namespace _Game.Systems.AIBot
             {
                 fontSize = 14, fontStyle = FontStyle.Bold
             };
+
+            _winBg = new Texture2D(1, 1);
+            _winBg.SetPixel(0, 0, new Color(0.05f, 0.05f, 0.08f, 0.93f));
+            _winBg.Apply();
+
+            _windowStyle = new GUIStyle(GUI.skin.window);
+            _windowStyle.normal.background = _winBg;
+            _windowStyle.onNormal.background = _winBg;
+            _windowStyle.border = new RectOffset(6, 6, 22, 6);
+            _windowStyle.padding = new RectOffset(10, 10, 24, 10);
+            _windowStyle.normal.textColor = Color.white;
+            _windowStyle.fontSize = 14;
+            _windowStyle.fontStyle = FontStyle.Bold;
+            _windowStyle.alignment = TextAnchor.UpperCenter;
         }
     }
 }

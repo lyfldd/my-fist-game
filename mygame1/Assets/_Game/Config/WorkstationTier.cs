@@ -10,6 +10,7 @@ namespace _Game.Config
         AdvancedBench, // 高级工作台（精密制造：武器/弹药/护甲/防御/通讯）
         Chemistry,           // 化学台（药剂/化工/燃料/投掷物）
         Machining,           // 机械加工台（工业设施/电力/车辆/动力）
-        ElectronicsAssembly  // 电子装配台（芯片/电路/传感器/精密电子）
+        ElectronicsAssembly, // 电子装配台（芯片/电路/传感器/精密电子）
+        ElementFurnace       // 元素合成炉（终局：聚变核心/高级能源）
     }
 }

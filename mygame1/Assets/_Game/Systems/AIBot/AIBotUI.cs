@@ -5,8 +5,14 @@ using _Game.Core;
 namespace _Game.Systems.AIBot
 {
     /// <summary>
-    /// AI机器人主面板 + 模式设置浮动窗。OnGUI 渲染，静态 Show/Hide。
+    /// AI机器人主面板 + 各设置浮动窗。主面板自定义拖动，浮动窗使用 GUI.Window 原生拖拽。
     /// </summary>
+    struct FloatWindow
+    {
+        public bool visible;
+        public Rect rect;
+    }
+
     public class AIBotUI : MonoBehaviour
     {
         static AIBotUI _instance;
@@ -17,24 +23,14 @@ namespace _Game.Systems.AIBot
         Rect _panelRect;
         Vector2 _scrollPos;
 
-        // 设置窗状态
-        bool _showFollowSettings;
-        bool _showGuardSettings;
-        bool _showPatrolSettings;
-        Rect _followSettingsRect;
-        Rect _guardSettingsRect;
-        Rect _patrolSettingsRect;
-        Vector2 _followScrollPos;
-        Vector2 _guardScrollPos;
-        Vector2 _patrolScrollPos;
+        // 主面板拖动
+        bool _isDragging;
+        Vector2 _dragOffset;
+        float _panelX = -1f, _panelY = -1f;
 
-        // 武器管理状态
-        bool _showRightArmConfig;
-        bool _showLeftArmConfig;
-        Rect _rightArmConfigRect;
-        Rect _leftArmConfigRect;
-        Vector2 _rightArmConfigScroll;
-        Vector2 _leftArmConfigScroll;
+        // 浮动窗口（各自独立拖动）
+        FloatWindow _wFollow, _wGuard, _wPatrol, _wRightArm, _wLeftArm, _wReactor;
+        Vector2 _followScrollPos, _guardScrollPos, _patrolScrollPos, _rightArmConfigScroll, _leftArmConfigScroll;
         ItemData _equippedRightArmItem;
         ItemData _equippedLeftArmItem;
         System.Collections.Generic.Dictionary<string, ItemData> _knownAmmoItems
@@ -42,7 +38,17 @@ namespace _Game.Systems.AIBot
 
         // 样式
         GUIStyle _headerStyle, _normalStyle, _greenStyle, _redStyle, _yellowStyle, _btnStyle, _smallBtnStyle;
+        GUIStyle _floatWindowStyle;
+        Texture2D _winBg;
         bool _stylesInit;
+
+        // GUI.Window 唯一 ID
+        const int WID_FOLLOW    = 901;
+        const int WID_GUARD     = 902;
+        const int WID_PATROL    = 903;
+        const int WID_RIGHT_ARM = 904;
+        const int WID_LEFT_ARM  = 905;
+        const int WID_REACTOR   = 906;
 
         // ============================================================
         // 静态接口
@@ -58,9 +64,10 @@ namespace _Game.Systems.AIBot
             _instance._bot = bot;
             _instance._combat = bot?.GetComponent<AIBotCombat>();
             _instance._visible = true;
-            _instance._showFollowSettings = false;
-            _instance._showGuardSettings = false;
-            _instance._showPatrolSettings = false;
+            _instance._panelX = -1f;
+            _instance._wFollow = default; _instance._wGuard = default;
+            _instance._wPatrol = default; _instance._wRightArm = default;
+            _instance._wLeftArm = default; _instance._wReactor = default;
         }
 
         public static void Hide()
@@ -80,12 +87,20 @@ namespace _Game.Systems.AIBot
             if (!_visible || _bot == null) return;
             InitStyles();
 
-            // 面板高度自适应屏幕，内容超出时滚动
+            // 面板尺寸
             float maxPanelH = Screen.height - 40f;
             float w = 420f, h = Mathf.Min(420f, maxPanelH);
-            float x = (Screen.width - w) * 0.5f;
-            float y = (Screen.height - h) * 0.5f;
-            _panelRect = new Rect(x, y, w, h);
+
+            // 首次显示时居中
+            if (_panelX < 0f) { _panelX = (Screen.width - w) * 0.5f; _panelY = (Screen.height - h) * 0.5f; }
+
+            // 限制不拖出屏幕
+            _panelX = Mathf.Clamp(_panelX, -w + 60f, Screen.width - 60f);
+            _panelY = Mathf.Clamp(_panelY, 0f, Screen.height - 40f);
+            _panelRect = new Rect(_panelX, _panelY, w, h);
+
+            // 拖动处理
+            HandleDrag();
 
             // 背景
             GUI.color = new Color(0.05f, 0.05f, 0.08f, 0.93f);
@@ -94,54 +109,55 @@ namespace _Game.Systems.AIBot
 
             GUILayout.BeginArea(_panelRect);
 
-            // 标题
+            // 标题（可拖动区域）
             GUILayout.Space(8);
-            GUILayout.Label("AI机器人", _headerStyle);
+            Rect titleRect = GUILayoutUtility.GetRect(w - 16f, 24f);
+            GUI.Label(titleRect, "AI机器人 (拖拽标题移动)", _headerStyle);
+
+            // 关闭按钮
+            Rect closeRect = new Rect(w - 32f, 10f, 24f, 24f);
+            GUI.color = new Color(1f, 0.3f, 0.3f);
+            if (GUI.Button(closeRect, "✕", _smallBtnStyle))
+                Hide();
+            GUI.color = Color.white;
+
             GUILayout.Space(4);
 
-            // 滚动区域：视口高度 = 面板剩余高度
+            // 滚动区域
             float scrollH = h - 50f;
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(scrollH));
 
-            // === 血量条 ===
             DrawHPBar();
             GUILayout.Space(8);
 
-            // === 能量模式 + 双能量条 ===
             DrawEnergySection();
             GUILayout.Space(8);
 
-            // === 攻击优先级 ===
             DrawPrioritySection();
             GUILayout.Space(4);
 
-            // === 警觉距离 ===
             DrawAlertRangeSlider();
             GUILayout.Space(8);
 
-            // === 武器挂载 ===
             DrawWeaponSlots();
             GUILayout.Space(8);
 
-            // === 指令按钮 ===
             DrawCommandButtons();
             GUILayout.Space(8);
 
-            // === 操作按钮 ===
             DrawActionButtons();
             GUILayout.Space(12);
 
             GUILayout.EndScrollView();
             GUILayout.EndArea();
 
-            // 设置浮动窗
-            if (_showFollowSettings) DrawFollowSettings();
-            if (_showGuardSettings) DrawGuardSettings();
-            if (_showPatrolSettings) DrawPatrolSettings();
-
-            // 武器管理浮动窗
-            if (_showRightArmConfig) DrawRightArmConfig();
-            if (_showLeftArmConfig) DrawLeftArmConfig();
+            // 设置浮动窗（各自使用 GUI.Window 独立拖动）
+            if (_wFollow.visible) DrawFollowSettings();
+            if (_wGuard.visible) DrawGuardSettings();
+            if (_wPatrol.visible) DrawPatrolSettings();
+            if (_wRightArm.visible) DrawRightArmConfig();
+            if (_wLeftArm.visible) DrawLeftArmConfig();
+            if (_wReactor.visible) DrawReactorUI();
 
             // 点面板外关闭
             if (Event.current.type == EventType.MouseDown &&
@@ -152,11 +168,12 @@ namespace _Game.Systems.AIBot
 
         bool IsClickInSettings(Vector2 pos)
         {
-            if (_showFollowSettings && _followSettingsRect.Contains(pos)) return true;
-            if (_showGuardSettings && _guardSettingsRect.Contains(pos)) return true;
-            if (_showPatrolSettings && _patrolSettingsRect.Contains(pos)) return true;
-            if (_showRightArmConfig && _rightArmConfigRect.Contains(pos)) return true;
-            if (_showLeftArmConfig && _leftArmConfigRect.Contains(pos)) return true;
+            if (_wFollow.visible && _wFollow.rect.Contains(pos)) return true;
+            if (_wGuard.visible && _wGuard.rect.Contains(pos)) return true;
+            if (_wPatrol.visible && _wPatrol.rect.Contains(pos)) return true;
+            if (_wRightArm.visible && _wRightArm.rect.Contains(pos)) return true;
+            if (_wLeftArm.visible && _wLeftArm.rect.Contains(pos)) return true;
+            if (_wReactor.visible && _wReactor.rect.Contains(pos)) return true;
             return false;
         }
 
@@ -181,6 +198,53 @@ namespace _Game.Systems.AIBot
             GUILayout.Label($"{_bot.HP:F0}/{_bot.MaxHP:F0}", _normalStyle, GUILayout.Width(80));
             GUILayout.EndHorizontal();
 
+            if (_bot.IsShieldAvailable || _bot.shieldActive)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("🛡", _normalStyle, GUILayout.Width(24));
+                float spct = _bot.ShieldPercent;
+                Color sColor = _bot.IsShieldActive && _bot.shieldStartupTimer <= 0f
+                    ? new Color(0.3f, 0.5f, 1f) : Color.gray;
+
+                Rect sBarRect = GUILayoutUtility.GetRect(300f, 14f);
+                GUI.color = new Color(0.2f, 0.2f, 0.3f);
+                GUI.DrawTexture(sBarRect, Texture2D.whiteTexture);
+                GUI.color = sColor;
+                GUI.DrawTexture(new Rect(sBarRect.x, sBarRect.y, sBarRect.width * spct, sBarRect.height), Texture2D.whiteTexture);
+                GUI.color = Color.white;
+
+                if (_bot.shieldStartupTimer > 0f)
+                    GUILayout.Label($"启动中... {_bot.shieldStartupTimer:F1}s", _yellowStyle, GUILayout.Width(100));
+                else if (!_bot.shieldActive)
+                    GUILayout.Label("未开启", _smallBtnStyle, GUILayout.Width(60));
+                else
+                    GUILayout.Label($"{_bot.ShieldCurrentHP:F0}/{_bot.ShieldMaxHP:F0}", _normalStyle, GUILayout.Width(80));
+
+                GUILayout.EndHorizontal();
+
+                if (_bot.IsShieldAvailable)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Space(28);
+                    if (_bot.shieldActive)
+                    {
+                        if (GUILayout.Button("关闭能量盾", _smallBtnStyle, GUILayout.Width(100)))
+                            _bot.DeactivateShield();
+                    }
+                    else
+                    {
+                        GUI.enabled = _bot.UraniumCurrent >= AIBot.SHIELD_STARTUP_COST;
+                        if (GUILayout.Button("开启能量盾 (30铀)", _smallBtnStyle, GUILayout.Width(130)))
+                            _bot.ActivateShield();
+                        GUI.enabled = true;
+                    }
+                    GUILayout.Label(_bot.shieldActive && _bot.shieldCurrentHP < _bot.shieldMaxHP
+                        ? $"维持:{AIBot.SHIELD_MAINTENANCE_RECHARGE}铀/s 回复:{AIBot.SHIELD_REGEN_PER_SEC}盾/s"
+                        : $"维持:{AIBot.SHIELD_MAINTENANCE_FULL}铀/s", _smallBtnStyle);
+                    GUILayout.EndHorizontal();
+                }
+            }
+
             if (_bot.IsLowHP)
             {
                 GUI.color = Color.red;
@@ -195,31 +259,61 @@ namespace _Game.Systems.AIBot
 
         void DrawEnergySection()
         {
-            bool isBattery = _bot.CurrentEnergyMode == EnergyMode.Battery;
+            var mode = _bot.CurrentEnergyMode;
 
-            // 电力模式
-            GUI.color = isBattery ? Color.cyan : Color.gray;
-            GUILayout.Label(isBattery ? "● 电力模式 (当前)" : "○ 电力模式", _normalStyle);
+            string modeLabel = mode switch
+            {
+                EnergyMode.EnergySaving => "♻ 节能模式",
+                EnergyMode.Electric => "● 电力模式",
+                EnergyMode.Uranium => "☢ 铀模式",
+                EnergyMode.Burst => "💥 爆发模式",
+                _ => "? 未知"
+            };
+            Color modeColor = mode switch
+            {
+                EnergyMode.EnergySaving => Color.green,
+                EnergyMode.Electric => Color.cyan,
+                EnergyMode.Uranium => new Color(1f, 0.6f, 0f),
+                EnergyMode.Burst => new Color(1f, 0.3f, 0f),
+                _ => Color.white
+            };
+            GUI.color = modeColor;
+            GUILayout.Label($"■ {modeLabel} (当前)", _normalStyle);
             GUI.color = Color.white;
+
+            GUILayout.BeginHorizontal();
+            GUI.color = Color.gray;
+            GUILayout.Label($"消耗×{_bot.ConsumptionMultiplier:F2}  速度×{_bot.SpeedMultiplier:F2}  冷却×{_bot.CooldownMultiplier:F2}", _smallBtnStyle);
+            GUI.color = Color.white;
+            GUILayout.EndHorizontal();
+
+            GUILayout.Space(2);
+
             DrawEnergyBar("🔋 电池", _bot.BatteryPercent, _bot.BatteryCurrent, _bot.BatteryMax, new Color(0.2f, 0.7f, 1f));
-
-            if (GUILayout.Button("切换电力模式", _smallBtnStyle, GUILayout.Width(120)))
-                _bot.SetEnergyMode(EnergyMode.Battery);
-
-            GUILayout.Space(4);
-
-            // 浓缩铀模式
-            GUI.color = !isBattery ? new Color(1f, 0.6f, 0f) : Color.gray;
-            GUILayout.Label(!isBattery ? "● 浓缩铀模式 (当前)" : "○ 浓缩铀模式", _normalStyle);
-            GUI.color = Color.white;
             DrawEnergyBar("☢ 铀燃料", _bot.UraniumPercent, _bot.UraniumCurrent, _bot.UraniumMax, new Color(1f, 0.5f, 0f));
 
-            if (GUILayout.Button("切换铀模式", _smallBtnStyle, GUILayout.Width(120)))
-                _bot.SetEnergyMode(EnergyMode.Uranium);
+            GUILayout.BeginHorizontal();
+            GUI.backgroundColor = _bot.ecoModeEnabled ? Color.green : Color.gray;
+            if (GUILayout.Button(_bot.ecoModeEnabled ? "节能:开" : "节能:关", _btnStyle, GUILayout.Height(28)))
+                _bot.ToggleEcoMode();
+            GUI.backgroundColor = Color.white;
 
-            GUILayout.Space(4);
+            bool canBurst = _bot.UraniumCurrent > 0f || (_bot.ecoModeEnabled && _bot.BatteryCurrent > 0f);
+            GUI.backgroundColor = _bot.burstModeEnabled ? new Color(1f, 0.3f, 0f) : Color.gray;
+            if (GUILayout.Button(_bot.burstModeEnabled ? "爆发:开" : "爆发:关", _btnStyle, GUILayout.Height(28)))
+                _bot.ToggleBurstMode();
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
 
-            // 太阳能板状态
+            if (_bot.ecoModeEnabled)
+            {
+                GUI.color = Color.green;
+                GUILayout.Label("⚠ 节能中：激光/AI辅助/AI接管已禁用", _smallBtnStyle);
+                GUI.color = Color.white;
+            }
+
+            GUILayout.Space(2);
+
             GUILayout.BeginHorizontal();
             bool solarActive = _bot.IsSolarActive;
             GUI.color = solarActive ? Color.green : Color.gray;
@@ -227,6 +321,26 @@ namespace _Game.Systems.AIBot
             GUI.color = Color.white;
             if (solarActive)
                 GUILayout.Label($"+{_bot.CurrentSolarRate:F1}/h", _greenStyle);
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            bool nuclearActive = _bot.IsNuclearActive;
+            GUI.color = nuclearActive ? new Color(1f, 0.6f, 0f) : Color.gray;
+            GUILayout.Label(nuclearActive ? "⚛ 微型反应堆 (运行中)" : "⚛ 微型反应堆 (休眠)", _normalStyle);
+            GUI.color = Color.white;
+            if (nuclearActive)
+                GUILayout.Label($"+{_bot.CurrentNuclearRate:F1}/h", _yellowStyle);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("打开反应堆", _smallBtnStyle, GUILayout.Width(90)))
+            { _wReactor.visible = !_wReactor.visible; if (_wReactor.visible) _wReactor.rect = new Rect(0, 0, 0, 0); }
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("移动速度:", _normalStyle, GUILayout.Width(80));
+            float sliderVal = GUILayout.HorizontalSlider(_bot.speedSliderValue, 0.25f, 1f, GUILayout.Width(200f));
+            _bot.speedSliderValue = Mathf.Round(sliderVal * 100f) / 100f;
+            float actualSpeed = (_bot.IsPiloted ? _bot.pilotBaseSpeed : _bot.moveSpeed) * _bot.SpeedMultiplier * _bot.speedSliderValue;
+            GUILayout.Label($"{actualSpeed:F1} m/s", _normalStyle, GUILayout.Width(60));
             GUILayout.EndHorizontal();
 
             if (_bot.IsShutdown)
@@ -317,7 +431,7 @@ namespace _Game.Systems.AIBot
             GUILayout.BeginHorizontal();
             GUILayout.Label("┌ 右臂", _smallBtnStyle);
             if (GUILayout.Button("⚙", _smallBtnStyle, GUILayout.Width(28), GUILayout.Height(18)))
-                _showRightArmConfig = !_showRightArmConfig;
+            { _wRightArm.visible = !_wRightArm.visible; if (_wRightArm.visible) _wRightArm.rect = new Rect(0, 0, 0, 0); }
             GUILayout.Label("──────────┐", _smallBtnStyle);
             GUILayout.EndHorizontal();
             string rightName = _combat.CurrentRightArm switch
@@ -340,7 +454,7 @@ namespace _Game.Systems.AIBot
             GUILayout.BeginHorizontal();
             GUILayout.Label("┌ 左臂", _smallBtnStyle);
             if (GUILayout.Button("⚙", _smallBtnStyle, GUILayout.Width(28), GUILayout.Height(18)))
-                _showLeftArmConfig = !_showLeftArmConfig;
+            { _wLeftArm.visible = !_wLeftArm.visible; if (_wLeftArm.visible) _wLeftArm.rect = new Rect(0, 0, 0, 0); }
             GUILayout.Label("──────────┐", _smallBtnStyle);
             GUILayout.EndHorizontal();
             string leftName = _combat.CurrentLeftArm switch
@@ -377,7 +491,7 @@ namespace _Game.Systems.AIBot
 
             GUI.backgroundColor = Color.white;
             if (GUILayout.Button("⚙", _smallBtnStyle, GUILayout.Width(28), GUILayout.Height(32)))
-                _showFollowSettings = !_showFollowSettings;
+            { _wFollow.visible = !_wFollow.visible; if (_wFollow.visible) _wFollow.rect = new Rect(0, 0, 0, 0); }
             GUILayout.Space(4);
 
             GUI.backgroundColor = isGuard ? Color.green : Color.gray;
@@ -386,7 +500,7 @@ namespace _Game.Systems.AIBot
 
             GUI.backgroundColor = Color.white;
             if (GUILayout.Button("⚙", _smallBtnStyle, GUILayout.Width(28), GUILayout.Height(32)))
-                _showGuardSettings = !_showGuardSettings;
+            { _wGuard.visible = !_wGuard.visible; if (_wGuard.visible) _wGuard.rect = new Rect(0, 0, 0, 0); }
             GUILayout.Space(4);
 
             GUI.backgroundColor = isPatrol ? Color.green : Color.gray;
@@ -395,7 +509,7 @@ namespace _Game.Systems.AIBot
 
             GUI.backgroundColor = Color.white;
             if (GUILayout.Button("⚙", _smallBtnStyle, GUILayout.Width(28), GUILayout.Height(32)))
-                _showPatrolSettings = !_showPatrolSettings;
+            { _wPatrol.visible = !_wPatrol.visible; if (_wPatrol.visible) _wPatrol.rect = new Rect(0, 0, 0, 0); }
 
             GUI.backgroundColor = Color.white;
             GUILayout.EndHorizontal();
@@ -407,7 +521,6 @@ namespace _Game.Systems.AIBot
 
         void DrawActionButtons()
         {
-            // 第一行：打开背包 / 加燃料 / 修理
             GUILayout.BeginHorizontal();
 
             if (GUILayout.Button("打开背包", _btnStyle, GUILayout.Height(34)))
@@ -429,7 +542,6 @@ namespace _Game.Systems.AIBot
 
             GUILayout.EndHorizontal();
 
-            // 第二行：驾驶 / AI接管武器
             GUILayout.BeginHorizontal();
 
             var pilot = _bot.GetComponent<AIBotPilot>();
@@ -455,18 +567,23 @@ namespace _Game.Systems.AIBot
 
             if (_combat != null)
             {
+                bool canOverride = _bot.IsAIWeaponOverrideEnabled;
+                if (!canOverride) _combat.aiWeaponOverride = false;
+
                 bool aiOverride = _combat.aiWeaponOverride;
+                GUI.enabled = canOverride;
                 GUI.backgroundColor = aiOverride ? Color.green : Color.gray;
                 if (GUILayout.Button(aiOverride ? "AI接管:开" : "AI接管:关", _btnStyle, GUILayout.Height(34)))
                     _combat.aiWeaponOverride = !_combat.aiWeaponOverride;
                 GUI.backgroundColor = Color.white;
+                GUI.enabled = true;
             }
 
             GUILayout.EndHorizontal();
         }
 
         // ============================================================
-        // 加燃料
+        // 加燃料 / 修理
         // ============================================================
 
         void AddFuelFromPlayerInventory()
@@ -474,7 +591,6 @@ namespace _Game.Systems.AIBot
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) { Debug.LogWarning("[AIBotUI] 未找到玩家背包"); return; }
 
-            // 尝试加电池组
             foreach (var placed in inv.placedItems)
             {
                 if (placed.itemData != null && placed.itemData.itemName == "电池组" && placed.count > 0)
@@ -490,7 +606,6 @@ namespace _Game.Systems.AIBot
                 }
             }
 
-            // 尝试加浓缩铀
             foreach (var placed in inv.placedItems)
             {
                 if (placed.itemData != null && placed.itemData.itemName == "浓缩铀" && placed.count > 0)
@@ -505,16 +620,11 @@ namespace _Game.Systems.AIBot
             Debug.LogWarning("[AIBotUI] 背包内无电池组或浓缩铀");
         }
 
-        // ============================================================
-        // 修理
-        // ============================================================
-
         void RepairFromPlayerInventory()
         {
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) { Debug.LogWarning("[AIBotUI] 未找到玩家背包"); return; }
 
-            // 优先用高级零件
             foreach (var placed in inv.placedItems)
             {
                 if (placed.itemData != null && placed.itemData.itemName == "高级零件" && placed.count > 0)
@@ -526,7 +636,6 @@ namespace _Game.Systems.AIBot
                 }
             }
 
-            // 用铁锭
             foreach (var placed in inv.placedItems)
             {
                 if (placed.itemData != null && placed.itemData.itemName == "铁锭" && placed.count > 0)
@@ -542,30 +651,26 @@ namespace _Game.Systems.AIBot
         }
 
         // ============================================================
-        // 武器管理浮动窗
+        // 右臂武器配置浮动窗
         // ============================================================
 
         void DrawRightArmConfig()
         {
-            float w = 280f, h = 320f;
-            float x = _panelRect.x + _panelRect.width + 10f;
-            float y = _panelRect.y;
-            _rightArmConfigRect = new Rect(x, y, w, h);
+            float fw = 280f, fh = 320f;
+            InitFloatPos(ref _wRightArm, fw, fh, false);
 
-            GUI.color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            GUI.DrawTexture(_rightArmConfigRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _wRightArm.rect = GUI.Window(WID_RIGHT_ARM, _wRightArm.rect, RightArmWindowFunc,
+                "右臂武器管理", _floatWindowStyle);
+        }
 
-            GUILayout.BeginArea(_rightArmConfigRect);
-            _rightArmConfigScroll = GUILayout.BeginScrollView(_rightArmConfigScroll, GUILayout.Height(240f));
-
-            GUILayout.Label("右臂武器管理", _headerStyle);
-            GUILayout.Space(6);
-
+        void RightArmWindowFunc(int id)
+        {
             var currentWeapon = _combat.CurrentRightArm;
             string ammoName = AIBotCombat.GetAmmoNameForWeapon(currentWeapon);
+            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
 
-            // 当前武器
+            _rightArmConfigScroll = GUILayout.BeginScrollView(_rightArmConfigScroll, GUILayout.Height(240f));
+
             GUILayout.BeginHorizontal();
             GUILayout.Label($"当前: {WeaponDisplayName(currentWeapon)}", _normalStyle);
             if (!string.IsNullOrEmpty(ammoName))
@@ -579,10 +684,8 @@ namespace _Game.Systems.AIBot
             }
 
             GUILayout.Space(6);
-
-            // 可装备武器
             GUILayout.Label("── 可装备武器 ──", _smallBtnStyle);
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+
             if (inv != null)
             {
                 foreach (RightArmWeapon rw in System.Enum.GetValues(typeof(RightArmWeapon)))
@@ -620,7 +723,6 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(6);
 
-            // 弹药
             if (!string.IsNullOrEmpty(ammoName))
             {
                 GUILayout.Label("── 弹药 ──", _smallBtnStyle);
@@ -638,30 +740,31 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
             if (GUILayout.Button("关闭", _btnStyle, GUILayout.Height(28)))
-                _showRightArmConfig = false;
+                _wRightArm.visible = false;
 
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
+
+        // ============================================================
+        // 左臂武器配置浮动窗
+        // ============================================================
 
         void DrawLeftArmConfig()
         {
-            float w = 260f, h = 280f;
-            float x = _panelRect.x + _panelRect.width + 10f;
-            float y = _panelRect.y + 160f;
-            _leftArmConfigRect = new Rect(x, y, w, h);
+            float fw = 260f, fh = 280f;
+            InitFloatPos(ref _wLeftArm, fw, fh, false);
 
-            GUI.color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            GUI.DrawTexture(_leftArmConfigRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _wLeftArm.rect = GUI.Window(WID_LEFT_ARM, _wLeftArm.rect, LeftArmWindowFunc,
+                "左臂武器管理", _floatWindowStyle);
+        }
 
-            GUILayout.BeginArea(_leftArmConfigRect);
-            _leftArmConfigScroll = GUILayout.BeginScrollView(_leftArmConfigScroll, GUILayout.Height(200f));
-
-            GUILayout.Label("左臂武器管理", _headerStyle);
-            GUILayout.Space(6);
-
+        void LeftArmWindowFunc(int id)
+        {
             var currentWeapon = _combat.CurrentLeftArm;
+            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+
+            _leftArmConfigScroll = GUILayout.BeginScrollView(_leftArmConfigScroll, GUILayout.Height(200f));
 
             GUILayout.Label($"当前: {WeaponDisplayName(currentWeapon)}", _normalStyle);
 
@@ -672,9 +775,8 @@ namespace _Game.Systems.AIBot
             }
 
             GUILayout.Space(6);
-
             GUILayout.Label("── 可装备武器 ──", _smallBtnStyle);
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+
             if (inv != null)
             {
                 foreach (LeftArmWeapon lw in System.Enum.GetValues(typeof(LeftArmWeapon)))
@@ -711,10 +813,10 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
             if (GUILayout.Button("关闭", _btnStyle, GUILayout.Height(28)))
-                _showLeftArmConfig = false;
+                _wLeftArm.visible = false;
 
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
         // ============================================================
@@ -726,18 +828,15 @@ namespace _Game.Systems.AIBot
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
-            // 先卸下当前武器
             if (_combat.CurrentRightArm != RightArmWeapon.None)
                 TryUnequipRightArm();
 
-            // 扣除武器物品
             inv.RemoveItem(itemData, 1);
             _combat.EquipRightArm(weapon);
             _equippedRightArmItem = itemData;
 
             Debug.Log($"[AIBotUI] 装备右臂武器: {WeaponDisplayName(weapon)}");
 
-            // 自动扫描并装入弹药
             string ammoName = AIBotCombat.GetAmmoNameForWeapon(weapon);
             if (!string.IsNullOrEmpty(ammoName))
                 LoadAmmoToBot(ammoName);
@@ -751,14 +850,12 @@ namespace _Game.Systems.AIBot
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
-            // 返还武器物品
             if (_equippedRightArmItem != null)
             {
                 inv.AddItem(_equippedRightArmItem, 1);
                 _equippedRightArmItem = null;
             }
 
-            // 自动取出弹药
             string ammoName = AIBotCombat.GetAmmoNameForWeapon(weapon);
             if (!string.IsNullOrEmpty(ammoName))
                 UnloadAmmoFromBot(ammoName);
@@ -772,11 +869,9 @@ namespace _Game.Systems.AIBot
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
-            // 先卸下当前武器
             if (_combat.CurrentLeftArm != LeftArmWeapon.None)
                 TryUnequipLeftArm();
 
-            // 扣除武器物品
             inv.RemoveItem(itemData, 1);
             _combat.EquipLeftArm(weapon);
             _equippedLeftArmItem = itemData;
@@ -792,7 +887,6 @@ namespace _Game.Systems.AIBot
             var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
-            // 返还武器物品
             if (_equippedLeftArmItem != null)
             {
                 inv.AddItem(_equippedLeftArmItem, 1);
@@ -814,7 +908,6 @@ namespace _Game.Systems.AIBot
             int playerCount = CountPlayerItem(inv, ammoName);
             if (playerCount <= 0) return;
 
-            // 缓存 ItemData 引用，方便后续取出
             if (!_knownAmmoItems.ContainsKey(ammoName))
                 _knownAmmoItems[ammoName] = itemData;
 
@@ -831,7 +924,6 @@ namespace _Game.Systems.AIBot
             int botCount = _combat.GetAmmoCount(ammoName);
             if (botCount <= 0) return;
 
-            // 优先从玩家背包找 ItemData，回退到缓存
             var itemData = FindPlayerItem(inv, ammoName);
             if (itemData == null)
                 _knownAmmoItems.TryGetValue(ammoName, out itemData);
@@ -902,19 +994,16 @@ namespace _Game.Systems.AIBot
 
         void DrawFollowSettings()
         {
-            float w = 220f, h = 200f;
-            float x = _panelRect.x + _panelRect.width + 10f;
-            float y = _panelRect.y;
-            _followSettingsRect = new Rect(x, y, w, h);
+            float fw = 220f, fh = 200f;
+            InitFloatPos(ref _wFollow, fw, fh, false);
 
-            GUI.color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            GUI.DrawTexture(_followSettingsRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _wFollow.rect = GUI.Window(WID_FOLLOW, _wFollow.rect, FollowWindowFunc,
+                "跟随设置", _floatWindowStyle);
+        }
 
-            GUILayout.BeginArea(_followSettingsRect);
+        void FollowWindowFunc(int id)
+        {
             _followScrollPos = GUILayout.BeginScrollView(_followScrollPos, GUILayout.Height(110f));
-            GUILayout.Label("跟随设置", _headerStyle);
-            GUILayout.Space(6);
 
             GUILayout.Label($"距离: {_bot.followDistance:F0}m", _normalStyle);
             float val = GUILayout.HorizontalSlider(_bot.followDistance, _bot.followDistanceMin, _bot.followDistanceMax,
@@ -924,7 +1013,6 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
 
-            // 快捷预设
             GUILayout.Label("快捷预设:", _normalStyle);
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("紧贴(1m)", _smallBtnStyle))
@@ -937,10 +1025,10 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
             if (GUILayout.Button("确定", _btnStyle, GUILayout.Height(28)))
-                _showFollowSettings = false;
+                _wFollow.visible = false;
 
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
         // ============================================================
@@ -949,19 +1037,16 @@ namespace _Game.Systems.AIBot
 
         void DrawGuardSettings()
         {
-            float w = 240f, h = 200f;
-            float x = _panelRect.x + _panelRect.width + 10f;
-            float y = _panelRect.y + 80f;
-            _guardSettingsRect = new Rect(x, y, w, h);
+            float fw = 240f, fh = 200f;
+            InitFloatPos(ref _wGuard, fw, fh, false);
 
-            GUI.color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            GUI.DrawTexture(_guardSettingsRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _wGuard.rect = GUI.Window(WID_GUARD, _wGuard.rect, GuardWindowFunc,
+                "驻守设置", _floatWindowStyle);
+        }
 
-            GUILayout.BeginArea(_guardSettingsRect);
+        void GuardWindowFunc(int id)
+        {
             _guardScrollPos = GUILayout.BeginScrollView(_guardScrollPos, GUILayout.Height(100f));
-            GUILayout.Label("驻守设置", _headerStyle);
-            GUILayout.Space(6);
 
             _bot.guardAutoRecallEnabled = GUILayout.Toggle(_bot.guardAutoRecallEnabled, "超距自动解除");
 
@@ -975,10 +1060,10 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
             if (GUILayout.Button("确定", _btnStyle, GUILayout.Height(28)))
-                _showGuardSettings = false;
+                _wGuard.visible = false;
 
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
         }
 
         // ============================================================
@@ -987,21 +1072,17 @@ namespace _Game.Systems.AIBot
 
         void DrawPatrolSettings()
         {
-            float w = 260f, h = 280f;
-            float x = _panelRect.x + _panelRect.width + 10f;
-            float y = _panelRect.y + 160f;
-            _patrolSettingsRect = new Rect(x, y, w, h);
+            float fw = 260f, fh = 280f;
+            InitFloatPos(ref _wPatrol, fw, fh, false);
 
-            GUI.color = new Color(0.1f, 0.1f, 0.15f, 0.95f);
-            GUI.DrawTexture(_patrolSettingsRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
+            _wPatrol.rect = GUI.Window(WID_PATROL, _wPatrol.rect, PatrolWindowFunc,
+                "巡逻设置", _floatWindowStyle);
+        }
 
-            GUILayout.BeginArea(_patrolSettingsRect);
+        void PatrolWindowFunc(int id)
+        {
             _patrolScrollPos = GUILayout.BeginScrollView(_patrolScrollPos, GUILayout.Height(180f));
-            GUILayout.Label("巡逻设置", _headerStyle);
-            GUILayout.Space(6);
 
-            // 巡逻模式
             bool aroundPlayer = GUILayout.Toggle(_bot.patrolAroundPlayer, "围绕玩家");
             if (aroundPlayer != _bot.patrolAroundPlayer)
             {
@@ -1024,7 +1105,6 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(4);
 
-            // 半径
             GUILayout.Label($"巡逻半径: {_bot.patrolRadius:F0}m", _normalStyle);
             float r = GUILayout.HorizontalSlider(_bot.patrolRadius, _bot.patrolRadiusMin, _bot.patrolRadiusMax,
                 GUILayout.Width(200f));
@@ -1033,7 +1113,6 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(4);
 
-            // 超距解除
             _bot.patrolAutoRecallEnabled = GUILayout.Toggle(_bot.patrolAutoRecallEnabled, "超距自动解除");
 
             GUI.enabled = _bot.patrolAutoRecallEnabled;
@@ -1046,10 +1125,190 @@ namespace _Game.Systems.AIBot
 
             GUILayout.Space(8);
             if (GUILayout.Button("确定", _btnStyle, GUILayout.Height(28)))
-                _showPatrolSettings = false;
+                _wPatrol.visible = false;
 
             GUILayout.EndScrollView();
-            GUILayout.EndArea();
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
+        }
+
+        // ============================================================
+        // 微型反应堆窗口 (3×3)
+        // ============================================================
+
+        void DrawReactorUI()
+        {
+            float fw = 260f, fh = 320f;
+            InitFloatPos(ref _wReactor, fw, fh, true);
+
+            _wReactor.rect = GUI.Window(WID_REACTOR, _wReactor.rect, ReactorWindowFunc,
+                "⚛ 微型反应堆 (3×3)", _floatWindowStyle);
+        }
+
+        void ReactorWindowFunc(int id)
+        {
+            GUILayout.Label(_bot.IsNuclearActive
+                ? $"运行中: +{_bot.CurrentNuclearRate:F1} 铀/h"
+                : "休眠中 (非铀模式)", _normalStyle);
+            GUILayout.Space(4);
+
+            for (int row = 0; row < 3; row++)
+            {
+                GUILayout.BeginHorizontal();
+                for (int col = 0; col < 3; col++)
+                {
+                    int idx = row * 3 + col;
+                    var slot = _bot.reactorSlots[idx];
+
+                    GUILayout.BeginVertical(GUILayout.Width(70), GUILayout.Height(70));
+
+                    Rect cellRect = GUILayoutUtility.GetRect(64f, 64f);
+                    if (slot.IsEmpty)
+                    {
+                        GUI.color = new Color(0.2f, 0.2f, 0.25f);
+                        GUI.DrawTexture(cellRect, Texture2D.whiteTexture);
+                        GUI.color = Color.white;
+                        GUI.Label(new Rect(cellRect.x + 15, cellRect.y + 20, 40f, 20f), "空", _smallBtnStyle);
+                    }
+                    else
+                    {
+                        Color cellColor = slot.IsLarge ? new Color(1f, 0.4f, 0f, 0.6f) : new Color(0.2f, 0.7f, 1f, 0.5f);
+                        GUI.color = cellColor;
+                        GUI.DrawTexture(cellRect, Texture2D.whiteTexture);
+                        GUI.color = Color.white;
+                        GUI.Label(new Rect(cellRect.x + 4, cellRect.y + 4, 56f, 16f),
+                            slot.IsLarge ? "大核心" : "小核心", _smallBtnStyle);
+                        float remainPct = slot.burnRemaining / Mathf.Max(slot.burnTime, 0.01f);
+                        GUI.Label(new Rect(cellRect.x + 4, cellRect.y + 20, 56f, 16f),
+                            $"{slot.burnRemaining:F1}h", _yellowStyle);
+                        GUI.Label(new Rect(cellRect.x + 4, cellRect.y + 36, 56f, 16f),
+                            $"{slot.outputRate:F0}/h", _greenStyle);
+
+                        GUI.color = new Color(0.3f, 0.3f, 0.3f);
+                        GUI.DrawTexture(new Rect(cellRect.x + 2, cellRect.y + 54, 60f, 8f), Texture2D.whiteTexture);
+                        GUI.color = slot.IsLarge ? new Color(1f, 0.5f, 0f) : Color.cyan;
+                        GUI.DrawTexture(new Rect(cellRect.x + 2, cellRect.y + 54, 60f * remainPct, 8f), Texture2D.whiteTexture);
+                        GUI.color = Color.white;
+                    }
+
+                    if (slot.IsEmpty)
+                    {
+                        if (GUILayout.Button("装入", _smallBtnStyle, GUILayout.Height(20)))
+                            LoadFusionCore(idx);
+                    }
+                    else
+                    {
+                        if (GUILayout.Button("取出", _smallBtnStyle, GUILayout.Height(20)))
+                        {
+                            ReturnFusionCore(idx);
+                            _bot.reactorSlots[idx] = default;
+                        }
+                    }
+
+                    GUILayout.EndVertical();
+                }
+                GUILayout.EndHorizontal();
+                GUILayout.Space(2);
+            }
+
+            GUILayout.Space(8);
+            if (GUILayout.Button("关闭", _btnStyle, GUILayout.Height(28)))
+                _wReactor.visible = false;
+
+            GUI.DragWindow(new Rect(0, 0, 10000, 20));
+        }
+
+        void LoadFusionCore(int slotIdx)
+        {
+            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            if (inv == null) { Debug.LogWarning("[ReactorUI] 未找到玩家背包"); return; }
+
+            foreach (var placed in inv.placedItems)
+            {
+                if (placed.itemData == null || placed.count <= 0) continue;
+                bool isSmall = placed.itemData.itemName == "聚变核心(小)";
+                bool isLarge = placed.itemData.itemName == "聚变核心(大)";
+                if (!isSmall && !isLarge) continue;
+
+                var itemRef = placed.itemData;
+                inv.RemoveItem(placed.itemData, 1);
+
+                _bot.reactorSlots[slotIdx] = new FusionCoreSlot
+                {
+                    itemName = itemRef.itemName,
+                    itemData = itemRef,
+                    burnTime = isLarge ? 12f : 4f,
+                    burnRemaining = isLarge ? 12f : 4f,
+                    outputRate = isLarge ? 45f : 30f
+                };
+                Debug.Log($"[ReactorUI] 装入 {itemRef.itemName} 到槽位 {slotIdx}");
+                return;
+            }
+
+            Debug.LogWarning("[ReactorUI] 背包中没有聚变核心");
+        }
+
+        void ReturnFusionCore(int slotIdx)
+        {
+            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            if (inv == null) return;
+
+            var slot = _bot.reactorSlots[slotIdx];
+            if (slot.IsEmpty) return;
+
+            if (slot.itemData != null)
+                inv.AddItem(slot.itemData, 1);
+
+            _bot.reactorSlots[slotIdx] = default;
+            Debug.Log($"[ReactorUI] 取出 {slot.itemName} 从槽位 {slotIdx}");
+        }
+
+        // ============================================================
+        // 浮动窗位置初始化
+        // ============================================================
+
+        void InitFloatPos(ref FloatWindow w, float width, float height, bool leftSide)
+        {
+            if (w.rect.width < 1f)
+            {
+                float x = leftSide
+                    ? _panelRect.x - width - 10f
+                    : _panelRect.x + _panelRect.width + 10f;
+                float y = _panelRect.y + 40f;
+                x = Mathf.Clamp(x, -width + 60f, Screen.width - 60f);
+                y = Mathf.Clamp(y, 0f, Screen.height - 40f);
+                w.rect = new Rect(x, y, width, height);
+            }
+        }
+
+        // ============================================================
+        // 主面板拖动
+        // ============================================================
+
+        void HandleDrag()
+        {
+            Event e = Event.current;
+            Rect dragArea = new Rect(_panelRect.x, _panelRect.y, _panelRect.width, 40f);
+
+            if (e.type == EventType.MouseDown && e.button == 0 && dragArea.Contains(e.mousePosition))
+            {
+                Rect closeRect = new Rect(_panelRect.x + _panelRect.width - 32f, _panelRect.y + 10f, 24f, 24f);
+                if (!closeRect.Contains(e.mousePosition))
+                {
+                    _isDragging = true;
+                    _dragOffset = e.mousePosition - new Vector2(_panelRect.x, _panelRect.y);
+                    e.Use();
+                }
+            }
+
+            if (e.type == EventType.MouseUp && e.button == 0)
+                _isDragging = false;
+
+            if (_isDragging && e.type == EventType.MouseDrag)
+            {
+                _panelX = e.mousePosition.x - _dragOffset.x;
+                _panelY = e.mousePosition.y - _dragOffset.y;
+                e.Use();
+            }
         }
 
         // ============================================================
@@ -1091,6 +1350,22 @@ namespace _Game.Systems.AIBot
             {
                 fontSize = 12
             };
+
+            // 浮动窗样式（深色背景，无边框）
+            _winBg = new Texture2D(1, 1);
+            _winBg.SetPixel(0, 0, new Color(0.08f, 0.08f, 0.14f, 0.95f));
+            _winBg.Apply();
+
+            _floatWindowStyle = new GUIStyle(GUI.skin.window);
+            _floatWindowStyle.normal.background = _winBg;
+            _floatWindowStyle.onNormal.background = _winBg;
+            _floatWindowStyle.border = new RectOffset(6, 6, 22, 6);
+            _floatWindowStyle.padding = new RectOffset(10, 10, 24, 10);
+            _floatWindowStyle.contentOffset = new Vector2(0, -2);
+            _floatWindowStyle.normal.textColor = Color.white;
+            _floatWindowStyle.fontSize = 14;
+            _floatWindowStyle.fontStyle = FontStyle.Bold;
+            _floatWindowStyle.alignment = TextAnchor.UpperCenter;
         }
     }
 }

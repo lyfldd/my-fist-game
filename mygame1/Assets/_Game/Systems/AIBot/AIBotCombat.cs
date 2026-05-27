@@ -135,8 +135,8 @@ namespace _Game.Systems.AIBot
             if (_bot.IsDead || _bot.IsShutdown) return;
             if (_bot.IsLowHP && !_nearPlayer) return;
 
-            // 冷却计时（铀模式下快一倍）
-            float dt = UnityEngine.Time.deltaTime * (_bot.CurrentEnergyMode == EnergyMode.Uranium ? 2f : 1f);
+            // 冷却计时（按模式倍率）
+            float dt = UnityEngine.Time.deltaTime * _bot.CooldownMultiplier;
             if (_laserTimer > 0f) _laserTimer -= dt;
             if (_rightArmTimer > 0f) _rightArmTimer -= dt;
             if (_leftArmTimer > 0f) _leftArmTimer -= dt;
@@ -217,20 +217,22 @@ namespace _Game.Systems.AIBot
             if (rightArmTarget < 0 && validCount > 0) rightArmTarget = 0;
             if (leftArmTarget < 0 && validCount > 0) leftArmTarget = 0;
 
-            // 各武器独立开火（驾驶中跳过手动武器，除非AI接管）
-            if (aiWeaponOverride || manualWeaponSlot != AttackPriority.Laser)
+            // 各武器独立开火（节能模式下无AI辅助，驾驶中跳过手动武器除非AI接管）
+            bool allowAutoFire = _bot.IsAIAssistEnabled || aiWeaponOverride;
+
+            if (allowAutoFire && _bot.IsLaserEnabled)
             {
                 if (_laserTimer <= 0f && laserTarget >= 0 && CanFireLaser(laserTarget))
                     FireLaser(_hitBuffer[laserTarget]);
             }
 
-            if (aiWeaponOverride || manualWeaponSlot != AttackPriority.RightArm)
+            if (allowAutoFire || manualWeaponSlot == AttackPriority.RightArm)
             {
                 if (_rightArmTimer <= 0f && rightArm != RightArmWeapon.None && rightArmTarget >= 0 && CanFireRightArm(rightArmTarget))
                     FireRightArm(_hitBuffer[rightArmTarget]);
             }
 
-            if (aiWeaponOverride || manualWeaponSlot != AttackPriority.LeftArm)
+            if (allowAutoFire || manualWeaponSlot == AttackPriority.LeftArm)
             {
                 if (_leftArmTimer <= 0f && leftArm != LeftArmWeapon.None && leftArm != LeftArmWeapon.Shield && leftArm != LeftArmWeapon.Chainsaw)
                 {
@@ -246,29 +248,47 @@ namespace _Game.Systems.AIBot
 
         bool CanFireLaser(int hitIndex)
         {
+            if (!_bot.IsLaserEnabled) return false;
             if (hitIndex < 0) return false;
             var dz = _hitBuffer[hitIndex].GetComponentInParent<DamageableZombie>();
             if (dz == null || dz.IsDead) return false;
 
-            float range = _bot.CurrentEnergyMode == EnergyMode.Uranium ? laserRangeUranium : laserRangeBattery;
+            float range = GetLaserRange();
             float dist = Vector3.Distance(transform.position, _hitBuffer[hitIndex].transform.position);
             return dist <= range;
         }
 
+        float GetLaserRange()
+        {
+            return _bot.CurrentEnergyMode switch
+            {
+                EnergyMode.Uranium => laserRangeUranium * 1f,
+                EnergyMode.Burst => laserRangeUranium * 1.25f,
+                _ => laserRangeBattery
+            };
+        }
+
+        float GetLaserDamage()
+        {
+            return _bot.CurrentEnergyMode switch
+            {
+                EnergyMode.Uranium => laserDamageUranium,
+                EnergyMode.Burst => laserDamageUranium * 1.25f,
+                _ => laserDamageBattery
+            };
+        }
+
         void FireLaser(Collider targetCollider)
         {
-            float damage = _bot.CurrentEnergyMode == EnergyMode.Uranium ? laserDamageUranium : laserDamageBattery;
+            if (!_bot.IsLaserEnabled) return;
+            float damage = GetLaserDamage();
             var dz = targetCollider.GetComponentInParent<DamageableZombie>();
             if (dz == null) return;
 
             dz.TakeDamage(damage);
             _laserTimer = laserCooldown;
 
-            // 消耗能量
-            _bot.ConsumeEnergyForAction(
-                _bot.CurrentEnergyMode == EnergyMode.Uranium
-                    ? AIBot.ENERGY_LASER_PER_SHOT * 0.5f
-                    : AIBot.ENERGY_LASER_PER_SHOT);
+            _bot.ConsumeEnergyForAction(AIBot.ENERGY_LASER_PER_SHOT);
 
             Debug.DrawLine(transform.position, targetCollider.transform.position, Color.red, 0.5f);
         }
@@ -615,13 +635,13 @@ namespace _Game.Systems.AIBot
         /// <summary>激光自动锁敌：扫描范围内最近僵尸→锁定→发射。</summary>
         public void ManualFireLaser()
         {
+            if (!_bot.IsLaserEnabled) { Debug.Log("[AIBotCombat] 激光在节能模式下禁用"); return; }
             if (_laserTimer > 0f) { Debug.Log("[AIBotCombat] 激光冷却中"); return; }
 
-            float range = _bot.CurrentEnergyMode == EnergyMode.Uranium ? laserRangeUranium : laserRangeBattery;
+            float range = GetLaserRange();
             int hitCount = Physics.OverlapSphereNonAlloc(transform.position, range, _hitBuffer, zombieLayer);
             if (hitCount == 0) { Debug.Log("[AIBotCombat] 激光范围内无目标"); return; }
 
-            // 找最近的活僵尸
             DamageableZombie nearest = null;
             float nearestDist = float.MaxValue;
             for (int i = 0; i < hitCount; i++)
@@ -634,15 +654,12 @@ namespace _Game.Systems.AIBot
 
             if (nearest == null) { Debug.Log("[AIBotCombat] 范围内无活僵尸"); return; }
 
-            float damage = _bot.CurrentEnergyMode == EnergyMode.Uranium ? laserDamageUranium : laserDamageBattery;
+            float damage = GetLaserDamage();
             nearest.TakeDamage(damage);
             _laserTimer = laserCooldown;
             Debug.Log($"[AIBotCombat] 激光命中 {nearest.name}, 伤害={damage}");
 
-            _bot.ConsumeEnergyForAction(
-                _bot.CurrentEnergyMode == EnergyMode.Uranium
-                    ? AIBot.ENERGY_LASER_PER_SHOT * 0.5f
-                    : AIBot.ENERGY_LASER_PER_SHOT);
+            _bot.ConsumeEnergyForAction(AIBot.ENERGY_LASER_PER_SHOT);
 
             Debug.DrawLine(transform.position, nearest.transform.position, Color.red, 0.5f);
         }

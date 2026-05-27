@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2581399b8c6bbf44ebf462398779fc5b, type: 3}
+  m_Name: FusionCore_Large
+  m_EditorClassIdentifier: 
+  itemName: "\u805A\u53D8\u6838\u5FC3(\u5927)"
+  icon: {fileID: 0}
+  description: "\u5927\u578B\u5FAE\u578B\u6838\u53CD\u5E94\u5806\u71C3\u6599\u68D2\u30023\u4E2A\u5C0F\u6838\u5FC3\u5408\u6210\u3002\u71C3\u801712\u5C0F\u65F6\uFF0C\u4EA7\u51FA\u94C045/h\u3002"
+  gridWidth: 1
+  gridHeight: 1
+  category: 1
+  maxStack: 5
+  weight: 5
+  quality: 0
+  hasDurability: 0
+  maxDurability: 100
+  usageTags: 
+  isWorkstation: 0
+  workstationTier: 0
+  equipSlot: 0
+  storageWidth: 0
+  storageHeight: 0
+  armorValue: 0
+  worldPrefab: {fileID: 0}
+  useTime: 1
+  itemEffects: []
+  warmthValue: 0
+  isWaterproof: 0
+  isFirearm: 0
+  weaponDamage: 10
+  weaponRange: 50
+  fireRate: 0.5
+  baseSpread: 2
+  maxSpread: 15
+  spreadRecovery: 8
+  spreadPerShot: 1.5
+  magazineSize: 0
+  range: 50

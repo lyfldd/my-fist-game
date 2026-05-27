@@ -90,7 +90,6 @@ namespace _Game.Systems.AIBot
             {
                 moveDir.Normalize();
 
-                // 将移动方向从摄像机视角转换到世界空间
                 Camera cam = Camera.main;
                 if (cam != null)
                 {
@@ -104,9 +103,9 @@ namespace _Game.Systems.AIBot
                     Vector3 worldDir = camForward * moveDir.z + camRight * moveDir.x;
                     worldDir.Normalize();
 
-                    _agent.Move(worldDir * moveSpeed * UnityEngine.Time.deltaTime);
+                    float speed = moveSpeed * _bot.SpeedMultiplier * _bot.speedSliderValue;
+                    _agent.Move(worldDir * speed * UnityEngine.Time.deltaTime);
 
-                    // 旋转朝向移动方向
                     Quaternion targetRot = Quaternion.LookRotation(worldDir, Vector3.up);
                     transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRot, rotationSpeed * UnityEngine.Time.deltaTime);
                 }
@@ -187,13 +186,25 @@ namespace _Game.Systems.AIBot
 
         public void CycleManualWeapon()
         {
-            ManualWeaponSlot = ManualWeaponSlot switch
+            // 节能模式下跳过激光
+            if (!_bot.IsLaserEnabled)
             {
-                AttackPriority.Laser => AttackPriority.RightArm,
-                AttackPriority.RightArm => AttackPriority.LeftArm,
-                AttackPriority.LeftArm => AttackPriority.Laser,
-                _ => AttackPriority.Laser
-            };
+                ManualWeaponSlot = ManualWeaponSlot switch
+                {
+                    AttackPriority.RightArm => AttackPriority.LeftArm,
+                    _ => AttackPriority.RightArm
+                };
+            }
+            else
+            {
+                ManualWeaponSlot = ManualWeaponSlot switch
+                {
+                    AttackPriority.Laser => AttackPriority.RightArm,
+                    AttackPriority.RightArm => AttackPriority.LeftArm,
+                    AttackPriority.LeftArm => AttackPriority.Laser,
+                    _ => AttackPriority.Laser
+                };
+            }
 
             if (_combat != null)
                 _combat.manualWeaponSlot = ManualWeaponSlot;
@@ -208,6 +219,11 @@ namespace _Game.Systems.AIBot
 
             if (ManualWeaponSlot == AttackPriority.Laser)
             {
+                if (!_bot.IsLaserEnabled)
+                {
+                    Debug.Log("[AIBotPilot] 激光在节能模式下禁用");
+                    return;
+                }
                 Debug.Log("[AIBotPilot] 激光开火");
                 _combat.ManualFireLaser();
             }

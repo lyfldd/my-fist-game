@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Character;
 using _Game.Systems.Combat;
@@ -7,10 +8,24 @@ using _Game.Systems.Combat;
 namespace _Game.Systems.AIBot
 {
     public enum AIBotCommand { Follow, Guard, Patrol, Pilot }
-    public enum EnergyMode { Battery, Uranium }
+    public enum EnergyMode { EnergySaving, Electric, Uranium, Burst }
+
+    [System.Serializable]
+    public struct FusionCoreSlot
+    {
+        public string itemName;       // "聚变核心(小)" / "聚变核心(大)"
+        public ItemData itemData;     // 物品引用（用于取出归还背包）
+        public float burnTime;        // 总燃耗时(h)
+        public float burnRemaining;   // 剩余燃耗时(h)
+        public float outputRate;      // 铀产出/h
+
+        public bool IsEmpty => string.IsNullOrEmpty(itemName) || burnRemaining <= 0f;
+        public bool IsSmall => itemName == "聚变核心(小)";
+        public bool IsLarge => itemName == "聚变核心(大)";
+    }
 
     /// <summary>
-    /// AI机器人主控制器。状态机 + 双能量 + 血量 + 防自杀协调。
+    /// AI机器人主控制器。状态机 + 四能量模式 + 血量 + 防自杀协调。
     /// 由 AIBotBuildable 在放置后初始化。
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
@@ -28,8 +43,31 @@ namespace _Game.Systems.AIBot
 
         [Header("当前状态")]
         [SerializeField] private AIBotCommand currentCommand = AIBotCommand.Follow;
-        [SerializeField] private EnergyMode energyMode = EnergyMode.Battery;
+        [SerializeField] private EnergyMode energyMode = EnergyMode.Electric;
         [SerializeField] private bool isDead;
+
+        [Header("节能模式")]
+        public bool ecoModeEnabled;
+
+        [Header("爆发模式")]
+        public bool burstModeEnabled;
+        public bool shieldActive;
+        public float shieldMaxHP = 500f;
+        public float shieldCurrentHP;
+        public float shieldStartupTimer;
+        public const float SHIELD_STARTUP_TIME = 5f;
+        public const float SHIELD_STARTUP_COST = 30f;
+        public const float SHIELD_MAINTENANCE_FULL = 0.1f;    // 铀/秒（满盾时）
+        public const float SHIELD_MAINTENANCE_RECHARGE = 0.5f; // 铀/秒（未满时）
+        public const float SHIELD_REGEN_PER_SEC = 5f;         // 盾回复/秒（未满时）
+
+        [Header("移动")]
+        public float moveSpeed = 5f;
+        public float pilotBaseSpeed = 8f;
+        [Range(0.25f, 1f)] public float speedSliderValue = 1f;
+
+        // 移动耗能 (/h)
+        public const float MOVE_ENERGY_PER_H = 5f;
 
         [Header("跟随设置")]
         public float followDistance = 3f;
@@ -51,9 +89,6 @@ namespace _Game.Systems.AIBot
         public bool patrolAroundPlayer = true;
         public Vector3 patrolCenterPoint;
 
-        [Header("移动")]
-        public float moveSpeed = 5f;
-
         // 能量消耗速率 (/h)
         public const float ENERGY_GUARD_PER_H = 3f;
         public const float ENERGY_FOLLOW_PER_H = 6f;
@@ -64,6 +99,10 @@ namespace _Game.Systems.AIBot
 
         // 太阳能充电速率 (/h，仅白天)
         public float solarRechargeRate = 120f;
+
+        // 微型核反应堆 (3×3 聚变核心槽位)
+        public FusionCoreSlot[] reactorSlots = new FusionCoreSlot[9];
+        public const float NUCLEAR_RECHARGE_BASE = 30f; // 小核心基础铀产出/h
 
         // 组件引用
         private NavMeshAgent _agent;
@@ -102,6 +141,40 @@ namespace _Game.Systems.AIBot
         public AIBotCommand CurrentCommand => currentCommand;
         public EnergyMode CurrentEnergyMode => energyMode;
 
+        // 模式倍率属性
+        public float SpeedMultiplier => energyMode switch
+        {
+            EnergyMode.EnergySaving => 0.75f,
+            EnergyMode.Electric => 1f,
+            EnergyMode.Uranium => 1.25f,
+            EnergyMode.Burst => 1.5f,
+            _ => 1f
+        };
+        public float ConsumptionMultiplier => energyMode switch
+        {
+            EnergyMode.EnergySaving => 0.5f,
+            EnergyMode.Electric => 1f,
+            EnergyMode.Uranium => 1f,
+            EnergyMode.Burst => 1.25f,
+            _ => 1f
+        };
+        public float CooldownMultiplier => energyMode switch
+        {
+            EnergyMode.EnergySaving => 0.5f,
+            EnergyMode.Electric => 1f,
+            EnergyMode.Uranium => 2f,
+            EnergyMode.Burst => 2.5f,
+            _ => 1f
+        };
+        public bool IsLaserEnabled => energyMode != EnergyMode.EnergySaving;
+        public bool IsAIAssistEnabled => energyMode != EnergyMode.EnergySaving;
+        public bool IsAIWeaponOverrideEnabled => energyMode != EnergyMode.EnergySaving;
+        public bool IsShieldAvailable => energyMode == EnergyMode.Burst;
+
+        // 能量来源判定
+        public bool UsesBattery => energyMode == EnergyMode.EnergySaving || energyMode == EnergyMode.Electric;
+        public bool UsesUranium => energyMode == EnergyMode.Uranium || energyMode == EnergyMode.Burst;
+
         public float BatteryCurrent => batteryCurrent;
         public float BatteryMax => batteryMax;
         public float BatteryPercent => batteryMax > 0f ? Mathf.Clamp01(batteryCurrent / batteryMax) : 0f;
@@ -109,9 +182,22 @@ namespace _Game.Systems.AIBot
         public float UraniumMax => uraniumMax;
         public float UraniumPercent => uraniumMax > 0f ? Mathf.Clamp01(uraniumCurrent / uraniumMax) : 0f;
 
+        public float ShieldCurrentHP => shieldCurrentHP;
+        public float ShieldMaxHP => shieldMaxHP;
+        public float ShieldPercent => shieldMaxHP > 0f ? Mathf.Clamp01(shieldCurrentHP / shieldMaxHP) : 0f;
+        public bool IsShieldActive => shieldActive && shieldCurrentHP > 0f;
+
         public bool IsBatteryEmpty => batteryCurrent <= 0f;
         public bool IsUraniumEmpty => uraniumCurrent <= 0f;
         public bool IsShutdown => IsBatteryEmpty && IsUraniumEmpty;
+
+        /// <summary>当前太阳能实际充电速率 (/h)，0 表示未在充电</summary>
+        public float CurrentSolarRate { get; private set; }
+        public bool IsSolarActive => CurrentSolarRate > 0f;
+
+        /// <summary>当前核反应堆充电速率 (/h)，0 表示未在充电</summary>
+        public float CurrentNuclearRate { get; private set; }
+        public bool IsNuclearActive => CurrentNuclearRate > 0f;
 
         public NavMeshAgent Agent => _agent;
         public Transform PlayerTransform => _player;
@@ -156,15 +242,30 @@ namespace _Game.Systems.AIBot
 
         void Update()
         {
-            if (IsPiloted) return;
             if (isDead) return;
-            if (_agent == null || !_agent.enabled) return;
 
-            // 能量消耗
+            // 模式回退检查
+            CheckEnergyFallback();
+
+            // 护盾维护（爆发模式下，驾驶中也生效）
+            if (burstModeEnabled && shieldActive)
+                UpdateShield();
+
+            // 护盾启动计时
+            if (shieldStartupTimer > 0f)
+                shieldStartupTimer -= UnityEngine.Time.deltaTime;
+
+            // 能量消耗（驾驶中也消耗）
             ConsumeEnergy();
 
-            // 太阳能充电（白天缓慢恢复电池）
+            // 核反应堆充电（铀/爆发模式，全天候，驾驶中也生效）
+            NuclearRecharge();
+
+            // 太阳能充电（白天缓慢恢复电池，驾驶中也生效）
             SolarRecharge();
+
+            if (IsPiloted) return;
+            if (_agent == null || !_agent.enabled) return;
 
             // 血量检查（防自杀：切跟随+紧贴，但不阻断移动）
             CheckLowHealthRetreat();
@@ -199,37 +300,156 @@ namespace _Game.Systems.AIBot
         {
             if (IsShutdown) return;
 
-            float ratePerSec = GetActivityRate() / 3600f;
+            float activityRate = GetActivityRate();
+            float moveRate = IsMoving() ? MOVE_ENERGY_PER_H : 0f;
+            float totalRate = (activityRate + moveRate) * ConsumptionMultiplier;
+            float ratePerSec = totalRate / 3600f;
+            float dt = UnityEngine.Time.deltaTime;
+            float consumed = ratePerSec * dt;
 
-            if (energyMode == EnergyMode.Battery)
+            if (UsesBattery)
             {
-                batteryCurrent -= ratePerSec * UnityEngine.Time.deltaTime;
+                batteryCurrent -= consumed;
                 if (batteryCurrent <= 0f)
                 {
                     batteryCurrent = 0f;
                     if (uraniumCurrent > 0f)
+                    {
                         energyMode = EnergyMode.Uranium;
+                        burstModeEnabled = false;
+                    }
                 }
             }
             else
             {
-                uraniumCurrent -= ratePerSec * UnityEngine.Time.deltaTime;
+                uraniumCurrent -= consumed;
                 if (uraniumCurrent <= 0f)
                 {
                     uraniumCurrent = 0f;
+                    burstModeEnabled = false;
+                    shieldActive = false;
                     if (batteryCurrent > 0f)
-                        energyMode = EnergyMode.Battery;
+                        energyMode = EnergyMode.Electric;
                 }
             }
+        }
+
+        bool IsMoving()
+        {
+            if (_agent == null || !_agent.enabled) return false;
+            return !_agent.isStopped && _agent.hasPath && _agent.velocity.magnitude > 0.1f;
+        }
+
+        /// <summary>模式能量耗尽时的回退检查（每帧调用）</summary>
+        void CheckEnergyFallback()
+        {
+            if (ecoModeEnabled && energyMode != EnergyMode.EnergySaving)
+            {
+                if (batteryCurrent > 0f)
+                {
+                    energyMode = EnergyMode.EnergySaving;
+                }
+                else
+                {
+                    ecoModeEnabled = false;
+                }
+            }
+            if (burstModeEnabled && energyMode != EnergyMode.Burst)
+            {
+                if (uraniumCurrent > 0f)
+                {
+                    energyMode = EnergyMode.Burst;
+                }
+                else
+                {
+                    burstModeEnabled = false;
+                    shieldActive = false;
+                }
+            }
+        }
+
+        /// <summary>护盾维护逻辑：维持消耗 + 回复 + 启动</summary>
+        void UpdateShield()
+        {
+            if (!burstModeEnabled || energyMode != EnergyMode.Burst) { shieldActive = false; return; }
+
+            if (shieldStartupTimer > 0f) return; // 还在启动中
+
+            if (shieldCurrentHP >= shieldMaxHP)
+            {
+                // 满盾：低功耗维持
+                shieldCurrentHP = shieldMaxHP;
+                ConsumeUraniumForShield(SHIELD_MAINTENANCE_FULL * UnityEngine.Time.deltaTime);
+            }
+            else
+            {
+                // 未满：消耗 + 回复
+                ConsumeUraniumForShield(SHIELD_MAINTENANCE_RECHARGE * UnityEngine.Time.deltaTime);
+                shieldCurrentHP = Mathf.Min(shieldCurrentHP + SHIELD_REGEN_PER_SEC * UnityEngine.Time.deltaTime, shieldMaxHP);
+            }
+        }
+
+        void ConsumeUraniumForShield(float amount)
+        {
+            uraniumCurrent = Mathf.Max(0f, uraniumCurrent - amount);
+            if (uraniumCurrent <= 0f)
+            {
+                uraniumCurrent = 0f;
+                shieldActive = false;
+                burstModeEnabled = false;
+                if (batteryCurrent > 0f) energyMode = EnergyMode.Electric;
+            }
+        }
+
+        /// <summary>开启/重启能量盾</summary>
+        public void ActivateShield()
+        {
+            if (!IsShieldAvailable || shieldActive) return;
+            if (uraniumCurrent < SHIELD_STARTUP_COST) return;
+
+            uraniumCurrent -= SHIELD_STARTUP_COST;
+            shieldStartupTimer = SHIELD_STARTUP_TIME;
+            shieldActive = true;
+            shieldCurrentHP = 0f;
+        }
+
+        /// <summary>关闭能量盾</summary>
+        public void DeactivateShield()
+        {
+            shieldActive = false;
+            shieldStartupTimer = 0f;
+        }
+
+        /// <summary>核反应堆被动充电（铀/爆发模式，全天候）</summary>
+        void NuclearRecharge()
+        {
+            CurrentNuclearRate = 0f;
+            if (!UsesUranium) return;
+            if (uraniumCurrent >= uraniumMax) return;
+            if (IsShutdown) return;
+
+            float totalRate = 0f;
+            for (int i = 0; i < reactorSlots.Length; i++)
+            {
+                if (!reactorSlots[i].IsEmpty)
+                {
+                    totalRate += reactorSlots[i].outputRate;
+                    reactorSlots[i].burnRemaining -= UnityEngine.Time.deltaTime / 3600f;
+                    if (reactorSlots[i].burnRemaining <= 0f)
+                        reactorSlots[i] = default;
+                }
+            }
+
+            if (totalRate <= 0f) return;
+
+            float recharge = totalRate / 3600f * UnityEngine.Time.deltaTime;
+            uraniumCurrent = Mathf.Min(uraniumCurrent + recharge, uraniumMax);
+            CurrentNuclearRate = totalRate;
         }
 
         private _Game.Systems.Time.TimeManager _cachedTimeManager;
         private _Game.Systems.Weather.WeatherManager _cachedWeatherManager;
         private float _solarDebugTimer;
-
-        // 当前太阳能实际充电速率 (/h)，0 表示未在充电
-        public float CurrentSolarRate { get; private set; }
-        public bool IsSolarActive => CurrentSolarRate > 0f;
 
         void SolarRecharge()
         {
@@ -299,18 +519,27 @@ namespace _Game.Systems.AIBot
         {
             if (IsShutdown) return;
 
-            if (energyMode == EnergyMode.Battery)
+            float adjustedAmount = amount * ConsumptionMultiplier;
+
+            if (UsesBattery)
             {
-                batteryCurrent = Mathf.Max(0f, batteryCurrent - amount);
+                batteryCurrent = Mathf.Max(0f, batteryCurrent - adjustedAmount);
                 if (batteryCurrent <= 0f && uraniumCurrent > 0f)
+                {
                     energyMode = EnergyMode.Uranium;
+                    burstModeEnabled = false;
+                }
             }
             else
             {
-                float halfAmount = amount * 0.5f;
-                uraniumCurrent = Mathf.Max(0f, uraniumCurrent - halfAmount);
-                if (uraniumCurrent <= 0f && batteryCurrent > 0f)
-                    energyMode = EnergyMode.Battery;
+                uraniumCurrent = Mathf.Max(0f, uraniumCurrent - adjustedAmount);
+                if (uraniumCurrent <= 0f)
+                {
+                    burstModeEnabled = false;
+                    shieldActive = false;
+                    if (batteryCurrent > 0f)
+                        energyMode = EnergyMode.Electric;
+                }
             }
         }
 
@@ -324,13 +553,32 @@ namespace _Game.Systems.AIBot
             uraniumCurrent = uraniumMax;
         }
 
-        /// <summary>切换能量模式。目标模式无能源时自动回退到有能源的模式，都没有则默认电池。</summary>
+        /// <summary>切换基础能量模式。会自动关闭节能/爆发开关。</summary>
         public void SetEnergyMode(EnergyMode mode)
         {
-            // 优先尝试目标模式
-            if (mode == EnergyMode.Battery && batteryCurrent > 0f)
+            ecoModeEnabled = false;
+            burstModeEnabled = false;
+            shieldActive = false;
+            shieldStartupTimer = 0f;
+
+            if (mode == EnergyMode.EnergySaving)
             {
-                energyMode = EnergyMode.Battery;
+                ecoModeEnabled = true;
+                energyMode = batteryCurrent > 0f ? EnergyMode.EnergySaving : EnergyMode.Electric;
+                if (batteryCurrent <= 0f && uraniumCurrent > 0f) energyMode = EnergyMode.Uranium;
+                return;
+            }
+            if (mode == EnergyMode.Burst)
+            {
+                burstModeEnabled = true;
+                energyMode = uraniumCurrent > 0f ? EnergyMode.Burst : EnergyMode.Uranium;
+                if (uraniumCurrent <= 0f && batteryCurrent > 0f) energyMode = EnergyMode.Electric;
+                return;
+            }
+
+            if (mode == EnergyMode.Electric && batteryCurrent > 0f)
+            {
+                energyMode = EnergyMode.Electric;
                 return;
             }
             if (mode == EnergyMode.Uranium && uraniumCurrent > 0f)
@@ -339,13 +587,38 @@ namespace _Game.Systems.AIBot
                 return;
             }
 
-            // 目标模式无能源 → 回退到另一种
             if (batteryCurrent > 0f)
-                energyMode = EnergyMode.Battery;
+                energyMode = EnergyMode.Electric;
             else if (uraniumCurrent > 0f)
                 energyMode = EnergyMode.Uranium;
             else
-                energyMode = EnergyMode.Battery; // 都没有，默认电池
+                energyMode = EnergyMode.Electric;
+        }
+
+        /// <summary>切换节能模式开关</summary>
+        public void ToggleEcoMode()
+        {
+            if (ecoModeEnabled)
+            {
+                SetEnergyMode(EnergyMode.Electric);
+            }
+            else
+            {
+                SetEnergyMode(EnergyMode.EnergySaving);
+            }
+        }
+
+        /// <summary>切换爆发模式开关</summary>
+        public void ToggleBurstMode()
+        {
+            if (burstModeEnabled)
+            {
+                SetEnergyMode(EnergyMode.Uranium);
+            }
+            else
+            {
+                SetEnergyMode(EnergyMode.Burst);
+            }
         }
 
         // ============================================================
@@ -355,6 +628,20 @@ namespace _Game.Systems.AIBot
         public void TakeDamage(float damage)
         {
             if (isDead) return;
+
+            // 护盾吸收优先
+            if (IsShieldActive && shieldStartupTimer <= 0f)
+            {
+                if (shieldCurrentHP >= damage)
+                {
+                    shieldCurrentHP -= damage;
+                    return;
+                }
+                damage -= shieldCurrentHP;
+                shieldCurrentHP = 0f;
+                shieldActive = false;
+            }
+
             currentHP -= damage;
             if (currentHP <= 0f)
             {
@@ -362,6 +649,8 @@ namespace _Game.Systems.AIBot
                 OnDeath();
             }
         }
+
+        public float DamageMultiplier => 1f;
 
         public void RepairHP(float amount)
         {
