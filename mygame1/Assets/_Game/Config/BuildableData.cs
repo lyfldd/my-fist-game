@@ -17,8 +17,7 @@ namespace _Game.Config
         ElectronicsIndustry,  // 电子工业（拉线/插件/电路/精密装配/AI）
         ChemicalIndustry,     // 化学工业（发酵/蒸馏/制药/火药/离心/基因）
         BioIndustry,          // 生物食品工业（织布/锯木/熏制/罐头/水泵）
-        EnergyIndustry,       // 能源工业（发电机/太阳能/核电站）
-        Power           // 电力设备（发电端+终端）
+        EnergyIndustry        // 能源工业（发电端+终端+核电站）
     }
 
     /// <summary>

@@ -33,6 +33,8 @@ MonoBehaviour:
     count: 4
   - itemData: {fileID: 11400000, guid: 2301d2e3f69788a4ca2eceab2497a5dc, type: 2}
     count: 4
+  - itemData: {fileID: 11400000, guid: 9929924a95468c24fa076f761a1705fc, type: 2}
+    count: 4
   resultItem: {fileID: 11400000, guid: 57ccfbc738ff1864fbf7264dfe20151a, type: 2}
   resultCount: 1
   craftTime: 30

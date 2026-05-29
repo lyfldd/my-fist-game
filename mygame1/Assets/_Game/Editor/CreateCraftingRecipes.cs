@@ -27,6 +27,7 @@ public static class CreateCraftingRecipes
         { WorkstationTier.Chemistry,     "研究中心" },
         { WorkstationTier.Machining,             "机械加工台" },
         { WorkstationTier.ElectronicsAssembly,  "电子装配台" },
+        { WorkstationTier.ElementFurnace,       "元素合成炉" },
     };
 
     static Dictionary<string, ItemData> _itemLookup;
@@ -131,6 +132,7 @@ public static class CreateCraftingRecipes
         CreateChemistryRecipes();
         CreateMachiningRecipes();
         CreateElectronicsAssemblyRecipes();
+        CreateElementFurnaceRecipes();
 
         UpdateCatalog();
 
@@ -670,7 +672,7 @@ public static class CreateCraftingRecipes
         // 工业设备
         CreateRecipe(S, "冲压机套件", RecipeCategory.Industry,
             GetItem("WS_PressMachine"), 1, 12f, 50f,
-            new[] { M("SteelIngot", 6), M("AdvancedParts", 4), M("Gear", 3), M("Bearing", 2) },
+            new[] { M("SteelIngot", 6), M("AdvancedParts", 4), M("Gear", 3), M("Bearing", 2), M("Rebar", 2) },
             new[] { (SkillType.建造拆解, 5) });
         CreateRecipe(S, "车床套件", RecipeCategory.Industry,
             GetItem("WS_Lathe"), 1, 10f, 38f,
@@ -750,6 +752,12 @@ public static class CreateCraftingRecipes
             GetItem("Gasoline"), 1, 15f, 40f,
             new[] { M("CoalTar", 1), M("Alcohol", 2), M("ChemicalAgent", 1) },
             new[] { (SkillType.建造拆解, 4) });
+
+        // 电池灌酸（化学活化：空电池+硫酸→电池）
+        CreateRecipe(S, "电池灌酸", RecipeCategory.Material,
+            GetItem("Battery"), 1, 6f, 18f,
+            new[] { M("EmptyBattery", 1), M("SulfuricAcid", 1) },
+            new[] { (SkillType.医疗生存, 2) });
 
         // 化工材料
         CreateRecipe(S, "橡胶", RecipeCategory.Material,
@@ -867,7 +875,7 @@ public static class CreateCraftingRecipes
         // 工业设备套件（最高级重工业设备）
         CreateRecipe(S, "工业炉套件", RecipeCategory.Industry,
             GetItem("WS_IndustrialFurnace"), 1, 12f, 50f,
-            new[] { M("SteelIngot", 8), M("StoneBrick", 15), M("AdvancedParts", 3), M("Coil", 2) },
+            new[] { M("SteelIngot", 8), M("StoneBrick", 15), M("AdvancedParts", 3), M("Coil", 2), M("Rebar", 3) },
             new[] { (SkillType.建造拆解, 5) });
         CreateRecipe(S, "电解槽套件", RecipeCategory.Industry,
             GetItem("WS_ElectrolysisTank"), 1, 15f, 55f,
@@ -954,7 +962,7 @@ public static class CreateCraftingRecipes
             new[] { (SkillType.建造拆解, 7) });
         CreateRecipe(S, "移动要塞基地车套件", RecipeCategory.Industry,
             GetItem("WS_MobileFortress"), 1, 30f, 100f,
-            new[] { M("SteelIngot", 15), M("SteelPipe", 8), M("AdvancedParts", 6), M("Gear", 4), M("Bearing", 4) },
+            new[] { M("SteelIngot", 15), M("SteelPipe", 8), M("AdvancedParts", 6), M("Gear", 4), M("Bearing", 4), M("Rebar", 4) },
             new[] { (SkillType.建造拆解, 9) });
         CreateRecipe(S, "电子装配台套件", RecipeCategory.Tool,
             GetItem("WS_ElectronicsAssembly"), 1, 20f, 65f,
@@ -997,7 +1005,7 @@ public static class CreateCraftingRecipes
         // 核电站套件
         CreateRecipe(S, "核电站套件", RecipeCategory.Industry,
             GetItem("WS_NuclearPlant"), 1, 40f, 150f,
-            new[] { M("SmallReactor", 1), M("TitaniumAlloy", 10), M("SteelIngot", 20), M("SteelPipe", 12), M("CapacitorBank", 5), M("ChipSet", 3) },
+            new[] { M("SmallReactor", 1), M("TitaniumAlloy", 10), M("SteelIngot", 20), M("SteelPipe", 12), M("CapacitorBank", 5), M("ChipSet", 3), M("Rebar", 5) },
             new[] { (SkillType.建造拆解, 10), (SkillType.智力, 9) });
     }
 
@@ -1040,7 +1048,7 @@ public static class CreateCraftingRecipes
             new[] { (SkillType.建造拆解, 8), (SkillType.智力, 8) });
         CreateRecipe(S, "净水厂套件", RecipeCategory.Industry,
             GetItem("WS_WaterPurifier"), 1, 20f, 70f,
-            new[] { M("SteelPipe", 6), M("CapacitorBank", 2), M("SteelIngot", 4), M("CopperIngot", 4) },
+            new[] { M("SteelPipe", 6), M("CapacitorBank", 2), M("SteelIngot", 4), M("CopperIngot", 4), M("Rebar", 3) },
             new[] { (SkillType.建造拆解, 9), (SkillType.智力, 7) });
         CreateRecipe(S, "自动炮塔套件", RecipeCategory.Industry,
             GetItem("WS_AutoTurret"), 1, 25f, 85f,
@@ -1088,6 +1096,21 @@ public static class CreateCraftingRecipes
             GetItem("SmallReactor"), 1, 30f, 100f,
             new[] { M("EnrichedUranium", 2), M("TitaniumAlloy", 4), M("CapacitorBank", 4), M("ChipSet", 2), M("LeadIngot", 5) },
             new[] { (SkillType.智力, 9), (SkillType.建造拆解, 8) });
+    }
+
+    // ================================================================
+    // 元素合成炉 ElementFurnace — 终局能源材料 (1 recipe)
+    // ================================================================
+
+    static void CreateElementFurnaceRecipes()
+    {
+        var S = WorkstationTier.ElementFurnace;
+
+        // 浓缩铀批量生产
+        CreateRecipe(S, "浓缩铀批量", RecipeCategory.Material,
+            GetItem("EnrichedUranium"), 3, 20f, 60f,
+            new[] { M("UraniumOre", 6), M("SulfuricAcid", 2), M("RefinedCoal", 3) },
+            new[] { (SkillType.智力, 7) });
     }
 
     // ================================================================

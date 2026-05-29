@@ -20,10 +20,12 @@ MonoBehaviour:
   requiredStation: 7
   isIndustrial: 1
   productionDeviceName: "\u51B2\u538B\u673A"
-  skillRequirements: []
+  skillRequirements:
+  - skill: 9
+    level: 3
   materials:
   - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-    count: 1
+    count: 9
   resultItem: {fileID: 11400000, guid: 797cfce063fe1874a91837156274af89, type: 2}
   resultCount: 8
   craftTime: 4

@@ -48,18 +48,18 @@ public static class CreateChemicalResearchData
                 new[] { ("SulfuricAcid", 2), ("CopperIngot", 6), ("CircuitBoard", 1) },
                 new[] { "拉线机", "电池生产线" }, 4),
 
-            Project("Elec_Advanced", "电子工程", "解锁电子装配机、电路印刷机",
+            Project("Elec_Advanced", "电子工程", "解锁电子装配机、电路印刷机、广播塔",
                 new[] { ("ChemicalAgent", 3), ("CopperIngot", 4), ("CircuitBoard", 3), ("AdvancedParts", 2) },
-                new[] { "电子装配机", "电路印刷机" }, 6),
+                new[] { "电子装配机", "电路印刷机", "广播塔" }, 6),
 
             Project("Elec_Precision", "精密电子技术", "解锁精密装配台、电解槽",
                 new[] { ("ChemicalAgent", 4), ("CircuitBoard", 4), ("ChipSet", 1), ("AdvancedParts", 4) },
                 new[] { "精密装配台", "电解槽" }, 8),
 
             // ===== 化学链 =====
-            Project("Chem_Organic", "有机化学", "解锁发酵罐、蒸馏器、制药台",
+            Project("Chem_Organic", "有机化学", "解锁发酵罐、蒸馏器、制药台、罐头封装机",
                 new[] { ("SulfuricAcid", 3), ("Alcohol", 2), ("GlassPane", 4), ("CopperIngot", 3) },
-                new[] { "发酵罐", "蒸馏器", "制药台" }, 2),
+                new[] { "发酵罐", "蒸馏器", "制药台", "罐头封装机" }, 2),
 
             Project("Chem_Explosive", "爆炸物化学", "解锁火药厂、离心机",
                 new[] { ("SulfuricAcid", 4), ("ChemicalAgent", 3), ("BlackPowder", 3), ("SteelPipe", 4) },

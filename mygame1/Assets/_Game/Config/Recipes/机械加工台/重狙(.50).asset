@@ -22,6 +22,8 @@ MonoBehaviour:
   skillRequirements:
   - skill: 1
     level: 8
+  - skill: 9
+    level: 2
   materials:
   - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
     count: 5

@@ -260,7 +260,6 @@ namespace _Game.Systems.Building
                 { BuildableCategory.ChemicalIndustry, "化学工业" },
                 { BuildableCategory.BioIndustry, "生物食品" },
                 { BuildableCategory.EnergyIndustry, "能源工业" },
-                { BuildableCategory.Power, "电力" },
             };
 
         private void DrawCategoryTabs()
@@ -280,7 +279,6 @@ namespace _Game.Systems.Building
                 BuildableCategory.ChemicalIndustry,
                 BuildableCategory.BioIndustry,
                 BuildableCategory.EnergyIndustry,
-                BuildableCategory.Power,
             };
 
             _currentTabs.Clear();

@@ -31,6 +31,8 @@ MonoBehaviour:
     count: 3
   - itemData: {fileID: 11400000, guid: 9207d954ab17788429f12e0c8233f1d3, type: 2}
     count: 2
+  - itemData: {fileID: 11400000, guid: 9929924a95468c24fa076f761a1705fc, type: 2}
+    count: 3
   resultItem: {fileID: 11400000, guid: 76bb48da506dea14ab44a9efe0352475, type: 2}
   resultCount: 1
   craftTime: 12

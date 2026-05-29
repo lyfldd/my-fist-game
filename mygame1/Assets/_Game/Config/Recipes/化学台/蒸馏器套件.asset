@@ -22,13 +22,15 @@ MonoBehaviour:
   skillRequirements:
   - skill: 7
     level: 4
+  - skill: 9
+    level: 3
   materials:
   - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-    count: 4
+    count: 16
   - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
-    count: 3
+    count: 12
   - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
-    count: 2
+    count: 8
   resultItem: {fileID: 11400000, guid: 9bf72f45c9668a84093a5cc501bfe289, type: 2}
   resultCount: 1
   craftTime: 10

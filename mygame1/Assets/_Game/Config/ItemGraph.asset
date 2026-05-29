@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0946ddcba871320458dd84c140608dd5, type: 3}
   m_Name: ItemGraph
   m_EditorClassIdentifier: 
-  buildTimestamp: 2026-05-29 18:59:35
-  recipeCountAtBuild: 277
+  buildTimestamp: 2026-05-29 20:25:51
+  recipeCountAtBuild: 308
   nodes:
   - itemName: ".22\u5C0F\u53E3\u5F84"
     primaryChain: 0
@@ -204,6 +204,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: 8bcf243dc4be5c14c90745d905c33af0, type: 2}
     - {fileID: 11400000, guid: 3c8d86de9503cb64e99a7444e58e8b40, type: 2}
+    - {fileID: 11400000, guid: 2db7193dfd165c54f9c34ab82f8d962b, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 8
@@ -313,6 +314,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: d96d17317615dfc4985013f0340704a4, type: 2}
+    - {fileID: 11400000, guid: b6998ebe015a40e44a32ec6ee2487b97, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -404,6 +406,7 @@ MonoBehaviour:
     depths: 0400000005000000
     upstreamItemNames:
     - "\u8F74\u627F"
+    - "\u94A2\u7B4B"
     - "\u94A2\u952D"
     - "\u9AD8\u7EA7\u96F6\u4EF6"
     - "\u9F7F\u8F6E"
@@ -425,6 +428,7 @@ MonoBehaviour:
     depths: 0500000006000000
     upstreamItemNames:
     - "\u7535\u5BB9\u7EC4"
+    - "\u94A2\u7B4B"
     - "\u94A2\u7BA1"
     - "\u94A2\u952D"
     - "\u94DC\u952D"
@@ -452,35 +456,13 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 6726ef53bbd633e44af740b1fad9a3d2, type: 2}
+    - {fileID: 11400000, guid: 9ad69e475f430fb449a950b2606a29f7, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
     isRawMaterial: 0
     isDeadEnd: 1
     requiredSystems: []
-    allSystemsReady: 1
-  - itemName: "\u5316\u5B66\u53F0\u5957\u4EF6"
-    primaryChain: 2
-    productionMode: 0
-    overrideStation: 0
-    manualStation: 0
-    depths: 0400000005000000
-    upstreamItemNames:
-    - "\u73BB\u7483\u677F"
-    - "\u94A2\u952D"
-    - "\u94DC\u952D"
-    - "\u9AD8\u7EA7\u96F6\u4EF6"
-    downstreamItemNames: []
-    producerRecipes:
-    - {fileID: 11400000, guid: 6b270a6e7fe7ce947a32791dd719b29c, type: 2}
-    consumerRecipes: []
-    consumerCount: 0
-    autoAssignedStation: 6
-    isRawMaterial: 0
-    isDeadEnd: 1
-    requiredSystems:
-    - Building
-    - Crafting
     allSystemsReady: 1
   - itemName: "\u5316\u5B66\u8BD5\u5242"
     primaryChain: 2
@@ -517,6 +499,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e44aed162c6b0624e8948dd6fa3ddd48, type: 2}
     - {fileID: 11400000, guid: 4c9c4447df2b4a0468654a64252a169d, type: 2}
     - {fileID: 11400000, guid: eda08285509973b4fbda7fec973b7fa0, type: 2}
+    - {fileID: 11400000, guid: 6db46036c44c0eb43a5af0138b934246, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 8bcf243dc4be5c14c90745d905c33af0, type: 2}
     - {fileID: 11400000, guid: d96d17317615dfc4985013f0340704a4, type: 2}
@@ -542,6 +525,23 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 2530efbb4ebc25446b80e8d3227e1bf6, type: 2}
     - {fileID: 11400000, guid: 7522d3270e74eb34aa9e115f9ff3c4e7, type: 2}
     - {fileID: 11400000, guid: 83edc747ceca19743b8aed07f202be28, type: 2}
+    - {fileID: 11400000, guid: 2db7193dfd165c54f9c34ab82f8d962b, type: 2}
+    - {fileID: 11400000, guid: b6998ebe015a40e44a32ec6ee2487b97, type: 2}
+    - {fileID: 11400000, guid: 9ad69e475f430fb449a950b2606a29f7, type: 2}
+    - {fileID: 11400000, guid: 4f93b2be942360e4c88c101359d89f0a, type: 2}
+    - {fileID: 11400000, guid: ad63696d035eb454f9082eb88298eba4, type: 2}
+    - {fileID: 11400000, guid: 7297513a723d3eb418cdb989e85a6edd, type: 2}
+    - {fileID: 11400000, guid: 7010dfa752bafc549a60542c268db0db, type: 2}
+    - {fileID: 11400000, guid: 699783b5e704efa45915daaa5d256c18, type: 2}
+    - {fileID: 11400000, guid: fe12e96240fa6384482df209f3e95032, type: 2}
+    - {fileID: 11400000, guid: fb1c779c285938548b63733d42f23d7a, type: 2}
+    - {fileID: 11400000, guid: b57877b40142bf04ab8d6c3767fd034c, type: 2}
+    - {fileID: 11400000, guid: 13557b6ad547f1646a40f29c5aa4e25f, type: 2}
+    - {fileID: 11400000, guid: 5bb46a753dabd34479941419e80ead6e, type: 2}
+    - {fileID: 11400000, guid: e563cb1ba0e080441a1d48e61c22e06b, type: 2}
+    - {fileID: 11400000, guid: 59a0018bcaf44f34b9c7f3a519903d11, type: 2}
+    - {fileID: 11400000, guid: bb8e8acbe6342cc46ad789eb1829fa12, type: 2}
+    - {fileID: 11400000, guid: 47bdb2c4feeed0644a008002c02f7914, type: 2}
     consumerCount: 20
     autoAssignedStation: 5
     isRawMaterial: 0
@@ -562,6 +562,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: 285aa5c162e9335439186cc49cdc69de, type: 2}
     - {fileID: 11400000, guid: 4faf0c6ad99cf7746aa5511211234e36, type: 2}
+    - {fileID: 11400000, guid: 4f93b2be942360e4c88c101359d89f0a, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -696,6 +697,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: fe6aa4e7cc5069644b4c22e488033679, type: 2}
+    - {fileID: 11400000, guid: 9e1418eb4b7a3cd4cbccf90c8e30b5cc, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -753,6 +755,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: a75a03fb2eb68b34ea1ffa0dbc216a16, type: 2}
+    - {fileID: 11400000, guid: 7297513a723d3eb418cdb989e85a6edd, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -823,6 +826,9 @@ MonoBehaviour:
     - {fileID: 11400000, guid: a75a03fb2eb68b34ea1ffa0dbc216a16, type: 2}
     - {fileID: 11400000, guid: 97021b040eb2e9942b8fdb9a80d827b5, type: 2}
     - {fileID: 11400000, guid: 4cda1da52a32d9e46ad8fb06e67db81d, type: 2}
+    - {fileID: 11400000, guid: 2db7193dfd165c54f9c34ab82f8d962b, type: 2}
+    - {fileID: 11400000, guid: 7297513a723d3eb418cdb989e85a6edd, type: 2}
+    - {fileID: 11400000, guid: 00685efb1bd9cd04bba8a34dbfa2b282, type: 2}
     consumerCount: 4
     autoAssignedStation: 8
     isRawMaterial: 0
@@ -848,12 +854,15 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 57dac5dbc05709541a4d9d74b1b796fb, type: 2}
     - {fileID: 11400000, guid: 08e952b6ed211c6438d8c6f9e0880333, type: 2}
     - {fileID: 11400000, guid: 7cb62f12523371d49af46df10eda2ee9, type: 2}
+    - {fileID: 11400000, guid: 699783b5e704efa45915daaa5d256c18, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 97ecd9a72dbe22f49b5d9b6f8d306f40, type: 2}
     - {fileID: 11400000, guid: 16a70f6a745e0764d871b3f038989c24, type: 2}
     - {fileID: 11400000, guid: a17106105ba53e7489a7eb145de62162, type: 2}
     - {fileID: 11400000, guid: 1bdf63ff62fe85e4c8f9d940ac1ad067, type: 2}
     - {fileID: 11400000, guid: 419027ed1ab126f47a2273cc0e5197bb, type: 2}
+    - {fileID: 11400000, guid: 13557b6ad547f1646a40f29c5aa4e25f, type: 2}
+    - {fileID: 11400000, guid: 47bdb2c4feeed0644a008002c02f7914, type: 2}
     - {fileID: 11400000, guid: 023d07795aa25f84a8f1fbff87db073a, type: 2}
     - {fileID: 11400000, guid: 1be6e4e9a1255594a80da9217c27259e, type: 2}
     consumerCount: 5
@@ -1014,6 +1023,7 @@ MonoBehaviour:
     upstreamItemNames:
     - "\u77F3\u7816"
     - "\u7EBF\u5708"
+    - "\u94A2\u7B4B"
     - "\u94A2\u952D"
     - "\u9AD8\u7EA7\u96F6\u4EF6"
     downstreamItemNames: []
@@ -1087,6 +1097,7 @@ MonoBehaviour:
     consumerRecipes:
     - {fileID: 11400000, guid: e1dfb914b1009cd43bb512720cd3fddf, type: 2}
     - {fileID: 11400000, guid: 396f85872d4e4c74c896017af1abc1d7, type: 2}
+    - {fileID: 11400000, guid: fe12e96240fa6384482df209f3e95032, type: 2}
     consumerCount: 2
     autoAssignedStation: 4
     isRawMaterial: 0
@@ -1146,6 +1157,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b414a44caf18d6e43907d8488748e369, type: 2}
     - {fileID: 11400000, guid: 7bb24349b710fd94eb38505ab4f89858, type: 2}
     - {fileID: 11400000, guid: ad6b0b5e681f36e488fdce1a4d710475, type: 2}
+    - {fileID: 11400000, guid: 04f0e04bd1a758b43a725dbb2f47f5f7, type: 2}
     - {fileID: 11400000, guid: 98ea4e23047b1544baaafcb89cda685e, type: 2}
     - {fileID: 11400000, guid: 705177fb0a946dd44aee5ddc2c291e7c, type: 2}
     - {fileID: 11400000, guid: 871317938af4ddd42a63c253588e7766, type: 2}
@@ -1241,6 +1253,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b414a44caf18d6e43907d8488748e369, type: 2}
     - {fileID: 11400000, guid: 7bb24349b710fd94eb38505ab4f89858, type: 2}
     - {fileID: 11400000, guid: ad6b0b5e681f36e488fdce1a4d710475, type: 2}
+    - {fileID: 11400000, guid: 5bb46a753dabd34479941419e80ead6e, type: 2}
     - {fileID: 11400000, guid: 98ea4e23047b1544baaafcb89cda685e, type: 2}
     - {fileID: 11400000, guid: 705177fb0a946dd44aee5ddc2c291e7c, type: 2}
     - {fileID: 11400000, guid: 871317938af4ddd42a63c253588e7766, type: 2}
@@ -1474,6 +1487,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: e1dfb914b1009cd43bb512720cd3fddf, type: 2}
+    - {fileID: 11400000, guid: fe12e96240fa6384482df209f3e95032, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -1538,6 +1552,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 21c32762e55125b4aaa480293835473f, type: 2}
+    - {fileID: 11400000, guid: 04f0e04bd1a758b43a725dbb2f47f5f7, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -1640,6 +1655,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: 95a6d1e9d012d05488ef15eb1125cd07, type: 2}
     - {fileID: 11400000, guid: 64bdcfa2254b303449a8b690a130c737, type: 2}
+    - {fileID: 11400000, guid: fb1c779c285938548b63733d42f23d7a, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -1763,6 +1779,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: 8d481235d13a1fc4aa482a4ce224fac9, type: 2}
     - {fileID: 11400000, guid: 28411fd74e10598438b680ce0edfbb4d, type: 2}
+    - {fileID: 11400000, guid: 50893a4d01c164a43b5600c3305a6326, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 087691d3bcd6a444295b2dfc26fffd3d, type: 2}
     - {fileID: 11400000, guid: 21c32762e55125b4aaa480293835473f, type: 2}
@@ -1771,6 +1788,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 380a1b36ef09d9c4181991381ae80a72, type: 2}
     - {fileID: 11400000, guid: 726b09769993af743bd7a56f51ce6b6e, type: 2}
     - {fileID: 11400000, guid: ad6b0b5e681f36e488fdce1a4d710475, type: 2}
+    - {fileID: 11400000, guid: 04f0e04bd1a758b43a725dbb2f47f5f7, type: 2}
     - {fileID: 11400000, guid: 705177fb0a946dd44aee5ddc2c291e7c, type: 2}
     consumerCount: 7
     autoAssignedStation: 6
@@ -2049,6 +2067,7 @@ MonoBehaviour:
     - "\u7535\u5BB9\u7EC4"
     - "\u82AF\u7247\u7EC4"
     - "\u949B\u5408\u91D1"
+    - "\u94A2\u7B4B"
     - "\u94A2\u7BA1"
     - "\u94A2\u952D"
     downstreamItemNames: []
@@ -2130,6 +2149,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: d265de7a4e7686d42bb7abcc7b219e9e, type: 2}
     - {fileID: 11400000, guid: 7cb62f12523371d49af46df10eda2ee9, type: 2}
     - {fileID: 11400000, guid: 2530efbb4ebc25446b80e8d3227e1bf6, type: 2}
+    - {fileID: 11400000, guid: 699783b5e704efa45915daaa5d256c18, type: 2}
+    - {fileID: 11400000, guid: b57877b40142bf04ab8d6c3767fd034c, type: 2}
     consumerCount: 9
     autoAssignedStation: 0
     isRawMaterial: 1
@@ -2178,6 +2199,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: dce8c2d90de0c2045bc9821b0faeddf5, type: 2}
     - {fileID: 11400000, guid: a17106105ba53e7489a7eb145de62162, type: 2}
     - {fileID: 11400000, guid: 2530efbb4ebc25446b80e8d3227e1bf6, type: 2}
+    - {fileID: 11400000, guid: b57877b40142bf04ab8d6c3767fd034c, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 74f4c232c002d4d4bad92cbc3d478963, type: 2}
     - {fileID: 11400000, guid: 3bb49b6b2a7a7a4488d4e94cb5200422, type: 2}
@@ -2398,8 +2420,10 @@ MonoBehaviour:
     - "\u71C3\u70E7\u5F39"
     producerRecipes:
     - {fileID: 11400000, guid: 894586a72a633ec47a3e3975b97d3082, type: 2}
+    - {fileID: 11400000, guid: ad63696d035eb454f9082eb88298eba4, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: ada85b8f06edae1418a8d5bc619c659a, type: 2}
+    - {fileID: 11400000, guid: 5bb46a753dabd34479941419e80ead6e, type: 2}
     consumerCount: 1
     autoAssignedStation: 4
     isRawMaterial: 0
@@ -2477,12 +2501,15 @@ MonoBehaviour:
     productionMode: 2
     overrideStation: 0
     manualStation: 0
-    depths: 01000000
+    depths: 0100000003000000
     upstreamItemNames:
+    - "\u786B\u9178"
+    - "\u7CBE\u70BC\u7164\u70AD"
     - "\u94C0\u77FF\u77F3"
     downstreamItemNames:
     - "\u5C0F\u578B\u53CD\u5E94\u5806"
     producerRecipes:
+    - {fileID: 11400000, guid: 3e23a0733765df1449db42f34008f7a5, type: 2}
     - {fileID: 11400000, guid: c368cf70fd74c8a4ca27e2e93554e859, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 33e0c0a760f0413409fa8a58624f98af, type: 2}
@@ -2615,6 +2642,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 97ecd9a72dbe22f49b5d9b6f8d306f40, type: 2}
+    - {fileID: 11400000, guid: 13557b6ad547f1646a40f29c5aa4e25f, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -2643,6 +2671,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 72863336dc7d28e429b6f57d4adc6f22, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 1557175f76edcf0428505699a8aed5a5, type: 2}
+    - {fileID: 11400000, guid: 66bebcc987ecca041839095fb2ac23cf, type: 2}
     consumerCount: 1
     autoAssignedStation: 1
     isRawMaterial: 0
@@ -2664,6 +2693,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: d8b7c6729c9a2164eb49e225bae7ba75, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 894586a72a633ec47a3e3975b97d3082, type: 2}
+    - {fileID: 11400000, guid: ad63696d035eb454f9082eb88298eba4, type: 2}
     consumerCount: 1
     autoAssignedStation: 4
     isRawMaterial: 0
@@ -2712,6 +2742,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b9cda6a0cb5b00e4e9dba9696a76887c, type: 2}
     - {fileID: 11400000, guid: aef7a8fcffc8c4f4883bd834ca4d3f23, type: 2}
     - {fileID: 11400000, guid: 3a92f03be499d524abb71e16064fc105, type: 2}
+    - {fileID: 11400000, guid: 349703493f314c4498a108bc7f0c2919, type: 2}
     - {fileID: 11400000, guid: a7d8ac00873615b4988ec537e2afe370, type: 2}
     consumerCount: 13
     autoAssignedStation: 3
@@ -2798,6 +2829,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: ada85b8f06edae1418a8d5bc619c659a, type: 2}
+    - {fileID: 11400000, guid: 5bb46a753dabd34479941419e80ead6e, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -2819,6 +2851,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: ea6c6a35fc5c8d446904fa4c683a89f2, type: 2}
+    - {fileID: 11400000, guid: 5b7d6ba1e7cd9904da751a20b9781e65, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -2923,12 +2956,12 @@ MonoBehaviour:
     downstreamItemNames:
     - "\u5149\u5B66\u900F\u955C"
     - "\u5236\u836F\u53F0\u5957\u4EF6"
-    - "\u5316\u5B66\u53F0\u5957\u4EF6"
     - "\u57FA\u56E0\u5206\u6790\u53F0\u5957\u4EF6"
     - "\u591C\u89C6\u4EEA"
     - "\u592A\u9633\u80FD\u677F\u5957\u4EF6"
     - "\u673A\u68B0\u52A0\u5DE5\u53F0\u5957\u4EF6"
     - "\u6C14\u8C61\u9884\u6D4B\u4EEA"
+    - "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
     - "\u84B8\u998F\u5668\u5957\u4EF6"
     - "\u9632\u6BD2\u9762\u5177"
     producerRecipes:
@@ -2940,11 +2973,14 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 6b270a6e7fe7ce947a32791dd719b29c, type: 2}
     - {fileID: 11400000, guid: c52c256eaae34eb49967bdbaaa78fcaa, type: 2}
     - {fileID: 11400000, guid: e22d6b8ddc4f3744ba1b40e2982dba25, type: 2}
+    - {fileID: 11400000, guid: c9e68de4818dde8439f11194cd60293c, type: 2}
     - {fileID: 11400000, guid: a2ed3d9ead2be0c4098aec81606d7583, type: 2}
     - {fileID: 11400000, guid: 83edc747ceca19743b8aed07f202be28, type: 2}
     - {fileID: 11400000, guid: 544268bf5f9be3d45b69571855706ea1, type: 2}
     - {fileID: 11400000, guid: 689946e4a01b6b04f926a6cd822568d5, type: 2}
     - {fileID: 11400000, guid: c7e4f44efbaa0d24bbc0420443e15f01, type: 2}
+    - {fileID: 11400000, guid: 9ad69e475f430fb449a950b2606a29f7, type: 2}
+    - {fileID: 11400000, guid: f89749d2b7281db40b5c9eff30aa5357, type: 2}
     consumerCount: 10
     autoAssignedStation: 5
     isRawMaterial: 0
@@ -2965,6 +3001,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: aa41d0a262e4d52478ae8b699e871481, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: ea6c6a35fc5c8d446904fa4c683a89f2, type: 2}
+    - {fileID: 11400000, guid: 5b7d6ba1e7cd9904da751a20b9781e65, type: 2}
     consumerCount: 1
     autoAssignedStation: 4
     isRawMaterial: 0
@@ -3116,9 +3153,11 @@ MonoBehaviour:
     productionMode: 2
     overrideStation: 0
     manualStation: 0
-    depths: 02000000
+    depths: 0200000004000000
     upstreamItemNames:
     - "\u786B\u78FA"
+    - "\u786B\u9178"
+    - "\u7A7A\u7535\u6C60"
     - "\u94C5\u77FF\u77F3"
     - "\u94DC\u952D"
     downstreamItemNames:
@@ -3126,9 +3165,11 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: dd6b832c684eb5b4d9e2e6e2912cff90, type: 2}
     - {fileID: 11400000, guid: 767f564138279074eace01bfd0a0b694, type: 2}
+    - {fileID: 11400000, guid: 8998195b6a300d647935642bb7c4ddc2, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 453fec799e19dae47913d26978e0404e, type: 2}
     - {fileID: 11400000, guid: 5d7589ae4bc3f9e4781eb922fcf84c19, type: 2}
+    - {fileID: 11400000, guid: c9140c470a9cc014991e4169ec14d6cc, type: 2}
     consumerCount: 1
     autoAssignedStation: 7
     isRawMaterial: 0
@@ -3181,6 +3222,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 9379b440fd8855140a79f520cb5f4e78, type: 2}
     - {fileID: 11400000, guid: 3d65e1b11f1382946a7b6495cd0272fe, type: 2}
     - {fileID: 11400000, guid: 5d7589ae4bc3f9e4781eb922fcf84c19, type: 2}
+    - {fileID: 11400000, guid: c9140c470a9cc014991e4169ec14d6cc, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 54dfdf1b20e78b247be4d4cae1414c1d, type: 2}
     - {fileID: 11400000, guid: f739479949758e54b853707d60ccf06b, type: 2}
@@ -3445,6 +3487,10 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 97021b040eb2e9942b8fdb9a80d827b5, type: 2}
     - {fileID: 11400000, guid: 3c8d86de9503cb64e99a7444e58e8b40, type: 2}
     - {fileID: 11400000, guid: 689946e4a01b6b04f926a6cd822568d5, type: 2}
+    - {fileID: 11400000, guid: 2db7193dfd165c54f9c34ab82f8d962b, type: 2}
+    - {fileID: 11400000, guid: b6998ebe015a40e44a32ec6ee2487b97, type: 2}
+    - {fileID: 11400000, guid: 7297513a723d3eb418cdb989e85a6edd, type: 2}
+    - {fileID: 11400000, guid: 00685efb1bd9cd04bba8a34dbfa2b282, type: 2}
     consumerCount: 5
     autoAssignedStation: 7
     isRawMaterial: 0
@@ -3732,6 +3778,30 @@ MonoBehaviour:
     requiredSystems:
     - Combat
     allSystemsReady: 1
+  - itemName: "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 0400000005000000
+    upstreamItemNames:
+    - "\u73BB\u7483\u677F"
+    - "\u94A2\u952D"
+    - "\u94DC\u952D"
+    - "\u9AD8\u7EA7\u96F6\u4EF6"
+    downstreamItemNames: []
+    producerRecipes:
+    - {fileID: 11400000, guid: 6b270a6e7fe7ce947a32791dd719b29c, type: 2}
+    - {fileID: 11400000, guid: c9e68de4818dde8439f11194cd60293c, type: 2}
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 7
+    isRawMaterial: 0
+    isDeadEnd: 1
+    requiredSystems:
+    - Building
+    - Crafting
+    allSystemsReady: 1
   - itemName: "\u7834\u5E03"
     primaryChain: 3
     productionMode: 0
@@ -3787,6 +3857,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: dd6b832c684eb5b4d9e2e6e2912cff90, type: 2}
     - {fileID: 11400000, guid: 767f564138279074eace01bfd0a0b694, type: 2}
     - {fileID: 11400000, guid: 3a92f03be499d524abb71e16064fc105, type: 2}
+    - {fileID: 11400000, guid: 13557b6ad547f1646a40f29c5aa4e25f, type: 2}
+    - {fileID: 11400000, guid: 1f713bc1ffba20a479dc2777867188a6, type: 2}
     consumerCount: 4
     autoAssignedStation: 0
     isRawMaterial: 1
@@ -3806,21 +3878,29 @@ MonoBehaviour:
     downstreamItemNames:
     - "\u5316\u5B66\u8BD5\u5242"
     - "\u65E0\u70DF\u706B\u836F"
+    - "\u6D53\u7F29\u94C0"
     - "\u706B\u836F\u5382\u5957\u4EF6"
+    - "\u7535\u6C60"
     - "\u7535\u6C60\u7EC4"
     - "\u7A7A\u7535\u6C60"
     producerRecipes:
     - {fileID: 11400000, guid: 479eca2af57a5bb4e9c15b145313446f, type: 2}
     - {fileID: 11400000, guid: 44ad6a1fea5088a4eab0dd362749163a, type: 2}
+    - {fileID: 11400000, guid: 1f713bc1ffba20a479dc2777867188a6, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 3f79f114fad8e1540910c5b38e68928b, type: 2}
+    - {fileID: 11400000, guid: 3e23a0733765df1449db42f34008f7a5, type: 2}
     - {fileID: 11400000, guid: e44aed162c6b0624e8948dd6fa3ddd48, type: 2}
     - {fileID: 11400000, guid: 8d481235d13a1fc4aa482a4ce224fac9, type: 2}
     - {fileID: 11400000, guid: 453fec799e19dae47913d26978e0404e, type: 2}
     - {fileID: 11400000, guid: 28411fd74e10598438b680ce0edfbb4d, type: 2}
     - {fileID: 11400000, guid: 5d7589ae4bc3f9e4781eb922fcf84c19, type: 2}
+    - {fileID: 11400000, guid: 6db46036c44c0eb43a5af0138b934246, type: 2}
+    - {fileID: 11400000, guid: 50893a4d01c164a43b5600c3305a6326, type: 2}
+    - {fileID: 11400000, guid: 8998195b6a300d647935642bb7c4ddc2, type: 2}
+    - {fileID: 11400000, guid: c9140c470a9cc014991e4169ec14d6cc, type: 2}
     - {fileID: 11400000, guid: 49fecbed3322ea242955dd9d5685ab80, type: 2}
-    consumerCount: 5
+    consumerCount: 7
     autoAssignedStation: 7
     isRawMaterial: 0
     isDeadEnd: 0
@@ -3851,6 +3931,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: ea6c6a35fc5c8d446904fa4c683a89f2, type: 2}
     - {fileID: 11400000, guid: 89221fe904db93d498ab4b4ffc5509d5, type: 2}
     - {fileID: 11400000, guid: d265de7a4e7686d42bb7abcc7b219e9e, type: 2}
+    - {fileID: 11400000, guid: 5bb46a753dabd34479941419e80ead6e, type: 2}
+    - {fileID: 11400000, guid: 5b7d6ba1e7cd9904da751a20b9781e65, type: 2}
     - {fileID: 11400000, guid: e77d4632eb9df5342a6ebfab490e3f33, type: 2}
     - {fileID: 11400000, guid: 2e7fd89e8238d04419770866c6fe561a, type: 2}
     - {fileID: 11400000, guid: 3786dc541935d5a468d06f5bf6ecd198, type: 2}
@@ -3896,6 +3978,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 97021b040eb2e9942b8fdb9a80d827b5, type: 2}
+    - {fileID: 11400000, guid: 00685efb1bd9cd04bba8a34dbfa2b282, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -3949,6 +4032,7 @@ MonoBehaviour:
     depths: 0500000006000000
     upstreamItemNames:
     - "\u8F74\u627F"
+    - "\u94A2\u7B4B"
     - "\u94A2\u7BA1"
     - "\u94A2\u952D"
     - "\u9AD8\u7EA7\u96F6\u4EF6"
@@ -3975,13 +4059,15 @@ MonoBehaviour:
     - "\u94C5\u952D"
     - "\u94DC\u952D"
     downstreamItemNames:
+    - "\u7535\u6C60"
     - "\u7535\u6C60\u7EC4"
     producerRecipes:
     - {fileID: 11400000, guid: 3f79f114fad8e1540910c5b38e68928b, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 9379b440fd8855140a79f520cb5f4e78, type: 2}
     - {fileID: 11400000, guid: 3d65e1b11f1382946a7b6495cd0272fe, type: 2}
-    consumerCount: 1
+    - {fileID: 11400000, guid: 8998195b6a300d647935642bb7c4ddc2, type: 2}
+    consumerCount: 2
     autoAssignedStation: 5
     isRawMaterial: 0
     isDeadEnd: 0
@@ -4116,20 +4202,22 @@ MonoBehaviour:
     allSystemsReady: 1
   - itemName: "\u7CBE\u70BC\u7164\u70AD"
     primaryChain: 2
-    productionMode: 0
+    productionMode: 2
     overrideStation: 0
     manualStation: 0
     depths: 02000000
     upstreamItemNames:
     - "\u7164\u77FF"
-    downstreamItemNames: []
+    downstreamItemNames:
+    - "\u6D53\u7F29\u94C0"
     producerRecipes:
     - {fileID: 11400000, guid: aef7a8fcffc8c4f4883bd834ca4d3f23, type: 2}
-    consumerRecipes: []
-    consumerCount: 0
+    consumerRecipes:
+    - {fileID: 11400000, guid: 3e23a0733765df1449db42f34008f7a5, type: 2}
+    consumerCount: 1
     autoAssignedStation: 4
     isRawMaterial: 0
-    isDeadEnd: 1
+    isDeadEnd: 0
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7EAF\u51C0\u6C34"
@@ -4152,9 +4240,12 @@ MonoBehaviour:
     - {fileID: 11400000, guid: a3a7f1a7115801243b994facf2de0194, type: 2}
     - {fileID: 11400000, guid: 100b06737e0d6f54f827a9b3041828cd, type: 2}
     - {fileID: 11400000, guid: c37ee76225f931844ae2fe0785bc82de, type: 2}
+    - {fileID: 11400000, guid: 349703493f314c4498a108bc7f0c2919, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 479eca2af57a5bb4e9c15b145313446f, type: 2}
     - {fileID: 11400000, guid: c5fe998a06c580b4fb9e0b374a28f525, type: 2}
+    - {fileID: 11400000, guid: 1f713bc1ffba20a479dc2777867188a6, type: 2}
+    - {fileID: 11400000, guid: bb8e8acbe6342cc46ad789eb1829fa12, type: 2}
     - {fileID: 11400000, guid: fbe9d6ff5f5058043ac9164831874b27, type: 2}
     - {fileID: 11400000, guid: a1a4b4cdc3fdc7844a96c0bd9151007b, type: 2}
     - {fileID: 11400000, guid: 72863336dc7d28e429b6f57d4adc6f22, type: 2}
@@ -4295,6 +4386,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: d3a9a3a4127b9db468b601b59637a508, type: 2}
     - {fileID: 11400000, guid: 12e48764947f33543950b3a7144aab54, type: 2}
+    - {fileID: 11400000, guid: e563cb1ba0e080441a1d48e61c22e06b, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -4340,6 +4432,7 @@ MonoBehaviour:
     producerRecipes:
     - {fileID: 11400000, guid: 1557175f76edcf0428505699a8aed5a5, type: 2}
     - {fileID: 11400000, guid: 8ed0e45a7c7d26045a8a0b6022cc8a7f, type: 2}
+    - {fileID: 11400000, guid: 66bebcc987ecca041839095fb2ac23cf, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -4454,6 +4547,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 259d69263536ec44eaf0e47906f9bb60, type: 2}
+    - {fileID: 11400000, guid: 59a0018bcaf44f34b9c7f3a519903d11, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -4619,6 +4713,13 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 8014bbad1a05e594dac000dafb3a1611, type: 2}
     - {fileID: 11400000, guid: 4c9c4447df2b4a0468654a64252a169d, type: 2}
     - {fileID: 11400000, guid: f698bf443bdaad3469add17c02ddda1d, type: 2}
+    - {fileID: 11400000, guid: b6998ebe015a40e44a32ec6ee2487b97, type: 2}
+    - {fileID: 11400000, guid: 6db46036c44c0eb43a5af0138b934246, type: 2}
+    - {fileID: 11400000, guid: fb1c779c285938548b63733d42f23d7a, type: 2}
+    - {fileID: 11400000, guid: 00685efb1bd9cd04bba8a34dbfa2b282, type: 2}
+    - {fileID: 11400000, guid: e563cb1ba0e080441a1d48e61c22e06b, type: 2}
+    - {fileID: 11400000, guid: 59a0018bcaf44f34b9c7f3a519903d11, type: 2}
+    - {fileID: 11400000, guid: bb8e8acbe6342cc46ad789eb1829fa12, type: 2}
     - {fileID: 11400000, guid: 3786dc541935d5a468d06f5bf6ecd198, type: 2}
     - {fileID: 11400000, guid: cd8b830a6d69b4e40ab3ae90f6e2a951, type: 2}
     consumerCount: 11
@@ -4640,6 +4741,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 6cdfd284e432ad549a242b280f6da51c, type: 2}
+    - {fileID: 11400000, guid: f89749d2b7281db40b5c9eff30aa5357, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 6
@@ -4681,6 +4783,7 @@ MonoBehaviour:
     consumerRecipes:
     - {fileID: 11400000, guid: 6996492b0af552744aee0cce939e371e, type: 2}
     - {fileID: 11400000, guid: 285aa5c162e9335439186cc49cdc69de, type: 2}
+    - {fileID: 11400000, guid: 4f93b2be942360e4c88c101359d89f0a, type: 2}
     - {fileID: 11400000, guid: f339659543b92834db2829b371b4c630, type: 2}
     - {fileID: 11400000, guid: fbe9d6ff5f5058043ac9164831874b27, type: 2}
     - {fileID: 11400000, guid: a1a4b4cdc3fdc7844a96c0bd9151007b, type: 2}
@@ -4761,6 +4864,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: c5fe998a06c580b4fb9e0b374a28f525, type: 2}
+    - {fileID: 11400000, guid: bb8e8acbe6342cc46ad789eb1829fa12, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -4881,6 +4985,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 93a22cc1560893b44a01f67143d50343, type: 2}
     - {fileID: 11400000, guid: 68d7b266d0df5ca4b8c6a6dabf3612bb, type: 2}
     - {fileID: 11400000, guid: dd38d26481cdaa946b8fcea7cbeaec6e, type: 2}
+    - {fileID: 11400000, guid: 9e1418eb4b7a3cd4cbccf90c8e30b5cc, type: 2}
     - {fileID: 11400000, guid: af58d42deac06db45970af9611e64e07, type: 2}
     - {fileID: 11400000, guid: 4752ec92a3d4c0c4792c2345d5fe7055, type: 2}
     - {fileID: 11400000, guid: 932d0d45ee4683e429b7c290c678d5ff, type: 2}
@@ -4918,6 +5023,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 6996492b0af552744aee0cce939e371e, type: 2}
     - {fileID: 11400000, guid: 1cb881dee3991974696ead1e9424a247, type: 2}
     - {fileID: 11400000, guid: f98c756869683f442886e4730a6daa88, type: 2}
+    - {fileID: 11400000, guid: 7010dfa752bafc549a60542c268db0db, type: 2}
     consumerRecipes:
     - {fileID: 11400000, guid: 949db563eceaedb4eacc3d2eef054b84, type: 2}
     - {fileID: 11400000, guid: e44aed162c6b0624e8948dd6fa3ddd48, type: 2}
@@ -4932,6 +5038,13 @@ MonoBehaviour:
     - {fileID: 11400000, guid: eda08285509973b4fbda7fec973b7fa0, type: 2}
     - {fileID: 11400000, guid: 47638a5aa0741f04b88cb18788a75038, type: 2}
     - {fileID: 11400000, guid: f1e944df2a789984c98960c4e0795731, type: 2}
+    - {fileID: 11400000, guid: 6db46036c44c0eb43a5af0138b934246, type: 2}
+    - {fileID: 11400000, guid: ad63696d035eb454f9082eb88298eba4, type: 2}
+    - {fileID: 11400000, guid: 7010dfa752bafc549a60542c268db0db, type: 2}
+    - {fileID: 11400000, guid: fb1c779c285938548b63733d42f23d7a, type: 2}
+    - {fileID: 11400000, guid: 50893a4d01c164a43b5600c3305a6326, type: 2}
+    - {fileID: 11400000, guid: 5b7d6ba1e7cd9904da751a20b9781e65, type: 2}
+    - {fileID: 11400000, guid: 59a0018bcaf44f34b9c7f3a519903d11, type: 2}
     - {fileID: 11400000, guid: cd8b830a6d69b4e40ab3ae90f6e2a951, type: 2}
     consumerCount: 11
     autoAssignedStation: 4
@@ -5031,22 +5144,32 @@ MonoBehaviour:
     allSystemsReady: 1
   - itemName: "\u94A2\u7B4B"
     primaryChain: 0
-    productionMode: 0
+    productionMode: 2
     overrideStation: 0
     manualStation: 0
     depths: 010000000400000005000000
     upstreamItemNames:
     - "\u94A2\u952D"
-    downstreamItemNames: []
+    downstreamItemNames:
+    - "\u51B2\u538B\u673A\u5957\u4EF6"
+    - "\u51C0\u6C34\u5382\u5957\u4EF6"
+    - "\u5DE5\u4E1A\u7194\u7089\u5957\u4EF6"
+    - "\u6838\u7535\u7AD9\u5957\u4EF6"
+    - "\u79FB\u52A8\u8981\u585E\u57FA\u5730\u8F66\u5957\u4EF6"
     producerRecipes:
     - {fileID: 11400000, guid: d47e909386bcc6e4fb8b7c3f98cc4a78, type: 2}
     - {fileID: 11400000, guid: 2f65dcc71efbbe841a2877d68aa28ca1, type: 2}
     - {fileID: 11400000, guid: 3d359ccb65a4a994194f62ff786ead6d, type: 2}
-    consumerRecipes: []
-    consumerCount: 0
+    consumerRecipes:
+    - {fileID: 11400000, guid: 011e636a3e704d64d8ac280069e2940a, type: 2}
+    - {fileID: 11400000, guid: 93444a9a35885154ca6252e9553162b3, type: 2}
+    - {fileID: 11400000, guid: 45a573a6e57f4d149a2a67217245bbab, type: 2}
+    - {fileID: 11400000, guid: 8bc77bb23b5826a478ae2b88606f2948, type: 2}
+    - {fileID: 11400000, guid: dff1d962b579ee94080dc954829d29fc, type: 2}
+    consumerCount: 5
     autoAssignedStation: 7
     isRawMaterial: 0
-    isDeadEnd: 1
+    isDeadEnd: 0
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u94A2\u7BA1"
@@ -5087,6 +5210,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: a2ed3d9ead2be0c4098aec81606d7583, type: 2}
     - {fileID: 11400000, guid: 8bc77bb23b5826a478ae2b88606f2948, type: 2}
     - {fileID: 11400000, guid: 56974d2933c3fd64886700bb5db35cbc, type: 2}
+    - {fileID: 11400000, guid: 9e1418eb4b7a3cd4cbccf90c8e30b5cc, type: 2}
+    - {fileID: 11400000, guid: f89749d2b7281db40b5c9eff30aa5357, type: 2}
     - {fileID: 11400000, guid: fd84744e50a1e1c438e626af59f691ab, type: 2}
     consumerCount: 12
     autoAssignedStation: 7
@@ -5110,7 +5235,6 @@ MonoBehaviour:
     - "\u51B2\u538B\u673A\u5957\u4EF6"
     - "\u51C0\u6C34\u5382\u5957\u4EF6"
     - "\u5236\u836F\u53F0\u5957\u4EF6"
-    - "\u5316\u5B66\u53F0\u5957\u4EF6"
     - "\u53D1\u7535\u673A\u5957\u4EF6"
     - "\u53D1\u9175\u7F50\u5957\u4EF6"
     - "\u56DE\u6536\u7AD9\u5957\u4EF6"
@@ -5135,6 +5259,7 @@ MonoBehaviour:
     - "\u7535\u8DEF\u5370\u5237\u673A\u5957\u4EF6"
     - "\u7535\u952F"
     - "\u76FE\u724C"
+    - "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
     - "\u79BB\u5FC3\u673A\u5957\u4EF6"
     - "\u79FB\u52A8\u8981\u585E\u57FA\u5730\u8F66\u5957\u4EF6"
     - "\u7A7F\u7532\u5F39"
@@ -5185,6 +5310,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 4f99127214db2ef4da13a6df85df3e75, type: 2}
     - {fileID: 11400000, guid: 8df8b2b6116a0974b9ec6e13759dedcf, type: 2}
     - {fileID: 11400000, guid: ef9fa7323dbb87c4dad56e05db71ac2e, type: 2}
+    - {fileID: 11400000, guid: c9e68de4818dde8439f11194cd60293c, type: 2}
     - {fileID: 11400000, guid: 7ce16d42e6af49d458375ee174a8ed46, type: 2}
     - {fileID: 11400000, guid: 45a573a6e57f4d149a2a67217245bbab, type: 2}
     - {fileID: 11400000, guid: 45d5661e7e52faf47af969ad81bd5e6c, type: 2}
@@ -5200,6 +5326,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 8bc77bb23b5826a478ae2b88606f2948, type: 2}
     - {fileID: 11400000, guid: 689946e4a01b6b04f926a6cd822568d5, type: 2}
     - {fileID: 11400000, guid: e9d742955516f1c45a92e8e341299799, type: 2}
+    - {fileID: 11400000, guid: 9ad69e475f430fb449a950b2606a29f7, type: 2}
+    - {fileID: 11400000, guid: 9e1418eb4b7a3cd4cbccf90c8e30b5cc, type: 2}
     - {fileID: 11400000, guid: dff1d962b579ee94080dc954829d29fc, type: 2}
     - {fileID: 11400000, guid: fd84744e50a1e1c438e626af59f691ab, type: 2}
     - {fileID: 11400000, guid: 4752ec92a3d4c0c4792c2345d5fe7055, type: 2}
@@ -5246,6 +5374,7 @@ MonoBehaviour:
     - "\u6D53\u7F29\u94C0"
     producerRecipes: []
     consumerRecipes:
+    - {fileID: 11400000, guid: 3e23a0733765df1449db42f34008f7a5, type: 2}
     - {fileID: 11400000, guid: c368cf70fd74c8a4ca27e2e93554e859, type: 2}
     consumerCount: 1
     autoAssignedStation: 0
@@ -5436,6 +5565,9 @@ MonoBehaviour:
     - {fileID: 11400000, guid: f3901f0a3e390c44188a192df27f1721, type: 2}
     - {fileID: 11400000, guid: dd38d26481cdaa946b8fcea7cbeaec6e, type: 2}
     - {fileID: 11400000, guid: 73f896ef776497c4bbb83f4ef63e9fea, type: 2}
+    - {fileID: 11400000, guid: fe12e96240fa6384482df209f3e95032, type: 2}
+    - {fileID: 11400000, guid: 04f0e04bd1a758b43a725dbb2f47f5f7, type: 2}
+    - {fileID: 11400000, guid: 66bebcc987ecca041839095fb2ac23cf, type: 2}
     - {fileID: 11400000, guid: adbf850e2a54dff4eab88681a03875f7, type: 2}
     - {fileID: 11400000, guid: 2a2080d6d40aed444b13b892e4305d21, type: 2}
     - {fileID: 11400000, guid: 03f8765355225534c8f0062b80cac1fd, type: 2}
@@ -5578,7 +5710,6 @@ MonoBehaviour:
     downstreamItemNames:
     - "\u51C0\u6C34\u5382\u5957\u4EF6"
     - "\u5236\u836F\u53F0\u5957\u4EF6"
-    - "\u5316\u5B66\u53F0\u5957\u4EF6"
     - "\u53D1\u7535\u673A\u5957\u4EF6"
     - "\u592A\u9633\u80FD\u677F\u5957\u4EF6"
     - "\u5E7F\u64AD\u5854\u5957\u4EF6"
@@ -5595,6 +5726,7 @@ MonoBehaviour:
     - "\u7535\u7F06"
     - "\u7535\u89E3\u69FD\u5957\u4EF6"
     - "\u7535\u8DEF\u677F"
+    - "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
     - "\u7A7A\u7535\u6C60"
     - "\u7EBF\u5708"
     - "\u84B8\u998F\u5668\u5957\u4EF6"
@@ -5625,10 +5757,14 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 2b6986826c569114cafc10696672e149, type: 2}
     - {fileID: 11400000, guid: 767f564138279074eace01bfd0a0b694, type: 2}
     - {fileID: 11400000, guid: 4f99127214db2ef4da13a6df85df3e75, type: 2}
+    - {fileID: 11400000, guid: c9e68de4818dde8439f11194cd60293c, type: 2}
     - {fileID: 11400000, guid: 0175afadb8f7b844f93cda230337e679, type: 2}
     - {fileID: 11400000, guid: a2ed3d9ead2be0c4098aec81606d7583, type: 2}
     - {fileID: 11400000, guid: 8bc77bb23b5826a478ae2b88606f2948, type: 2}
     - {fileID: 11400000, guid: 4692f84f79c5fc44a95d088fd1862379, type: 2}
+    - {fileID: 11400000, guid: 9ad69e475f430fb449a950b2606a29f7, type: 2}
+    - {fileID: 11400000, guid: c9140c470a9cc014991e4169ec14d6cc, type: 2}
+    - {fileID: 11400000, guid: f89749d2b7281db40b5c9eff30aa5357, type: 2}
     - {fileID: 11400000, guid: cfe01acdb0f327e41b75f458b6f21aef, type: 2}
     - {fileID: 11400000, guid: c1c058fcf37e7d54ba99ba40b62355b9, type: 2}
     - {fileID: 11400000, guid: 4752ec92a3d4c0c4792c2345d5fe7055, type: 2}
@@ -5678,6 +5814,7 @@ MonoBehaviour:
     consumerRecipes:
     - {fileID: 11400000, guid: 16a70f6a745e0764d871b3f038989c24, type: 2}
     - {fileID: 11400000, guid: 6819df5650be5ca4e9d46989d1aac8dc, type: 2}
+    - {fileID: 11400000, guid: 47bdb2c4feeed0644a008002c02f7914, type: 2}
     consumerCount: 2
     autoAssignedStation: 7
     isRawMaterial: 0
@@ -5810,6 +5947,7 @@ MonoBehaviour:
     downstreamItemNames: []
     producerRecipes:
     - {fileID: 11400000, guid: 16a70f6a745e0764d871b3f038989c24, type: 2}
+    - {fileID: 11400000, guid: 47bdb2c4feeed0644a008002c02f7914, type: 2}
     consumerRecipes: []
     consumerCount: 0
     autoAssignedStation: 4
@@ -5959,6 +6097,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 39e5b74873bfe5f4099b45e485a404b3, type: 2}
     - {fileID: 11400000, guid: 100b06737e0d6f54f827a9b3041828cd, type: 2}
     - {fileID: 11400000, guid: c37ee76225f931844ae2fe0785bc82de, type: 2}
+    - {fileID: 11400000, guid: 349703493f314c4498a108bc7f0c2919, type: 2}
     consumerCount: 2
     autoAssignedStation: 2
     isRawMaterial: 0
@@ -6004,7 +6143,6 @@ MonoBehaviour:
     - "\u5149\u5B66\u900F\u955C"
     - "\u5168\u81EA\u52A8\u6539\u9020\u5957\u4EF6"
     - "\u51B2\u538B\u673A\u5957\u4EF6"
-    - "\u5316\u5B66\u53F0\u5957\u4EF6"
     - "\u534A\u81EA\u52A8\u6539\u9020\u5957\u4EF6"
     - "\u53D1\u7535\u673A\u5957\u4EF6"
     - "\u5DE5\u4E1A\u7194\u7089\u5957\u4EF6"
@@ -6020,6 +6158,7 @@ MonoBehaviour:
     - "\u7535\u6C60\u751F\u4EA7\u7EBF\u5957\u4EF6"
     - "\u7535\u8DEF\u5370\u5237\u673A\u5957\u4EF6"
     - "\u76FE\u724C"
+    - "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
     - "\u79BB\u5FC3\u673A\u5957\u4EF6"
     - "\u79FB\u52A8\u8981\u585E\u57FA\u5730\u8F66\u5957\u4EF6"
     - "\u7C89\u788E\u673A\u5957\u4EF6"
@@ -6052,6 +6191,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 13a757df6e4fc2f4886ac2527e846ea4, type: 2}
     - {fileID: 11400000, guid: 38ddbc163f87ff3479c64331bce2369e, type: 2}
     - {fileID: 11400000, guid: ef9fa7323dbb87c4dad56e05db71ac2e, type: 2}
+    - {fileID: 11400000, guid: c9e68de4818dde8439f11194cd60293c, type: 2}
     - {fileID: 11400000, guid: 7ce16d42e6af49d458375ee174a8ed46, type: 2}
     - {fileID: 11400000, guid: 45a573a6e57f4d149a2a67217245bbab, type: 2}
     - {fileID: 11400000, guid: 45d5661e7e52faf47af969ad81bd5e6c, type: 2}
@@ -6122,6 +6262,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: b414a44caf18d6e43907d8488748e369, type: 2}
     - {fileID: 11400000, guid: 7bb24349b710fd94eb38505ab4f89858, type: 2}
     - {fileID: 11400000, guid: 28411fd74e10598438b680ce0edfbb4d, type: 2}
+    - {fileID: 11400000, guid: 50893a4d01c164a43b5600c3305a6326, type: 2}
     - {fileID: 11400000, guid: 98ea4e23047b1544baaafcb89cda685e, type: 2}
     - {fileID: 11400000, guid: 871317938af4ddd42a63c253588e7766, type: 2}
     - {fileID: 11400000, guid: c1c058fcf37e7d54ba99ba40b62355b9, type: 2}
@@ -6174,5 +6315,5 @@ MonoBehaviour:
     requiredSystems: []
     allSystemsReady: 1
   rawMaterialCount: 63
-  deadEndCount: 164
+  deadEndCount: 162
   coreMaterialCount: 18

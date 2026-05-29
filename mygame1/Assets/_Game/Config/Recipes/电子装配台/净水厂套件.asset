@@ -16,7 +16,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   description: 
   category: 10
-  requiredStation: 8
+  requiredStation: 7
   isIndustrial: 0
   productionDeviceName: 
   skillRequirements:
@@ -33,6 +33,8 @@ MonoBehaviour:
     count: 4
   - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
     count: 4
+  - itemData: {fileID: 11400000, guid: 9929924a95468c24fa076f761a1705fc, type: 2}
+    count: 3
   resultItem: {fileID: 11400000, guid: af24033978c445544bd3c004a358c6dd, type: 2}
   resultCount: 1
   craftTime: 20

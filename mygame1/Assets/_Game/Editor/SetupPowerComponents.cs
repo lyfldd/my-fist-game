@@ -164,13 +164,13 @@ namespace _Game.Editor
             if (data == null) return 0;
 
             // 已迁移过则跳过
-            if (data.category == BuildableCategory.Power && data.powerOutput > 0f)
+            if (data.category == BuildableCategory.EnergyIndustry && data.powerOutput > 0f)
             {
                 Debug.Log("[SetupPower] 旧发电机已迁移，跳过");
                 return 0;
             }
 
-            data.category = BuildableCategory.Power;
+            data.category = BuildableCategory.EnergyIndustry;
             data.powerOutput = 200f;
             data.powerSourceType = PowerSourceType.Combustion;
             data.powerRequiresFuel = true;

@@ -78,7 +78,7 @@ namespace _Game.Editor
             var data = ScriptableObject.CreateInstance<BuildableData>();
             data.displayName = name;
             data.description = $"供电终端，半径{radius}m。范围内设备自动通电。可通过电缆连接发电端或其他终端。";
-            data.category = BuildableCategory.Power;
+            data.category = BuildableCategory.EnergyIndustry;
             data.placementSize = new Vector3(1f, 1f, 1f);
             data.snapSize = 1f;
             data.buildDuration = 3f;
@@ -106,7 +106,7 @@ namespace _Game.Editor
             var data = ScriptableObject.CreateInstance<BuildableData>();
             data.displayName = name;
             data.description = $"发电设备，输出功率 {power}W。放置后需用电缆连接至用电终端。";
-            data.category = BuildableCategory.Power;
+            data.category = BuildableCategory.EnergyIndustry;
             data.placementSize = power >= 300f
                 ? new Vector3(3f, 2f, 3f)
                 : new Vector3(1.5f, 2f, 1.5f);

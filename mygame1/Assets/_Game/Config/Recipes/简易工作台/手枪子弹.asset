@@ -19,7 +19,9 @@ MonoBehaviour:
   requiredStation: 7
   isIndustrial: 0
   productionDeviceName: 
-  skillRequirements: []
+  skillRequirements:
+  - skill: 9
+    level: 2
   materials:
   - itemData: {fileID: 11400000, guid: 797cfce063fe1874a91837156274af89, type: 2}
     count: 10

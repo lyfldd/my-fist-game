@@ -17,7 +17,11 @@ MonoBehaviour:
   description: 
   category: 10
   requiredStation: 9
-  skillRequirements: []
+  isIndustrial: 0
+  productionDeviceName: 
+  skillRequirements:
+  - skill: 9
+    level: 3
   materials:
   - itemData: {fileID: 0}
     count: 3

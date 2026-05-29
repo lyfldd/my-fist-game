@@ -17,16 +17,20 @@ MonoBehaviour:
   description: 
   category: 10
   requiredStation: 9
-  skillRequirements: []
+  isIndustrial: 0
+  productionDeviceName: 
+  skillRequirements:
+  - skill: 9
+    level: 3
   materials:
   - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
-    count: 3
-  - itemData: {fileID: 11400000, guid: 0defe3a1e0ad4df4f91a4d5f870711ea, type: 2}
-    count: 9
-  - itemData: {fileID: 11400000, guid: 1b4eec668affeaf469641c05626f1797, type: 2}
-    count: 3
-  - itemData: {fileID: 11400000, guid: f70cc5ce565e4a348983403880e801cb, type: 2}
     count: 6
+  - itemData: {fileID: 11400000, guid: 0defe3a1e0ad4df4f91a4d5f870711ea, type: 2}
+    count: 81
+  - itemData: {fileID: 11400000, guid: 1b4eec668affeaf469641c05626f1797, type: 2}
+    count: 27
+  - itemData: {fileID: 11400000, guid: f70cc5ce565e4a348983403880e801cb, type: 2}
+    count: 54
   resultItem: {fileID: 0}
   resultCount: 1
   craftTime: 30
