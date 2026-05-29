@@ -20,26 +20,31 @@ MonoBehaviour:
   recipes:
   - input: {fileID: 11400000, guid: e6759332181046f47b17afc5abc66ec5, type: 2}
     inputCount: 3
+    inputs: []
     output: {fileID: 11400000, guid: cb1ad6dc6447f2043b6112d714c8ae2e, type: 2}
     outputCount: 2
     baseTime: 6
   - input: {fileID: 11400000, guid: 5e9c6924925b8294ea414fd644cc1aa9, type: 2}
     inputCount: 3
+    inputs: []
     output: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
     outputCount: 3
     baseTime: 5
   - input: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
     inputCount: 4
+    inputs: []
     output: {fileID: 11400000, guid: 783c0eda44fed15428b9fecd527c739b, type: 2}
     outputCount: 5
     baseTime: 4
   - input: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
     inputCount: 1
+    inputs: []
     output: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
     outputCount: 1
     baseTime: 6
   - input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
     inputCount: 5
+    inputs: []
     output: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     outputCount: 2
     baseTime: 5

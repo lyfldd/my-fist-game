@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 518e29df93df32941ba7eff134a7312e, type: 3}
   m_Name: Buildable_Chemistry
   m_EditorClassIdentifier: 
-  displayName: "\u5316\u5B66\u53F0"
-  description: "\u5316\u5B66\u5408\u6210\u4E0E\u5236\u836F\u3002\u53EF\u5236\u4F5C\u836F\u54C1\u3001\u5316\u5DE5\u539F\u6599\u3001\u71C3\u6599\u548C\u6295\u63B7\u7269\u3002"
+  displayName: "\u7814\u7A76\u4E2D\u5FC3"
+  description: "\u5DE5\u4E1A\u6280\u672F\u7814\u53D1\u8BBE\u65BD\u3002\u6D88\u8017\u6750\u6599\u7814\u7A76\u89E3\u9501\u5DE5\u4E1A\u8BBE\u5907\u914D\u65B9\u3002"
   icon: {fileID: 0}
   category: 4
   previewPrefab: {fileID: 0}
@@ -58,3 +58,5 @@ MonoBehaviour:
   isWorkstation: 1
   workstationTier: 6
   productionDeviceRef: {fileID: 0}
+  industrialChain: 0
+  producedItems: []

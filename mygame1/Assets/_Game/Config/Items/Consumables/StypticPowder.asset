@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u4F7F\u7528\u6548\u679C"
+    system: 2
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C SurvivalSystem \u8BFB\u53D6 itemEffects"
   useTime: 2
   itemEffects:
   - effectType: 4

@@ -13,8 +13,11 @@ namespace _Game.Config
         Furniture,   // 家具（装饰+功能）
         Barricade,   // 路障（门/窗加固）
         Workstation, // 工作台（交互打开合成面板）
-        Industrial,     // 工业设备（自动化生产）
-        LateIndustrial, // 大后期工业（终局要塞级设备）
+        MetalIndustry,        // 金属工业（冶炼/冲压/车床/装配/弹药/武器）
+        ElectronicsIndustry,  // 电子工业（拉线/插件/电路/精密装配/AI）
+        ChemicalIndustry,     // 化学工业（发酵/蒸馏/制药/火药/离心/基因）
+        BioIndustry,          // 生物食品工业（织布/锯木/熏制/罐头/水泵）
+        EnergyIndustry,       // 能源工业（发电机/太阳能/核电站）
         Power           // 电力设备（发电端+终端）
     }
 
@@ -131,6 +134,12 @@ namespace _Game.Config
         public WorkstationTier workstationTier;
         [Tooltip("关联的生产设备数据（null=纯工作台，非null=放置后附加自运转生产逻辑）")]
         public ProductionDeviceData productionDeviceRef;
+
+        [Header("工业设备联动")]
+        [Tooltip("所属产业链（工业设备自动推算）")]
+        public ChainType industrialChain;
+        [Tooltip("该设备产出的物品名列表（建造菜单预览用）")]
+        public string[] producedItems;
     }
 
     /// <summary>

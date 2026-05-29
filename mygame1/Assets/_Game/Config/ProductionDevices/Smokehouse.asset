@@ -20,6 +20,7 @@ MonoBehaviour:
   recipes:
   - input: {fileID: 11400000, guid: 98bc22c127339004798bf87b6adf0f5a, type: 2}
     inputCount: 2
+    inputs: []
     output: {fileID: 11400000, guid: 1fe3857f18f032246b6798529d8ee792, type: 2}
     outputCount: 1
     baseTime: 8

@@ -4,6 +4,7 @@ using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Interaction;
 using _Game.Systems.Inventory;
+using _Game.Systems.ItemGraph;
 
 namespace _Game.Systems.Crafting
 {
@@ -113,7 +114,13 @@ namespace _Game.Systems.Crafting
 
         void TryProduce()
         {
-            if (_data.recipes == null || _data.recipes.Length == 0) return;
+            // 研究门控
+            var researchMgr = Object.FindObjectOfType<ChemicalResearchManager>();
+            if (researchMgr != null && !researchMgr.IsDeviceUnlocked(_data.deviceName))
+                return;
+
+            var recipes = GetActiveRecipes();
+            if (recipes == null || recipes.Length == 0) return;
 
             var consumer = GetComponent<Power.PowerConsumer>();
 
@@ -141,10 +148,30 @@ namespace _Game.Systems.Crafting
                 }
             }
 
-            // 遍历配方
-            foreach (var recipe in _data.recipes)
+            // 遍历配方（优先走 RecipeData，兜底 ProductionRecipe）
+            foreach (var recipe in recipes)
             {
-                if (HasInputItem(recipe.input, recipe.inputCount))
+                // 多材料输入检查
+                if (recipe.inputs != null && recipe.inputs.Length > 0)
+                {
+                    bool hasAll = true;
+                    foreach (var req in recipe.inputs)
+                    {
+                        if (req.itemData == null || !HasInputItem(req.itemData, req.count))
+                        { hasAll = false; break; }
+                    }
+                    if (hasAll)
+                    {
+                        foreach (var req in recipe.inputs)
+                            RemoveInputItem(req.itemData, req.count);
+                        PlaceOutput(recipe.output, recipe.outputCount);
+                        EventBus.Publish(new ProductionCycleEvent(
+                            gameObject, recipe.output, recipe.outputCount));
+                        return;
+                    }
+                }
+                // 单材料输入（兼容旧数据）
+                else if (recipe.input != null && HasInputItem(recipe.input, recipe.inputCount))
                 {
                     RemoveInputItem(recipe.input, recipe.inputCount);
                     PlaceOutput(recipe.output, recipe.outputCount);
@@ -153,6 +180,42 @@ namespace _Game.Systems.Crafting
                     return;
                 }
             }
+        }
+
+        /// <summary>
+        /// 获取设备的所有配方：优先从图谱/RecipeCatalog 查询，兜底使用 ProductionDeviceData 内嵌配方
+        /// </summary>
+        ProductionRecipe[] GetActiveRecipes()
+        {
+            // 已有内嵌配方直接使用
+            if (_data.recipes != null && _data.recipes.Length > 0)
+                return _data.recipes;
+
+            // 从图谱查询工业配方
+            var graph = ItemGraphManager.Instance;
+            if (graph != null)
+            {
+                var catalogRecipes = graph.GetRecipesForDevice(_data.deviceName);
+                if (catalogRecipes.Length > 0)
+                {
+                    var result = new ProductionRecipe[catalogRecipes.Length];
+                    for (int i = 0; i < catalogRecipes.Length; i++)
+                    {
+                        var r = catalogRecipes[i];
+                        result[i] = new ProductionRecipe
+                        {
+                            input = r.materials != null && r.materials.Length > 0 ? r.materials[0].itemData : null,
+                            inputCount = r.materials != null && r.materials.Length > 0 ? r.materials[0].count : 0,
+                            output = r.resultItem,
+                            outputCount = r.resultCount,
+                            baseTime = r.craftTime
+                        };
+                    }
+                    return result;
+                }
+            }
+
+            return new ProductionRecipe[0];
         }
 
         bool ConsumeFuel()

@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u7535\u529B"
+    system: 5
+    componentTypeName: PowerSource/PowerTerminal
+    implemented: 1
+    notes: "\u5DF2\u6709\u7535\u529B\u7CFB\u7EDF\u5B8C\u6574\u652F\u6301"
   useTime: 1
   itemEffects: []
   warmthValue: 0

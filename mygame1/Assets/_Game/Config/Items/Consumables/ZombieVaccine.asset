@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u9AD8\u7EA7\u533B\u7597"
+    system: 2
+    componentTypeName: 
+    implemented: 0
+    notes: "\u6548\u679C\u811A\u672C\u672A\u5B9E\u73B0\uFF08ItemEffect \u679A\u4E3E\u9700\u6269\u5C55\uFF1A\u54AC\u4F24\u514D\u75AB/\u6C38\u4E45\u4F24\u6062\u590D/\u6280\u80FD\u6062\u590D\uFF09"
   useTime: 1
   itemEffects: []
   warmthValue: 0

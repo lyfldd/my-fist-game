@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u8F7D\u5177"
+    system: 4
+    componentTypeName: VehicleController
+    implemented: 1
+    notes: "\u5DF2\u6709\u8F7D\u5177\u7CFB\u7EDF"
   useTime: 1
   itemEffects: []
   warmthValue: 0

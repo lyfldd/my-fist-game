@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: "\u53D1\u9175\u7F50"
   description: "\u751F\u7269\u53D1\u9175\u3002\u53EF\u751F\u4EA7\u9152\u7CBE\u3001\u6709\u673A\u9178\u548C\u751F\u7269\u71C3\u6599\u3002"
   icon: {fileID: 0}
-  category: 5
+  category: 7
   previewPrefab: {fileID: 0}
   builtPrefab: {fileID: 0}
   placementSize: {x: 1.5, y: 2, z: 1.5}
@@ -58,3 +58,5 @@ MonoBehaviour:
   isWorkstation: 0
   workstationTier: 0
   productionDeviceRef: {fileID: 11400000, guid: 2090a96df26fc154cae2e4854d415960, type: 2}
+  industrialChain: 0
+  producedItems: []

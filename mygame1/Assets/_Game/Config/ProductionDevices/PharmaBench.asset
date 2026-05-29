@@ -20,21 +20,25 @@ MonoBehaviour:
   recipes:
   - input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
     inputCount: 4
+    inputs: []
     output: {fileID: 11400000, guid: ad8b22f2679061a43a5a81e8f04e22a5, type: 2}
     outputCount: 1
     baseTime: 8
   - input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
     inputCount: 5
+    inputs: []
     output: {fileID: 11400000, guid: 728ef3a48d228ae4eb2b1da68d9a2712, type: 2}
     outputCount: 1
     baseTime: 6
   - input: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
     inputCount: 1
+    inputs: []
     output: {fileID: 11400000, guid: 465f25356e30b0446989d1301b4ba399, type: 2}
     outputCount: 2
     baseTime: 7
   - input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
     inputCount: 3
+    inputs: []
     output: {fileID: 11400000, guid: 3f7e40ae1cac2ce44b00835a5d63997a, type: 2}
     outputCount: 1
     baseTime: 6

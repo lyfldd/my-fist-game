@@ -243,6 +243,16 @@ namespace _Game.Systems.Crafting
             GUI.Label(new Rect(x + 6f, y + 4f, leftWidth - 12f, 20f), "生产配方", _sectionHeaderStyle);
             y += 24f;
 
+            // 研究状态检查
+            var researchMgr = Object.FindObjectOfType<ChemicalResearchManager>();
+            bool researched = researchMgr == null || researchMgr.IsDeviceUnlocked(_deviceData.deviceName);
+            if (!researched)
+            {
+                GUI.Label(new Rect(x + 8f, y, leftWidth - 16f, 40f),
+                    "未研究\n请在研究中心完成对应研究项目以解锁此设备配方", _dimStyle);
+                return;
+            }
+
             var recipes = _deviceData.recipes;
             if (recipes == null || recipes.Length == 0)
             {
@@ -265,7 +275,18 @@ namespace _Game.Systems.Crafting
 
                 Color prev = GUI.backgroundColor;
                 GUI.backgroundColor = selected ? new Color(0f, 0.45f, 0f, 1f) : new Color(0.18f, 0.18f, 0.18f, 1f);
-                string label = $"{ItemName(r.input)} ×{r.inputCount} → {ItemName(r.output)} ×{r.outputCount}";
+                string label;
+                if (r.inputs != null && r.inputs.Length > 0)
+                {
+                    var parts = new System.Collections.Generic.List<string>();
+                    foreach (var req in r.inputs)
+                        parts.Add($"{ItemName(req.itemData)}×{req.count}");
+                    label = $"{string.Join("+", parts)} → {ItemName(r.output)}×{r.outputCount}";
+                }
+                else
+                {
+                    label = $"{ItemName(r.input)}×{r.inputCount} → {ItemName(r.output)}×{r.outputCount}";
+                }
                 if (GUI.Button(btnRect, label, _labelStyle))
                     _selectedRecipeIdx = i;
                 GUI.backgroundColor = prev;
@@ -452,23 +473,53 @@ namespace _Game.Systems.Crafting
                 _selectedRecipeIdx < _deviceData.recipes.Length)
             {
                 var selRecipe = _deviceData.recipes[_selectedRecipeIdx];
-                int canSupply = _playerInv != null ? _playerInv.GetItemCount(selRecipe.input) : 0;
-                bool canFeed = canSupply >= selRecipe.inputCount;
+                bool isMulti = selRecipe.inputs != null && selRecipe.inputs.Length > 0;
 
-                curY = Mathf.Max(curY + 2f, panel.y + panel.height - padding * 2 - 50f);
-
-                Rect supplyBtn = new Rect(x + 6f, curY, rightWidth - 14f, 32f);
-                GUI.enabled = canFeed;
-                GUI.backgroundColor = canFeed ? btnColor : new Color(0.3f, 0.3f, 0.3f, 0.6f);
-                string supplyText = canFeed
-                    ? $"补充材料 ({ItemName(selRecipe.input)} ×{selRecipe.inputCount})  拥有: {canSupply}"
-                    : $"材料不足 ({ItemName(selRecipe.input)} ×{selRecipe.inputCount})  拥有: {canSupply}";
-                if (GUI.Button(supplyBtn, supplyText, _btnStyle))
+                if (isMulti)
                 {
-                    SupplyInput(selRecipe.input, selRecipe.inputCount);
+                    // 多材料：显示所有材料需求，逐一补充
+                    var reqs = selRecipe.inputs;
+                    for (int ri = 0; ri < reqs.Length; ri++)
+                    {
+                        var req = reqs[ri];
+                        if (req.itemData == null) continue;
+                        int canSupply = _playerInv != null ? _playerInv.GetItemCount(req.itemData) : 0;
+                        bool canFeed = canSupply >= req.count;
+
+                        curY = Mathf.Max(curY + 2f, panel.y + panel.height - padding * 2 - 50f - (reqs.Length - 1 - ri) * 36f);
+
+                        Rect supplyBtn = new Rect(x + 6f, curY, rightWidth - 14f, 28f);
+                        GUI.enabled = canFeed;
+                        GUI.backgroundColor = canFeed ? btnColor : new Color(0.3f, 0.3f, 0.3f, 0.6f);
+                        string supplyText = canFeed
+                            ? $"补充 {ItemName(req.itemData)}×{req.count}  拥有: {canSupply}"
+                            : $"不足 {ItemName(req.itemData)}×{req.count}  拥有: {canSupply}";
+                        if (GUI.Button(supplyBtn, supplyText, _btnStyle))
+                            SupplyInput(req.itemData, req.count);
+                        GUI.backgroundColor = Color.white;
+                        GUI.enabled = true;
+                    }
                 }
-                GUI.backgroundColor = Color.white;
-                GUI.enabled = true;
+                else
+                {
+                    int canSupply = _playerInv != null ? _playerInv.GetItemCount(selRecipe.input) : 0;
+                    bool canFeed = canSupply >= selRecipe.inputCount;
+
+                    curY = Mathf.Max(curY + 2f, panel.y + panel.height - padding * 2 - 50f);
+
+                    Rect supplyBtn = new Rect(x + 6f, curY, rightWidth - 14f, 32f);
+                    GUI.enabled = canFeed;
+                    GUI.backgroundColor = canFeed ? btnColor : new Color(0.3f, 0.3f, 0.3f, 0.6f);
+                    string supplyText = canFeed
+                        ? $"补充材料 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  拥有: {canSupply}"
+                        : $"材料不足 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  拥有: {canSupply}";
+                    if (GUI.Button(supplyBtn, supplyText, _btnStyle))
+                    {
+                        SupplyInput(selRecipe.input, selRecipe.inputCount);
+                    }
+                    GUI.backgroundColor = Color.white;
+                    GUI.enabled = true;
+                }
             }
         }
 

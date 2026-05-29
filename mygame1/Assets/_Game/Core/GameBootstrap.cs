@@ -38,6 +38,9 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Building.BuildMenuUI");
             AddIfMissing(player, "_Game.Systems.Building.GhostPreview");
             AddIfMissing(player, "_Game.Systems.Crafting.CraftingUI");
+            AddIfMissing(player, "_Game.Systems.Crafting.ProductionDeviceUI");
+            AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchManager");
+            AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchUI");
             AddIfMissing(player, "_Game.Systems.PlayerInput.MouseGroundProjector");
             AddIfMissing(player, "_Game.Systems.Character.StaminaSystem");
             AddIfMissing(player, "_Game.Systems.Character.SurvivalXPSystem");

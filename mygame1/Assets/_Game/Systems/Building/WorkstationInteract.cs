@@ -34,7 +34,7 @@ namespace _Game.Systems.Building
                     WorkstationTier.Furnace => "使用熔炉",
                     WorkstationTier.MediumBench => "使用中级工作台",
                     WorkstationTier.AdvancedBench => "使用高级工作台",
-                    WorkstationTier.Chemistry => "使用化学台",
+                    WorkstationTier.Chemistry => "使用研究中心",
                     WorkstationTier.Machining => "使用机械加工台",
                     _ => "使用工作台"
                 };
@@ -46,6 +46,14 @@ namespace _Game.Systems.Building
 
         void IInteractable.OnInteract(GameObject interactor)
         {
+            // 研究中心走独立研究面板，不走合成UI
+            if (workstationTier == WorkstationTier.Chemistry)
+            {
+                EventBus.Publish(new ResearchStationOpenedEvent(workstationTier));
+                Debug.Log($"[WorkstationInteract] 打开研究中心面板");
+                return;
+            }
+
             if (_craftingSystem == null)
             {
                 Debug.LogError("[WorkstationInteract] CraftingSystem.Instance 为空，请确保场景中有 CraftingSystem");

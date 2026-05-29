@@ -616,6 +616,19 @@ namespace _Game.Core
     // ===== 工作台交互事件 =====
 
     /// <summary>
+    /// 玩家打开研究中心面板。
+    /// </summary>
+    public readonly struct ResearchStationOpenedEvent
+    {
+        public WorkstationTier Tier { get; }
+
+        public ResearchStationOpenedEvent(WorkstationTier tier)
+        {
+            Tier = tier;
+        }
+    }
+
+    /// <summary>
     /// 玩家打开工作台合成面板。
     /// </summary>
     public readonly struct WorkstationOpenedEvent

@@ -16,7 +16,9 @@ MonoBehaviour:
   icon: {fileID: 0}
   description: 
   category: 8
-  requiredStation: 6
+  requiredStation: 4
+  isIndustrial: 0
+  productionDeviceName: 
   skillRequirements: []
   materials:
   - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}

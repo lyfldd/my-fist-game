@@ -15,24 +15,33 @@ MonoBehaviour:
   deviceName: "\u8F66\u5E8A"
   icon: {fileID: 0}
   description: 
-  tier: 5
+  tier: 7
   builtPrefab: {fileID: 2359986791072710052, guid: cc310a1fbc0ffcb43910fde83627c724, type: 3}
   recipes:
   - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     inputCount: 2
+    inputs: []
     output: {fileID: 11400000, guid: ec2bb68afb3af7041af96a8ddff8dc0f, type: 2}
     outputCount: 1
     baseTime: 5
   - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     inputCount: 2
+    inputs: []
     output: {fileID: 11400000, guid: 2301d2e3f69788a4ca2eceab2497a5dc, type: 2}
     outputCount: 1
     baseTime: 4
   - input: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
     inputCount: 2
+    inputs: []
     output: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
     outputCount: 1
     baseTime: 6
+  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 2
+    inputs: []
+    output: {fileID: 11400000, guid: b6ddef43fdfcbbf4e98d21f448b8bb07, type: 2}
+    outputCount: 4
+    baseTime: 4
   productionInterval: 5
   batchSize: 1
   requiresFuel: 1

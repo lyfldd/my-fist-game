@@ -17,6 +17,8 @@ MonoBehaviour:
   description: 
   category: 4
   requiredStation: 4
+  isIndustrial: 0
+  productionDeviceName: 
   skillRequirements:
   - skill: 4
     level: 2

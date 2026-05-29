@@ -31,6 +31,17 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "AI\u673A\u5668\u4EBA"
+    system: 10
+    componentTypeName: AIBot
+    implemented: 1
+    notes: "AIBot \u7CFB\u7EDF\u5B8C\u6574"
+  - behaviourName: "AI\u6838\u5FC3"
+    system: 10
+    componentTypeName: AICore
+    implemented: 0
+    notes: "\u8DDF\u968F\u673A\u5668\u4EBA\uFF0C\u81EA\u52A8\u641C\u522E+\u7535\u51FB\u9632\u8EAB\uFF0C\u667ALv10"
   useTime: 1
   itemEffects: []
   warmthValue: 0

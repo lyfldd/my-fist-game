@@ -151,7 +151,7 @@ namespace _Game.Systems.Building
             }
 
             // 4.5 AI机器人限1台/玩家
-            if (activeBuildable.category == BuildableCategory.LateIndustrial
+            if (activeBuildable.category == BuildableCategory.ElectronicsIndustry
                 && activeBuildable.displayName.Contains("AI"))
             {
                 var existing = FindObjectOfType<_Game.Systems.AIBot.AIBot>();
@@ -235,7 +235,7 @@ namespace _Game.Systems.Building
             }
 
             // 3.5 AI机器人特殊处理：挂载 AIBot + AIBotBuildable
-            bool isAIBot = activeBuildable.category == BuildableCategory.LateIndustrial
+            bool isAIBot = activeBuildable.category == BuildableCategory.ElectronicsIndustry
                 && structure.GetComponent<_Game.Systems.AIBot.AIBot>() == null
                 && structure.GetComponent<_Game.Systems.AIBot.AIBotBuildable>() == null
                 && activeBuildable.displayName.Contains("AI");
@@ -478,7 +478,7 @@ namespace _Game.Systems.Building
             }
 
             // AI机器人特殊处理
-            bool isAIBot = data.category == BuildableCategory.LateIndustrial
+            bool isAIBot = data.category == BuildableCategory.ElectronicsIndustry
                 && structure.GetComponent<_Game.Systems.AIBot.AIBot>() == null
                 && structure.GetComponent<_Game.Systems.AIBot.AIBotBuildable>() == null
                 && data.displayName.Contains("AI");

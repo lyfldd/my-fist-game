@@ -244,10 +244,8 @@ namespace _Game.Systems.Building
         }
 
         // ============================================================
-        // 分类标签（支持工业子分类 + 滚动）
+        // 分类标签（按产业链分类，无子标签展开）
         // ============================================================
-
-        private static readonly string[] IndustrialPhaseNames = { "前期", "中期", "后期" };
 
         private static readonly System.Collections.Generic.Dictionary<BuildableCategory, string> CategoryNames
             = new System.Collections.Generic.Dictionary<BuildableCategory, string>
@@ -257,62 +255,40 @@ namespace _Game.Systems.Building
                 { BuildableCategory.Furniture, "家具" },
                 { BuildableCategory.Barricade, "路障" },
                 { BuildableCategory.Workstation, "工作台" },
-                { BuildableCategory.Industrial, "工业" },
-                { BuildableCategory.LateIndustrial, "大后期工业" },
+                { BuildableCategory.MetalIndustry, "金属工业" },
+                { BuildableCategory.ElectronicsIndustry, "电子工业" },
+                { BuildableCategory.ChemicalIndustry, "化学工业" },
+                { BuildableCategory.BioIndustry, "生物食品" },
+                { BuildableCategory.EnergyIndustry, "能源工业" },
                 { BuildableCategory.Power, "电力" },
             };
-
-        private int GetIndustrialPhase(BuildableData b)
-        {
-            int maxLv = GetMaxBuildLevel(b);
-            if (maxLv <= 1) return 0;
-            if (maxLv == 2) return 1;
-            return 2;
-        }
-
-        private int GetMaxBuildLevel(BuildableData b)
-        {
-            if (b.skillRequirements == null || b.skillRequirements.Length == 0) return 0;
-            int max = 0;
-            foreach (var req in b.skillRequirements)
-                if (req.level > max) max = req.level;
-            return max;
-        }
-
-        private string GetTabLabel((BuildableCategory cat, int phase) tab)
-        {
-            if (tab.phase >= 0)
-                return $"工业·{IndustrialPhaseNames[tab.phase]}";
-            return CategoryNames.TryGetValue(tab.cat, out string cn) ? cn : tab.cat.ToString();
-        }
 
         private void DrawCategoryTabs()
         {
             if (catalog == null) return;
 
-            // 构建标签列表：Industrial 展开为 前期/中期/后期
-            _availableCategories = System.Array.ConvertAll(
-                catalog.GetUsedCategories().ToArray(), c => c);
-            _currentTabs.Clear();
-            foreach (var cat in _availableCategories)
+            // 按固定顺序构建标签列表
+            var orderedCats = new BuildableCategory[]
             {
-                if (cat == BuildableCategory.Industrial)
-                {
-                    var industrials = catalog.GetByCategory(cat);
-                    for (int phase = 0; phase < 3; phase++)
-                    {
-                        int phaseCount = 0;
-                        foreach (var b in industrials)
-                            if (b != null && GetIndustrialPhase(b) == phase) phaseCount++;
+                BuildableCategory.Wall,
+                BuildableCategory.Floor,
+                BuildableCategory.Furniture,
+                BuildableCategory.Barricade,
+                BuildableCategory.Workstation,
+                BuildableCategory.MetalIndustry,
+                BuildableCategory.ElectronicsIndustry,
+                BuildableCategory.ChemicalIndustry,
+                BuildableCategory.BioIndustry,
+                BuildableCategory.EnergyIndustry,
+                BuildableCategory.Power,
+            };
 
-                        if (phaseCount > 0)
-                            _currentTabs.Add((cat, phase));
-                    }
-                }
-                else
-                {
+            _currentTabs.Clear();
+            foreach (var cat in orderedCats)
+            {
+                var items = catalog.GetByCategory(cat);
+                if (items != null && items.Length > 0)
                     _currentTabs.Add((cat, -1));
-                }
             }
 
             int tabCount = _currentTabs.Count;
@@ -333,23 +309,9 @@ namespace _Game.Systems.Building
                 int tabIdx = _tabScrollOffset + slot;
                 if (tabIdx >= tabCount) break;
 
-                var (cat, phase) = _currentTabs[tabIdx];
-                string label;
-                int count;
-
-                if (phase >= 0)
-                {
-                    label = $"工业·{IndustrialPhaseNames[phase]}";
-                    var industrials = catalog.GetByCategory(cat);
-                    count = 0;
-                    foreach (var b in industrials)
-                        if (b != null && GetIndustrialPhase(b) == phase) count++;
-                }
-                else
-                {
-                    label = cat.ToString();
-                    count = catalog.GetByCategory(cat).Length;
-                }
+                var (cat, _) = _currentTabs[tabIdx];
+                string label = CategoryNames.TryGetValue(cat, out string cn) ? cn : cat.ToString();
+                int count = catalog.GetByCategory(cat).Length;
 
                 float tx = tabStartX + slot * (tabButtonWidth + buttonSpacing);
                 Rect r = new Rect(tx, tabY, tabButtonWidth, tabButtonHeight);
@@ -381,13 +343,8 @@ namespace _Game.Systems.Building
             if (tab < 0 || tab >= _currentTabs.Count)
                 tab = 0;
 
-            var (cat, phase) = _currentTabs[tab];
-            var items = catalog.GetByCategory(cat);
-
-            if (phase >= 0)
-                items = System.Array.FindAll(items, b => b != null && GetIndustrialPhase(b) == phase);
-
-            return items;
+            var (cat, _) = _currentTabs[tab];
+            return catalog.GetByCategory(cat);
         }
 
         private void SelectBuildable(BuildableData[] items, int index)
@@ -421,7 +378,7 @@ namespace _Game.Systems.Building
             GUI.color = Color.white;
 
             string tabName = (_currentTabs.Count > 0 && _selectedTab >= 0 && _selectedTab < _currentTabs.Count)
-                ? GetTabLabel(_currentTabs[_selectedTab]) : "建造";
+                ? (CategoryNames.TryGetValue(_currentTabs[_selectedTab].cat, out string cn) ? cn : _currentTabs[_selectedTab].cat.ToString()) : "建造";
             string pageInfo = count <= visibleSlots ? "" : $"  ◀ {_scrollOffset + 1}~{_scrollOffset + visibleSlots}/{count} ▶";
             GUI.Label(new Rect(panelX, panelY - 22f, panelW, 20f),
                 $"建造 [{tabName}] (滚轮翻页{pageInfo})", _centeredLabelStyle);

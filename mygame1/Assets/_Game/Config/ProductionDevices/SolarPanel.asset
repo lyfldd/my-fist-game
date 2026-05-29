@@ -18,8 +18,9 @@ MonoBehaviour:
   tier: 7
   builtPrefab: {fileID: 6192696851478091943, guid: 62c72c4eb8dcfe64bb13b7495c1dbb0c, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: 4e96ebf8bca2c8046aa62c8cfcf0cd42, type: 2}
-    inputCount: 0
+  - input: {fileID: 11400000, guid: 170559a13929fda449cd27e8ec507fab, type: 2}
+    inputCount: 1
+    inputs: []
     output: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
     outputCount: 1
     baseTime: 15

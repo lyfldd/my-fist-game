@@ -102,6 +102,15 @@ public static class CreateDefaultBuildables
         return b;
     }
 
+    static ProductionDeviceData LoadProdRef(string deviceName)
+    {
+        var path = $"Assets/_Game/Config/ProductionDevices/{deviceName}.asset";
+        var pd = AssetDatabase.LoadAssetAtPath<ProductionDeviceData>(path);
+        if (pd == null)
+            Debug.LogWarning($"[CreateDefaultBuildables] 未找到 ProductionDeviceData: {deviceName}");
+        return pd;
+    }
+
     // ================================================================
     // 工作台 (8)
     // ================================================================
@@ -191,11 +200,11 @@ public static class CreateDefaultBuildables
             b.materials = new ItemRequirement[] { M("SteelIngot", 3), M("AdvancedParts", 4), M("CommonParts", 8), M("Gear", 2) };
         }
 
-        // 化学台
+        // 研究中心
         {
             var b = Create("Buildable_Chemistry");
-            b.displayName = "化学台";
-            b.description = "化学合成与制药。可制作药品、化工原料、燃料和投掷物。";
+            b.displayName = "研究中心";
+            b.description = "工业技术研发设施。消耗材料研究解锁工业设备配方。";
             b.category = BuildableCategory.Workstation;
             b.buildDuration = 15f;
             b.maxHealth = 120f;
@@ -254,10 +263,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_PressMachine");
             b.displayName = "冲压机";
             b.description = "批量生产通用零件和标准件。初级自动化设备。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 12f;
             b.maxHealth = 150f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("PressMachine");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 2f, 2f);
@@ -270,10 +280,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_IndustrialFurnace");
             b.displayName = "工业炉";
             b.description = "高温批量冶炼。可自动化熔炼矿石和生产金属锭。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 15f;
             b.maxHealth = 200f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("IndustrialFurnace");
             b.skillRequirements = BuildReq(6);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2.5f, 2.5f, 2.5f);
@@ -286,10 +297,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_ElectrolysisTank");
             b.displayName = "电解槽";
             b.description = "电解水制氢气和氧气。需要电力驱动。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 15f;
             b.maxHealth = 120f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("ElectrolysisTank");
             b.skillRequirements = BuildReq(6);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 2f);
@@ -301,10 +313,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Fermenter");
             b.displayName = "发酵罐";
             b.description = "生物发酵。可生产酒精、有机酸和生物燃料。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 10f;
             b.maxHealth = 80f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Fermenter");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 2f, 1.5f);
@@ -316,10 +329,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Distiller");
             b.displayName = "蒸馏器";
             b.description = "液体分离纯化。可生产蒸馏水、精炼酒精和化工溶剂。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 12f;
             b.maxHealth = 100f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Distiller");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 2.5f, 1.5f);
@@ -331,10 +345,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Crusher");
             b.displayName = "粉碎机";
             b.description = "原料粉碎与研磨。可将矿石粉碎为矿粉、回收建筑废料。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 10f;
             b.maxHealth = 150f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Crusher");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 2f, 2f);
@@ -347,10 +362,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Loom");
             b.displayName = "织布机";
             b.description = "自动纺织设备。可将植物纤维织成线和布。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.BioIndustry;
             b.buildDuration = 8f;
             b.maxHealth = 80f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Loom");
             b.skillRequirements = BuildReq(1);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 1.5f, 1.5f);
@@ -362,10 +378,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Sawmill");
             b.displayName = "锯木机";
             b.description = "自动木材加工。将原木锯成木板和木棍。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.BioIndustry;
             b.buildDuration = 8f;
             b.maxHealth = 100f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Sawmill");
             b.skillRequirements = BuildReq(1);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 2f);
@@ -378,10 +395,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_WaterPump");
             b.displayName = "水泵";
             b.description = "自动取水设备。从地下抽取清水。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.BioIndustry;
             b.buildDuration = 6f;
             b.maxHealth = 100f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("WaterPump");
             b.skillRequirements = BuildReq(1);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1f, 1.5f, 1f);
@@ -393,10 +411,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Kiln");
             b.displayName = "炭窑";
             b.description = "高温窑炉。烧制木炭和砖块。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 10f;
             b.maxHealth = 120f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Kiln");
             b.skillRequirements = BuildReq(1);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 1.5f, 1.5f);
@@ -408,10 +427,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Lathe");
             b.displayName = "车床";
             b.description = "金属精密加工。可制造齿轮、轴承和弹簧组件。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 14f;
             b.maxHealth = 150f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Lathe");
             b.skillRequirements = BuildReq(6);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 2f);
@@ -424,10 +444,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_AssemblyTable");
             b.displayName = "装配台";
             b.description = "零件组装设备。可将通用零件组装为高级零件。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 10f;
             b.maxHealth = 120f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("AssemblyTable");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 1.5f);
@@ -439,10 +460,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_RecyclingStation");
             b.displayName = "回收站";
             b.description = "废料回收处理。可将废金属和电子垃圾回收为有用材料。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 10f;
             b.maxHealth = 150f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("RecyclingStation");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 2f, 2f);
@@ -455,10 +477,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_Smokehouse");
             b.displayName = "熏制房";
             b.description = "食物保存设施。可将生肉熏制成可长期保存的熏肉。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.BioIndustry;
             b.buildDuration = 6f;
             b.maxHealth = 80f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Smokehouse");
             b.skillRequirements = BuildReq(1);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 2f, 1.5f);
@@ -470,10 +493,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_CanningMachine");
             b.displayName = "罐头封装机";
             b.description = "食品罐装设备。可将炖菜封装为可长期保存的罐头。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.BioIndustry;
             b.buildDuration = 8f;
             b.maxHealth = 100f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("CanningMachine");
             b.skillRequirements = BuildReq(2);
             b.snapSize = 1f;
             b.placementSize = new Vector3(1.5f, 1.5f, 1.5f);
@@ -485,10 +509,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_PharmaBench");
             b.displayName = "制药台";
             b.description = "自动制药设备。可批量生产抗生素、消毒水和维生素。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 12f;
             b.maxHealth = 100f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("PharmaBench");
             b.skillRequirements = Skills((SkillType.建造拆解, 4), (SkillType.医疗生存, 4));
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 1.5f);
@@ -500,10 +525,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_RadioTower");
             b.displayName = "广播塔";
             b.description = "无线电扫描塔。可分析电子元件获取电路板和高级零件。";
-            b.category = BuildableCategory.Industrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 18f;
             b.maxHealth = 200f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("RadioTower");
             b.skillRequirements = Skills((SkillType.建造拆解, 8), (SkillType.智力, 5));
             b.snapSize = 1f;
             b.placementSize = new Vector3(1f, 4f, 1f);
@@ -515,11 +541,12 @@ public static class CreateDefaultBuildables
         {
             var b = Create("Buildable_Centrifuge");
             b.displayName = "离心机";
-            b.description = "高速离心分离设备。加速化学台产出，可分离血液提取疫苗原液。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.description = "高速离心分离设备。加速研究中心产出，可分离血液提取疫苗原液。";
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 15f;
             b.maxHealth = 120f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("Centrifuge");
             b.skillRequirements = BuildReq(7);
             b.snapSize = 1f;
             b.placementSize = new Vector3(2f, 1.5f, 2f);
@@ -533,10 +560,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_PrecisionAssembly");
             b.displayName = "精密装配台";
             b.description = "芯片焊接与电路印刷。可制造芯片组、伺服电机，加速电子装配台产出。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 18f;
             b.maxHealth = 140f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("PrecisionAssembly");
             b.skillRequirements = Skills((SkillType.建造拆解, 8), (SkillType.智力, 8));
             b.snapSize = 1f;
             b.placementSize = new Vector3(2.5f, 1.5f, 2f);
@@ -550,10 +578,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_GeneAnalyzer");
             b.displayName = "基因分析台";
             b.description = "基因测序与疫苗合成设备。可制造逆转疫苗和高级医疗品。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 22f;
             b.maxHealth = 150f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("GeneAnalyzer");
             b.skillRequirements = Skills((SkillType.建造拆解, 9), (SkillType.医疗生存, 9));
             b.snapSize = 1f;
             b.placementSize = new Vector3(2.5f, 2f, 2f);
@@ -567,10 +596,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_WaterPurifier");
             b.displayName = "净水厂";
             b.description = "大规模净水设施。自动生产纯净水，满足基地用水需求。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ChemicalIndustry;
             b.buildDuration = 20f;
             b.maxHealth = 250f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("WaterPurifier");
             b.skillRequirements = Skills((SkillType.建造拆解, 9), (SkillType.智力, 7));
             b.snapSize = 1f;
             b.placementSize = new Vector3(3f, 2f, 3f);
@@ -585,7 +615,7 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_MobileFortress");
             b.displayName = "移动要塞基地车";
             b.description = "大巴/卡车改装移动基地。内置工作台+8格储物+床位(睡觉存档)+车顶瞭望台。油耗4倍，噪音50m。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.MetalIndustry;
             b.buildDuration = 30f;
             b.maxHealth = 800f;
             b.isWorkstation = false;
@@ -601,7 +631,7 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_AutoTurret");
             b.displayName = "自动炮塔";
             b.description = "全自动防御炮塔。自动锁定并射击范围内僵尸，需供电。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 25f;
             b.maxHealth = 400f;
             b.isWorkstation = false;
@@ -618,7 +648,7 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_EMFence");
             b.displayName = "电磁围栏";
             b.description = "高压电磁屏障。僵尸触碰即被电击麻痹，需大量电力。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 20f;
             b.maxHealth = 500f;
             b.isWorkstation = false;
@@ -635,7 +665,7 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_DronePlatform");
             b.displayName = "无人机平台";
             b.description = "侦察无人机起降平台。自动巡逻侦察，标记范围内僵尸位置。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 25f;
             b.maxHealth = 300f;
             b.isWorkstation = false;
@@ -652,10 +682,11 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_NuclearPlant");
             b.displayName = "核电站";
             b.description = "终极发电设施。消耗浓缩铀产生巨额电力(5000W)，需水冷。噪音极大(100m)，爆炸半径20m。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.EnergyIndustry;
             b.buildDuration = 40f;
             b.maxHealth = 2000f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("NuclearPlant");
             b.skillRequirements = Skills((SkillType.建造拆解, 10), (SkillType.智力, 9));
             b.snapSize = 1f;
             b.placementSize = new Vector3(5f, 3f, 5f);
@@ -676,7 +707,7 @@ public static class CreateDefaultBuildables
             var b = Create("Buildable_AIBot");
             b.displayName = "AI机器人";
             b.description = "自主AI战斗伙伴。跟随玩家，自动拾取战利品(200kg负重)，电击防御。限1台/人。消耗电池组驱动，可额外加入浓缩铀启动增强模式(电击伤害+50%、移速+30%)。双进度条：电量+核燃料。";
-            b.category = BuildableCategory.LateIndustrial;
+            b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 30f;
             b.maxHealth = 500f;
             b.isWorkstation = false;
@@ -685,6 +716,125 @@ public static class CreateDefaultBuildables
             b.placementSize = new Vector3(1.5f, 2f, 1.5f);
             b.staminaDrainPerSec = 3f;
             b.materials = new ItemRequirement[] { M("AICore", 1), M("AutomationController", 1), M("SatelliteDish", 1), M("SmallReactor", 1), M("WS_SolarPanel", 1), M("TitaniumAlloy", 5), M("AluminumIngot", 8), M("ServoMotor", 3), M("CapacitorBank", 3), M("ChipSet", 2), M("BatteryPack", 5) };
+        }
+
+        // ================================================================
+        // 新增7个工业设备 (v0.22)
+        // ================================================================
+
+        // 拉线机 — 电子链
+        {
+            var b = Create("Buildable_WireDrawer");
+            b.displayName = "拉线机";
+            b.description = "金属拉丝设备。将铜锭拉成电线和电缆。";
+            b.category = BuildableCategory.ElectronicsIndustry;
+            b.buildDuration = 12f;
+            b.maxHealth = 120f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("WireDrawer");
+            b.skillRequirements = BuildReq(5);
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2f, 1.5f, 2f);
+            b.materials = new ItemRequirement[] { M("WS_WireDrawer", 1), M("SteelIngot", 4), M("CopperIngot", 4), M("IronIngot", 3) };
+        }
+
+        // 电池生产线 — 电子链
+        {
+            var b = Create("Buildable_BatteryLine");
+            b.displayName = "电池生产线";
+            b.description = "电池自动装配线。批量生产电池和电池组。";
+            b.category = BuildableCategory.ElectronicsIndustry;
+            b.buildDuration = 15f;
+            b.maxHealth = 140f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("BatteryLine");
+            b.skillRequirements = BuildReq(5);
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2.5f, 2f, 2f);
+            b.materials = new ItemRequirement[] { M("WS_BatteryLine", 1), M("SteelIngot", 5), M("CopperIngot", 3), M("CircuitBoard", 2) };
+        }
+
+        // 电子装配机 — 电子链
+        {
+            var b = Create("Buildable_ElectronicsAssembler");
+            b.displayName = "电子装配机";
+            b.description = "电子元件自动装配。批量生产电子元件、线圈和电容组。";
+            b.category = BuildableCategory.ElectronicsIndustry;
+            b.buildDuration = 18f;
+            b.maxHealth = 140f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("ElectronicsAssembler");
+            b.skillRequirements = Skills((SkillType.建造拆解, 6), (SkillType.智力, 4));
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2f, 1.5f, 2f);
+            b.materials = new ItemRequirement[] { M("WS_ElectronicsAssembler", 1), M("SteelIngot", 5), M("CopperIngot", 4), M("CircuitBoard", 3) };
+        }
+
+        // 电路印刷机 — 电子链
+        {
+            var b = Create("Buildable_CircuitPrinter");
+            b.displayName = "电路印刷机";
+            b.description = "PCB电路板印刷设备。批量生产电路板。";
+            b.category = BuildableCategory.ElectronicsIndustry;
+            b.buildDuration = 20f;
+            b.maxHealth = 130f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("CircuitPrinter");
+            b.skillRequirements = Skills((SkillType.建造拆解, 7), (SkillType.智力, 5));
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2f, 1.5f, 2f);
+            b.materials = new ItemRequirement[] { M("WS_CircuitPrinter", 1), M("SteelIngot", 4), M("CopperIngot", 3), M("ChipSet", 1), M("CircuitBoard", 2) };
+        }
+
+        // 火药厂 — 化学链
+        {
+            var b = Create("Buildable_GunpowderFactory");
+            b.displayName = "火药厂";
+            b.description = "火药制造设备。批量生产黑火药、无烟火药和塑料碎片。";
+            b.category = BuildableCategory.ChemicalIndustry;
+            b.buildDuration = 18f;
+            b.maxHealth = 180f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("GunpowderFactory");
+            b.skillRequirements = Skills((SkillType.建造拆解, 5), (SkillType.医疗生存, 4));
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2.5f, 2f, 2.5f);
+            b.staminaDrainPerSec = 2f;
+            b.materials = new ItemRequirement[] { M("WS_GunpowderFactory", 1), M("SteelIngot", 6), M("StoneBrick", 8), M("SteelPipe", 3) };
+        }
+
+        // 弹药装填机 — 金属链
+        {
+            var b = Create("Buildable_AmmoLoader");
+            b.displayName = "弹药装填机";
+            b.description = "弹药自动装填设备。批量生产各类子弹和穿甲弹。";
+            b.category = BuildableCategory.MetalIndustry;
+            b.buildDuration = 20f;
+            b.maxHealth = 200f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("AmmoLoader");
+            b.skillRequirements = Skills((SkillType.建造拆解, 6), (SkillType.枪械专精, 3));
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(2.5f, 2f, 2f);
+            b.staminaDrainPerSec = 2f;
+            b.materials = new ItemRequirement[] { M("WS_AmmoLoader", 1), M("SteelIngot", 8), M("SteelPipe", 4), M("Gear", 3), M("AdvancedParts", 2) };
+        }
+
+        // 武器组装台 — 金属链
+        {
+            var b = Create("Buildable_WeaponAssembly");
+            b.displayName = "武器组装台";
+            b.description = "武器精密组装设备。可制造手枪、步枪、霰弹枪、重狙和防弹衣。";
+            b.category = BuildableCategory.MetalIndustry;
+            b.buildDuration = 25f;
+            b.maxHealth = 250f;
+            b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("WeaponAssembly");
+            b.skillRequirements = Skills((SkillType.建造拆解, 7), (SkillType.枪械专精, 4));
+            b.snapSize = 1f;
+            b.placementSize = new Vector3(3f, 2f, 2.5f);
+            b.staminaDrainPerSec = 3f;
+            b.materials = new ItemRequirement[] { M("WS_WeaponAssembly", 1), M("SteelIngot", 10), M("SteelPipe", 5), M("AdvancedParts", 4), M("Gear", 4) };
         }
     }
 

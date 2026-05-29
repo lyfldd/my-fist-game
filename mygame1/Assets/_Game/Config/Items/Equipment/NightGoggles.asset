@@ -31,6 +31,17 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u6B66\u5668\u6218\u6597"
+    system: 1
+    componentTypeName: WeaponShooting/PlayerCombat
+    implemented: 1
+    notes: "\u5DF2\u6709\u6B66\u5668\u7CFB\u7EDF\u5B8C\u6574\u652F\u6301"
+  - behaviourName: "\u591C\u89C6\u6548\u679C"
+    system: 0
+    componentTypeName: NightVisionEffect
+    implemented: 0
+    notes: "\u88C5\u5907\u540E\u5C4F\u5E55\u53D8\u7EFF\u589E\u4EAE\uFF0C\u591C\u95F4\u6709\u6548"
   useTime: 1
   itemEffects: []
   warmthValue: 0

@@ -33,6 +33,8 @@ namespace _Game.Config
 
         [Header("合成需求")]
         public WorkstationTier requiredStation;
+        public bool isIndustrial;
+        public string productionDeviceName;
         public SkillRequirement[] skillRequirements;
         public ItemRequirement[] materials;
 

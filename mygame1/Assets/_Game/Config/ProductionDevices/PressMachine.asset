@@ -15,24 +15,57 @@ MonoBehaviour:
   deviceName: "\u51B2\u538B\u673A"
   icon: {fileID: 0}
   description: 
-  tier: 4
+  tier: 7
   builtPrefab: {fileID: 6679269715622532170, guid: 712f5f7d03853ee4a9a0758597efa495, type: 3}
   recipes:
   - input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
     inputCount: 3
+    inputs: []
     output: {fileID: 11400000, guid: 7922bfbd3bb04f84dbde89edda930acc, type: 2}
     outputCount: 5
     baseTime: 4
   - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     inputCount: 2
+    inputs: []
     output: {fileID: 11400000, guid: 7922bfbd3bb04f84dbde89edda930acc, type: 2}
     outputCount: 8
     baseTime: 3
   - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     inputCount: 1
+    inputs: []
     output: {fileID: 11400000, guid: 5d4b1b72572b0aa43b9850b0c31f8c9a, type: 2}
     outputCount: 15
     baseTime: 2
+  - input: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    inputCount: 2
+    inputs: []
+    output: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+    outputCount: 3
+    baseTime: 5
+  - input: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    inputCount: 2
+    inputs: []
+    output: {fileID: 11400000, guid: 9929924a95468c24fa076f761a1705fc, type: 2}
+    outputCount: 4
+    baseTime: 5
+  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 1
+    inputs: []
+    output: {fileID: 11400000, guid: 69b5820f60025414c9af60d194cf6c33, type: 2}
+    outputCount: 10
+    baseTime: 3
+  - input: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+    inputCount: 1
+    inputs: []
+    output: {fileID: 11400000, guid: 797cfce063fe1874a91837156274af89, type: 2}
+    outputCount: 8
+    baseTime: 4
+  - input: {fileID: 11400000, guid: e00357cbb5a67844ea7ef50cfcf11b55, type: 2}
+    inputCount: 1
+    inputs: []
+    output: {fileID: 11400000, guid: f74c274d79027c24ea33a2951df527ae, type: 2}
+    outputCount: 10
+    baseTime: 4
   productionInterval: 4
   batchSize: 1
   requiresFuel: 1

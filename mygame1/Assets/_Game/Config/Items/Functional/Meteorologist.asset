@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u73AF\u5883\u63A2\u6D4B"
+    system: 7
+    componentTypeName: Meteorologist/SatelliteDish
+    implemented: 0
+    notes: "\u6C14\u8C61\u9884\u6D4B\u4EEA/\u536B\u661F\u63A5\u6536\u7AD9\u811A\u672C\u672A\u5B9E\u73B0"
   useTime: 1
   itemEffects: []
   warmthValue: 0

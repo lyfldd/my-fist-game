@@ -20,14 +20,16 @@ MonoBehaviour:
   recipes:
   - input: {fileID: 11400000, guid: 58a40d65a9ad1fa43849e3e00f79a627, type: 2}
     inputCount: 1
+    inputs: []
     output: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
     outputCount: 3
     baseTime: 2
   - input: {fileID: 11400000, guid: 58a40d65a9ad1fa43849e3e00f79a627, type: 2}
-    inputCount: 2
-    output: {fileID: 11400000, guid: e94b8436efaa5e24a9d5625fb711b709, type: 2}
-    outputCount: 5
-    baseTime: 2
+    inputCount: 3
+    inputs: []
+    output: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+    outputCount: 6
+    baseTime: 3
   productionInterval: 2
   batchSize: 1
   requiresFuel: 1

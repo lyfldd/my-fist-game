@@ -20,12 +20,58 @@ MonoBehaviour:
   category: 4
   maxStack: 1
   weight: 0.8
+  quality: 0
+  hasDurability: 0
+  maxDurability: 100
+  usageTags: 
+  isWorkstation: 0
+  workstationTier: 0
   equipSlot: 3
   storageWidth: 2
   storageHeight: 2
   armorValue: 3
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u6B66\u5668\u6218\u6597"
+    system: 1
+    componentTypeName: WeaponShooting/PlayerCombat
+    implemented: 1
+    notes: "\u5DF2\u6709\u6B66\u5668\u7CFB\u7EDF\u5B8C\u6574\u652F\u6301"
+  - behaviourName: "\u5F39\u836F"
+    system: 1
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C WeaponShooting \u8BFB\u53D6 ItemData.weaponDamage
+      \u7B49\u5B57\u6BB5"
+  - behaviourName: "\u62A4\u7532\u51CF\u4F24"
+    system: 0
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C\u88C5\u5907\u7CFB\u7EDF\u8BFB\u53D6
+      armorValue"
+  - behaviourName: "\u5BB9\u5668\u6269\u5BB9"
+    system: 0
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C\u88C5\u5907\u7CFB\u7EDF\u8BFB\u53D6
+      storageWidth/Height"
+  - behaviourName: "\u4FDD\u6696\u6548\u679C"
+    system: 2
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C\u6E29\u5EA6\u7CFB\u7EDF\u8BFB\u53D6
+      warmthValue"
   useTime: 1
   itemEffects: []
   warmthValue: 0.5
   isWaterproof: 0
+  isFirearm: 0
+  weaponDamage: 10
+  weaponRange: 50
+  fireRate: 0.5
+  baseSpread: 2
+  maxSpread: 15
+  spreadRecovery: 8
+  spreadPerShot: 1.5
+  magazineSize: 0
+  range: 50

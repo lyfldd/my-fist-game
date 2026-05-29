@@ -47,6 +47,9 @@ namespace _Game.Config
         [Header("世界表现")]
         public GameObject worldPrefab;
 
+        [Header("行为列表（替代无限加字段，每个条目对应一个功能脚本）")]
+        public List<ItemBehaviourEntry> behaviours;
+
         [Header("使用")]
         public float useTime = GameConstants.DEFAULT_USE_TIME;  // 使用耗时（秒）
 

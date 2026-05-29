@@ -24,7 +24,7 @@ public static class CreateCraftingRecipes
         { WorkstationTier.Furnace,       "熔炉" },
         { WorkstationTier.MediumBench,   "中级工作台" },
         { WorkstationTier.AdvancedBench, "高级工作台" },
-        { WorkstationTier.Chemistry,     "化学台" },
+        { WorkstationTier.Chemistry,     "研究中心" },
         { WorkstationTier.Machining,             "机械加工台" },
         { WorkstationTier.ElectronicsAssembly,  "电子装配台" },
     };
@@ -58,6 +58,15 @@ public static class CreateCraftingRecipes
         CreateKitItem(dir, "WS_PharmaBench", "制药台套件", 20f);
         CreateKitItem(dir, "WS_RadioTower", "广播塔套件", 30f);
 
+        // 新增7个工业设备套件（v0.22 工业链扩展）
+        CreateKitItem(dir, "WS_WireDrawer", "拉线机套件", 15f);
+        CreateKitItem(dir, "WS_BatteryLine", "电池生产线套件", 18f);
+        CreateKitItem(dir, "WS_ElectronicsAssembler", "电子装配机套件", 20f);
+        CreateKitItem(dir, "WS_CircuitPrinter", "电路印刷机套件", 22f);
+        CreateKitItem(dir, "WS_GunpowderFactory", "火药厂套件", 20f);
+        CreateKitItem(dir, "WS_AmmoLoader", "弹药装填机套件", 22f);
+        CreateKitItem(dir, "WS_WeaponAssembly", "武器组装台套件", 25f);
+
         // 终局设备套件（电子装配台 / 机械加工台）
         CreateKitItem(dir, "WS_Centrifuge", "离心机套件", 22f);
         CreateKitItem(dir, "WS_GeneAnalyzer", "基因分析台套件", 28f);
@@ -69,9 +78,12 @@ public static class CreateCraftingRecipes
         CreateKitItem(dir, "WS_DronePlatform", "无人机平台套件", 35f);
         CreateKitItem(dir, "WS_NuclearPlant", "核电站套件", 50f);
 
+        // 空电池
+        CreateKitItem(dir, "EmptyBattery", "空电池", 0.3f);
+
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("27 个工业套件物品已创建！");
+        Debug.Log("28 个工业套件物品已创建（含空电池）！");
     }
 
     static void CreateKitItem(string dir, string assetName, string displayName, float weight)
@@ -580,6 +592,12 @@ public static class CreateCraftingRecipes
             GetItem("Cable"), 3, 5f, 15f,
             new[] { M("CopperIngot", 2), M("Rubber", 1) });
 
+        // 空电池（发电机/太阳能板充电用）
+        CreateRecipe(S, "空电池", RecipeCategory.Material,
+            GetItem("EmptyBattery"), 1, 5f, 18f,
+            new[] { M("LeadIngot", 2), M("CopperIngot", 1), M("SulfuricAcid", 1) },
+            new[] { (SkillType.建造拆解, 2) });
+
         // 终局弹药
         CreateRecipe(S, "爆炸箭头", RecipeCategory.Ammo,
             GetItem("Ammo_Explosive"), 3, 5f, 25f,
@@ -605,19 +623,10 @@ public static class CreateCraftingRecipes
             new[] { M("SteelIngot", 2), M("CommonParts", 1) },
             new[] { (SkillType.建造拆解, 3) });
 
-        // 高级武器
-        CreateRecipe(S, "霰弹枪", RecipeCategory.Weapon,
-            GetItem("Shotgun"), 1, 12f, 50f,
-            new[] { M("SteelIngot", 4), M("AdvancedParts", 3), M("WoodPlank", 3) },
-            new[] { (SkillType.枪械专精, 3), (SkillType.建造拆解, 4) });
-        CreateRecipe(S, "步枪", RecipeCategory.Weapon,
-            GetItem("Rifle"), 1, 15f, 60f,
-            new[] { M("SteelIngot", 5), M("AdvancedParts", 4), M("WoodPlank", 4) },
-            new[] { (SkillType.枪械专精, 4), (SkillType.建造拆解, 4) });
-        CreateRecipe(S, "手枪", RecipeCategory.Weapon,
-            GetItem("Pistol"), 1, 8f, 40f,
-            new[] { M("SteelIngot", 3), M("AdvancedParts", 2), M("WoodPlank", 1) },
-            new[] { (SkillType.枪械专精, 2), (SkillType.建造拆解, 3) });
+        // 高级武器 — 已移入武器组装台（工业设备），不再手搓
+        // CreateRecipe(S, "霰弹枪", RecipeCategory.Weapon, ...);
+        // CreateRecipe(S, "步枪", RecipeCategory.Weapon, ...);
+        // CreateRecipe(S, "手枪", RecipeCategory.Weapon, ...);
 
         // 高级护甲
         CreateRecipe(S, "铁甲", RecipeCategory.Armor,
@@ -627,10 +636,7 @@ public static class CreateCraftingRecipes
         CreateRecipe(S, "铁盾", RecipeCategory.Armor,
             GetItem("IronShield"), 1, 6f, 30f,
             new[] { M("IronIngot", 4), M("WoodPlank", 2) });
-        CreateRecipe(S, "防弹衣", RecipeCategory.Armor,
-            GetItem("BulletproofVest"), 1, 10f, 50f,
-            new[] { M("SteelIngot", 3), M("ClothRoll", 3), M("AdvancedParts", 2) },
-            new[] { (SkillType.建造拆解, 4) });
+        // CreateRecipe(S, "防弹衣", ...); // 已移入武器组装台（工业设备）
 
         // 高级工具
         CreateRecipe(S, "工具箱", RecipeCategory.Tool,
@@ -670,6 +676,34 @@ public static class CreateCraftingRecipes
             GetItem("WS_Lathe"), 1, 10f, 38f,
             new[] { M("SteelIngot", 8), M("AdvancedParts", 4), M("Bearing", 4), M("CircuitBoard", 2) },
             new[] { (SkillType.建造拆解, 4) });
+        CreateRecipe(S, "弹药装填机套件", RecipeCategory.Industry,
+            GetItem("WS_AmmoLoader"), 1, 12f, 45f,
+            new[] { M("SteelIngot", 6), M("AdvancedParts", 3), M("Gear", 2), M("SteelPipe", 2) },
+            new[] { (SkillType.建造拆解, 5) });
+        CreateRecipe(S, "武器组装台套件", RecipeCategory.Industry,
+            GetItem("WS_WeaponAssembly"), 1, 14f, 50f,
+            new[] { M("SteelIngot", 8), M("AdvancedParts", 4), M("Gear", 3), M("Bearing", 2) },
+            new[] { (SkillType.建造拆解, 5) });
+        CreateRecipe(S, "拉线机套件", RecipeCategory.Industry,
+            GetItem("WS_WireDrawer"), 1, 8f, 30f,
+            new[] { M("SteelIngot", 4), M("CopperIngot", 3), M("CircuitBoard", 1), M("CommonParts", 2) },
+            new[] { (SkillType.建造拆解, 4) });
+        CreateRecipe(S, "电池生产线套件", RecipeCategory.Industry,
+            GetItem("WS_BatteryLine"), 1, 10f, 35f,
+            new[] { M("SteelIngot", 5), M("CopperIngot", 3), M("CircuitBoard", 2), M("AdvancedParts", 2) },
+            new[] { (SkillType.建造拆解, 4) });
+        CreateRecipe(S, "电子装配机套件", RecipeCategory.Industry,
+            GetItem("WS_ElectronicsAssembler"), 1, 12f, 42f,
+            new[] { M("SteelIngot", 5), M("CircuitBoard", 3), M("Coil", 2), M("AdvancedParts", 3) },
+            new[] { (SkillType.建造拆解, 5), (SkillType.智力, 4) });
+        CreateRecipe(S, "电路印刷机套件", RecipeCategory.Industry,
+            GetItem("WS_CircuitPrinter"), 1, 10f, 38f,
+            new[] { M("SteelIngot", 4), M("CircuitBoard", 2), M("ChipSet", 1), M("AdvancedParts", 2) },
+            new[] { (SkillType.建造拆解, 5), (SkillType.智力, 4) });
+        CreateRecipe(S, "火药厂套件", RecipeCategory.Industry,
+            GetItem("WS_GunpowderFactory"), 1, 12f, 40f,
+            new[] { M("SteelIngot", 6), M("AdvancedParts", 3), M("SulfuricAcid", 2), M("CircuitBoard", 1) },
+            new[] { (SkillType.建造拆解, 4) });
 
         // 工作台制造
         CreateRecipe(S, "熔炉套件", RecipeCategory.Tool,
@@ -683,33 +717,16 @@ public static class CreateCraftingRecipes
             GetItem("WS_SimpleBench"), 1, 5f, 20f,
             new[] { M("WoodPlank", 5), M("Nails", 10) });
 
-        // 9mm手枪弹
-        CreateRecipe(S, "9mm手枪弹", RecipeCategory.Ammo,
-            GetItem("Ammo_9mm"), 15, 5f, 25f,
-            new[] { M("BulletCasing", 15), M("Primer", 15), M("Gunpowder", 3), M("BulletHead", 15) },
-            new[] { (SkillType.枪械专精, 1) });
-        CreateRecipe(S, "-45沙鹰弹", RecipeCategory.Ammo,
-            GetItem("Ammo_45ACP"), 10, 5f, 25f,
-            new[] { M("BulletCasing", 10), M("Primer", 10), M("Gunpowder", 3), M("BulletHead", 10) },
-            new[] { (SkillType.枪械专精, 2) });
-        CreateRecipe(S, "7-62mm步枪弹", RecipeCategory.Ammo,
-            GetItem("Ammo_762mm"), 10, 6f, 30f,
-            new[] { M("BulletCasing", 10), M("Primer", 10), M("Gunpowder", 4), M("BulletHead", 10) },
-            new[] { (SkillType.枪械专精, 3) });
-        CreateRecipe(S, "12号霰弹", RecipeCategory.Ammo,
-            GetItem("Ammo_12Gauge"), 5, 6f, 28f,
-            new[] { M("PlasticScrap", 5), M("Primer", 5), M("Gunpowder", 3), M("ScrapMetal", 3) },
-            new[] { (SkillType.枪械专精, 2) });
-
-        // 终局弹药
-        CreateRecipe(S, "穿甲弹", RecipeCategory.Ammo,
-            GetItem("Ammo_AP"), 5, 6f, 35f,
-            new[] { M("SteelIngot", 1), M("LeadIngot", 1), M("BulletCasing", 5), M("Gunpowder", 2) },
-            new[] { (SkillType.枪械专精, 6) });
+        // 弹药 — 已移入弹药装填机（工业设备），不再手搓
+        // CreateRecipe(S, "9mm手枪弹", ...);
+        // CreateRecipe(S, "-45沙鹰弹", ...);
+        // CreateRecipe(S, "7-62mm步枪弹", ...);
+        // CreateRecipe(S, "12号霰弹", ...);
+        // CreateRecipe(S, "穿甲弹", ...);
     }
 
     // ================================================================
-    // 化学台 Chemistry — 药剂/化工/投掷物/燃料 (18 recipes)
+    // 研究中心 Chemistry — 药剂/化工/投掷物/燃料 (18 recipes)
     // ================================================================
 
     static void CreateChemistryRecipes()
@@ -869,11 +886,7 @@ public static class CreateCraftingRecipes
             new[] { M("SteelIngot", 10), M("CopperIngot", 8), M("CircuitBoard", 6), M("AdvancedParts", 4), M("Coil", 4) },
             new[] { (SkillType.建造拆解, 6) });
 
-        // 高级武器·机械
-        CreateRecipe(S, "5-56mm步枪弹", RecipeCategory.Ammo,
-            GetItem("Ammo_556mm"), 15, 6f, 32f,
-            new[] { M("BulletCasing", 15), M("Primer", 15), M("Gunpowder", 5), M("BulletHead", 15) },
-            new[] { (SkillType.枪械专精, 4) });
+        // CreateRecipe(S, "5-56mm步枪弹", ...); // 已移入弹药装填机（工业设备）
 
         // 高级生产
         CreateRecipe(S, "高级零件批量", RecipeCategory.Material,
@@ -920,7 +933,7 @@ public static class CreateCraftingRecipes
             GetItem("WS_AdvancedBench"), 1, 12f, 45f,
             new[] { M("SteelIngot", 5), M("WoodPlank", 6), M("AdvancedParts", 3), M("CircuitBoard", 1) },
             new[] { (SkillType.建造拆解, 4) });
-        CreateRecipe(S, "化学台套件", RecipeCategory.Tool,
+        CreateRecipe(S, "研究中心套件", RecipeCategory.Tool,
             GetItem("WS_Chemistry"), 1, 12f, 45f,
             new[] { M("SteelIngot", 4), M("GlassPane", 4), M("CopperIngot", 3), M("AdvancedParts", 2) },
             new[] { (SkillType.建造拆解, 4) });
@@ -975,10 +988,7 @@ public static class CreateCraftingRecipes
             GetItem("FullAutoKit"), 1, 10f, 45f,
             new[] { M("AdvancedParts", 4), M("ServoMotor", 1), M("SteelIngot", 3) },
             new[] { (SkillType.枪械专精, 7) });
-        CreateRecipe(S, "重狙(.50)", RecipeCategory.Weapon,
-            GetItem("HeavySniper"), 1, 18f, 65f,
-            new[] { M("TitaniumAlloy", 5), M("OpticalLens", 2), M("SteelIngot", 6) },
-            new[] { (SkillType.枪械专精, 8) });
+        // CreateRecipe(S, "重狙(.50)", ...); // 已移入武器组装台（工业设备）
         CreateRecipe(S, "榴弹发射器", RecipeCategory.Weapon,
             GetItem("GrenadeLauncher"), 1, 20f, 75f,
             new[] { M("TitaniumAlloy", 6), M("ServoMotor", 2), M("SpringAssembly", 4), M("SteelPipe", 3) },

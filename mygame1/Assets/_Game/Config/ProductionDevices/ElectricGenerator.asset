@@ -18,20 +18,35 @@ MonoBehaviour:
   tier: 7
   builtPrefab: {fileID: 1778522143073034340, guid: bec0baea4d30235449127709c8e37b11, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
-    inputCount: 2
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 170559a13929fda449cd27e8ec507fab, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
+      count: 2
     output: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
-    outputCount: 1
+    outputCount: 2
     baseTime: 8
-  - input: {fileID: 11400000, guid: 58a40d65a9ad1fa43849e3e00f79a627, type: 2}
-    inputCount: 3
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 170559a13929fda449cd27e8ec507fab, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: 58a40d65a9ad1fa43849e3e00f79a627, type: 2}
+      count: 3
     output: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
     outputCount: 1
     baseTime: 10
-  - input: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
-    inputCount: 5
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 170559a13929fda449cd27e8ec507fab, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 5
     output: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
-    outputCount: 2
+    outputCount: 3
     baseTime: 6
   productionInterval: 10
   batchSize: 1

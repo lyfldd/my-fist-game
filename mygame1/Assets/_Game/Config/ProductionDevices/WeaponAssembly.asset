@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65eac7dea26ea8d419fd18826c0b11d8, type: 3}
+  m_Name: WeaponAssembly
+  m_EditorClassIdentifier: 
+  deviceName: "\u6B66\u5668\u7EC4\u88C5\u53F0"
+  icon: {fileID: 0}
+  description: 
+  tier: 7
+  builtPrefab: {fileID: 0}
+  recipes:
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 1
+    output: {fileID: 11400000, guid: 576c75c9b7446494cb886f40376e1240, type: 2}
+    outputCount: 1
+    baseTime: 12
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 1
+    output: {fileID: 11400000, guid: d3a64eefe83209d41bff698286be7eac, type: 2}
+    outputCount: 1
+    baseTime: 12
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: ec2bb68afb3af7041af96a8ddff8dc0f, type: 2}
+      count: 1
+    output: {fileID: 11400000, guid: b3799c9e2db47504aa2c55f9c36d7bb8, type: 2}
+    outputCount: 1
+    baseTime: 15
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 2
+    output: {fileID: 11400000, guid: 9635969ce4c8a0b4ebe25a01f7052933, type: 2}
+    outputCount: 1
+    baseTime: 20
+  - input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: a0088bae2810e0a459d8df6617cf88e1, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 1
+    output: {fileID: 11400000, guid: 090df18110a21394ebfb8e2514c15eeb, type: 2}
+    outputCount: 1
+    baseTime: 12
+  productionInterval: 12
+  batchSize: 1
+  requiresFuel: 0
+  fuelItem: {fileID: 0}
+  fuelPerCycle: 1
+  acceptsAutomation: 1
+  automationMultiplier: 2

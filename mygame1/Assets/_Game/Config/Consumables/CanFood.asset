@@ -20,10 +20,23 @@ MonoBehaviour:
   category: 1
   maxStack: 10
   weight: 0.5
+  quality: 0
+  hasDurability: 0
+  maxDurability: 100
+  usageTags: 
+  isWorkstation: 0
+  workstationTier: 0
   equipSlot: 0
   storageWidth: 0
   storageHeight: 0
+  armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u4F7F\u7528\u6548\u679C"
+    system: 2
+    componentTypeName: 
+    implemented: 1
+    notes: "\u7EAF\u6570\u636E\u9A71\u52A8\uFF0C SurvivalSystem \u8BFB\u53D6 itemEffects"
   useTime: 3
   itemEffects:
   - effectType: 1
@@ -32,3 +45,13 @@ MonoBehaviour:
     isInstant: 1
   warmthValue: 0
   isWaterproof: 0
+  isFirearm: 0
+  weaponDamage: 10
+  weaponRange: 50
+  fireRate: 0.5
+  baseSpread: 2
+  maxSpread: 15
+  spreadRecovery: 8
+  spreadPerShot: 1.5
+  magazineSize: 0
+  range: 50

@@ -31,6 +31,12 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u8BBE\u5907\u81EA\u52A8\u5316"
+    system: 3
+    componentTypeName: AutomationController
+    implemented: 0
+    notes: "\u8BBE\u5907\u81EA\u52A8\u53D6\u6599\u52A0\u71C3\u6599\uFF0C\u5168\u81EA\u52A8\u5DE5\u5382"
   useTime: 1
   itemEffects: []
   warmthValue: 0

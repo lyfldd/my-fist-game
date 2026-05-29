@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Buildable_Centrifuge
   m_EditorClassIdentifier: 
   displayName: "\u79BB\u5FC3\u673A"
-  description: "\u9AD8\u901F\u79BB\u5FC3\u5206\u79BB\u8BBE\u5907\u3002\u52A0\u901F\u5316\u5B66\u53F0\u4EA7\u51FA\uFF0C\u53EF\u5206\u79BB\u8840\u6DB2\u63D0\u53D6\u75AB\u82D7\u539F\u6DB2\u3002"
+  description: "\u9AD8\u901F\u79BB\u5FC3\u5206\u79BB\u8BBE\u5907\u3002\u52A0\u901F\u7814\u7A76\u4E2D\u5FC3\u4EA7\u51FA\uFF0C\u53EF\u5206\u79BB\u8840\u6DB2\u63D0\u53D6\u75AB\u82D7\u539F\u6DB2\u3002"
   icon: {fileID: 0}
-  category: 6
+  category: 7
   previewPrefab: {fileID: 0}
   builtPrefab: {fileID: 0}
   placementSize: {x: 2, y: 1.5, z: 2}
@@ -58,3 +58,5 @@ MonoBehaviour:
   isWorkstation: 0
   workstationTier: 0
   productionDeviceRef: {fileID: 11400000, guid: d5ddb5e5d88e44f45b78c95b337c76fe, type: 2}
+  industrialChain: 0
+  producedItems: []

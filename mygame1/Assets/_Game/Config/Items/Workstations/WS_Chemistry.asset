@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2581399b8c6bbf44ebf462398779fc5b, type: 3}
   m_Name: WS_Chemistry
   m_EditorClassIdentifier: 
-  itemName: "\u5316\u5B66\u53F0\u5957\u4EF6"
+  itemName: "\u7814\u7A76\u4E2D\u5FC3\u5957\u4EF6"
   icon: {fileID: 0}
   description: 
   gridWidth: 2
@@ -31,6 +31,17 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u5DE5\u4F5C\u53F0\u4EA4\u4E92"
+    system: 3
+    componentTypeName: 
+    implemented: 1
+    notes: "\u5EFA\u9020\u7CFB\u7EDF + WorkstationInteract \u5904\u7406"
+  - behaviourName: "\u5408\u6210\u9762\u677F"
+    system: 9
+    componentTypeName: 
+    implemented: 1
+    notes: "CraftingUI \u6253\u5F00\u5BF9\u5E94\u5DE5\u4F5C\u53F0\u7B49\u7EA7\u914D\u65B9"
   useTime: 1
   itemEffects: []
   warmthValue: 0

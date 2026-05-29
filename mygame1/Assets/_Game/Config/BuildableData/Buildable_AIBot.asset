@@ -73,4 +73,6 @@ MonoBehaviour:
   powerElectricSpeedMul: 2
   isWorkstation: 0
   workstationTier: 0
-  productionDeviceRef: {fileID: 11400000, guid: 945abb7ef28089d4795f3d5db1d9576f, type: 2}
+  productionDeviceRef: {fileID: 0}
+  industrialChain: 0
+  producedItems: []

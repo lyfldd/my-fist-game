@@ -47,8 +47,11 @@ namespace _Game.Config
     [Serializable]
     public struct ProductionRecipe
     {
+        [Tooltip("单材料输入（兼容旧数据）")]
         public ItemData input;
         public int inputCount;
+        [Tooltip("多材料输入（优先级高于单材料）")]
+        public ItemRequirement[] inputs;
         public ItemData output;
         public int outputCount;
         public float baseTime;

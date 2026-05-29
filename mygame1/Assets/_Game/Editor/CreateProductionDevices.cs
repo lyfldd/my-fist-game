@@ -8,7 +8,7 @@ using _Game.Config;
 /// 用法：先执行 Create Crafting Items, 再执行本菜单。
 /// 菜单栏 → Game Tools → Create Production Devices
 ///
-/// 生成 ~19 ProductionDeviceData，覆盖从简易工作台到机械加工台的生产设备。
+/// 生成 ~30 ProductionDeviceData，覆盖全部6条工业链的生产设备。
 /// 生产设备 = 放置后自运转：消耗原料 → 产出 → 放入输出槽。
 /// </summary>
 public static class CreateProductionDevices
@@ -41,13 +41,22 @@ public static class CreateProductionDevices
         CreateSmokehouse();
         CreateCanningMachine();
         CreatePharmaBench();
-        CreateRadioTower();
+        // CreateRadioTower(); // 广播塔已移出工业设备，改为通讯设施
         CreateCentrifuge();
         CreateGeneAnalyzer();
         CreatePrecisionAssembly();
         CreateWaterPurifier();
         CreateAIBot();
         CreateNuclearPlant();
+
+        // 新增7个工业设备
+        CreateWireDrawer();
+        CreateBatteryLine();
+        CreateElectronicsAssembler();
+        CreateCircuitPrinter();
+        CreateGunpowderFactory();
+        CreateAmmoLoader();
+        CreateWeaponAssembly();
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
@@ -126,6 +135,21 @@ public static class CreateProductionDevices
         };
     }
 
+    // 多材料配方便捷方法
+    static ProductionRecipe RM(string outputName, int outputCount, float baseTime, params (string name, int count)[] inputs)
+    {
+        var reqs = new ItemRequirement[inputs.Length];
+        for (int i = 0; i < inputs.Length; i++)
+            reqs[i] = new ItemRequirement { itemData = GetItem(inputs[i].name), count = inputs[i].count };
+        return new ProductionRecipe
+        {
+            inputs = reqs,
+            output = GetItem(outputName),
+            outputCount = outputCount,
+            baseTime = baseTime
+        };
+    }
+
     // ================================================================
     // 冲压机 — 通用零件批量生产
     // ================================================================
@@ -133,13 +157,18 @@ public static class CreateProductionDevices
     static void CreatePressMachine()
     {
         Create("PressMachine", "冲压机",
-            WorkstationTier.MediumBench, interval: 4f, batchSize: 1,
+            WorkstationTier.Machining, interval: 4f, batchSize: 1,
             requiresFuel: true, fuel: GetItem("Coal"), fuelPerCycle: 1f,
             recipes: new[]
             {
                 R("ScrapMetal", 3, "CommonParts", 5, 4f),
                 R("IronIngot", 2, "CommonParts", 8, 3f),
                 R("IronIngot", 1, "Nails", 15, 2f),
+                R("SteelIngot", 2, "SteelPipe", 3, 5f),
+                R("SteelIngot", 2, "Rebar", 4, 5f),
+                R("IronIngot", 1, "Screw", 10, 3f),
+                R("CopperIngot", 1, "BulletCasing", 8, 4f),
+                R("LeadIngot", 1, "BulletHead", 10, 4f),
             });
     }
 
@@ -177,7 +206,7 @@ public static class CreateProductionDevices
                 R("Stone", 2, "Sand", 3, 3f),
                 R("Limestone", 2, "Cement", 2, 3f),
                 R("WoodLog", 1, "WoodPlank", 3, 2f),
-                R("ScrapMetal", 3, "IronOre", 1, 5f),
+                R("ScrapMetal", 4, "IronIngot", 1, 6f),
                 R("AnimalBone", 2, "Fertilizer", 1, 4f),
             });
     }
@@ -211,7 +240,7 @@ public static class CreateProductionDevices
             recipes: new[]
             {
                 R("WoodLog", 1, "WoodPlank", 3, 2f),
-                R("WoodLog", 2, "Branch", 5, 2f),
+                R("WoodLog", 3, "WoodPlank", 6, 3f),       // 批量锯木板（效率提升）
             });
     }
 
@@ -260,7 +289,7 @@ public static class CreateProductionDevices
             {
                 R("Alcohol", 2, "ChemicalAgent", 1, 5f),
                 R("Water", 5, "PurifiedWater", 3, 4f),
-                R("Alcohol", 4, "StypticPowder", 1, 6f),
+                R("Alcohol", 5, "Antiseptic", 1, 6f),    // 蒸馏浓缩酒精→消毒水
             });
     }
 
@@ -312,9 +341,9 @@ public static class CreateProductionDevices
             acceptsAutomation: false,
             recipes: new[]
             {
-                R("Coal", 2, "BatteryPack", 1, 8f),
-                R("WoodLog", 3, "BatteryPack", 1, 10f),
-                R("Alcohol", 5, "BatteryPack", 2, 6f),
+                RM("BatteryPack", 2, 8f, ("EmptyBattery", 1), ("Coal", 2)),
+                RM("BatteryPack", 1, 10f, ("EmptyBattery", 1), ("WoodLog", 3)),
+                RM("BatteryPack", 3, 6f, ("EmptyBattery", 2), ("Alcohol", 5)),
             });
     }
 
@@ -325,13 +354,15 @@ public static class CreateProductionDevices
     static void CreateLathe()
     {
         Create("Lathe", "车床",
-            WorkstationTier.AdvancedBench, interval: 5f, batchSize: 1,
+            WorkstationTier.Machining, interval: 5f, batchSize: 1,
             requiresFuel: true, fuel: GetItem("Coal"), fuelPerCycle: 1f,
             recipes: new[]
             {
                 R("IronIngot", 2, "Gear", 1, 5f),
                 R("IronIngot", 2, "Bearing", 1, 4f),
                 R("SteelIngot", 2, "SpringAssembly", 1, 6f),
+                R("IronIngot", 2, "Spring", 4, 4f),
+                // RM("TitaniumAlloy", ...) // 钛合金暂缺ItemData
             });
     }
 
@@ -342,11 +373,12 @@ public static class CreateProductionDevices
     static void CreateAssemblyTable()
     {
         Create("AssemblyTable", "装配台",
-            WorkstationTier.MediumBench, interval: 5f, batchSize: 1,
+            WorkstationTier.Machining, interval: 5f, batchSize: 1,
             requiresFuel: true, fuel: GetItem("Coal"), fuelPerCycle: 1f,
             recipes: new[]
             {
                 R("CommonParts", 4, "AdvancedParts", 1, 6f),
+                // RM("MechanicalAssembly", ...) // 机械传动组件暂缺ItemData
             });
     }
 
@@ -363,7 +395,8 @@ public static class CreateProductionDevices
             {
                 R("ScrapMetal", 4, "IronIngot", 1, 5f),
                 R("ScrapMetal", 6, "CopperIngot", 1, 6f),
-                R("Electronic", 2, "CircuitBoard", 1, 8f),
+                // 回收拆解：电路板→电子元件
+                R("CircuitBoard", 1, "Electronic", 3, 8f),
                 R("PlasticScrap", 3, "Rubber", 1, 5f),
             });
     }
@@ -379,7 +412,7 @@ public static class CreateProductionDevices
             requiresFuel: false, acceptsAutomation: false,
             recipes: new[]
             {
-                R("Water", 0, "BatteryPack", 1, 15f),
+                R("EmptyBattery", 1, "BatteryPack", 1, 15f),
             });
     }
 
@@ -442,8 +475,130 @@ public static class CreateProductionDevices
             requiresFuel: true, fuel: GetItem("BatteryPack"), fuelPerCycle: 1f,
             recipes: new[]
             {
-                R("Electronic", 2, "CircuitBoard", 1, 12f),
-                R("BatteryPack", 1, "AdvancedParts", 1, 10f),
+                // 广播塔扫描信号→发现电子元件/电池组（无线电侦测回收）
+                R("BatteryPack", 1, "Electronic", 5, 12f),
+                R("BatteryPack", 2, "BatteryPack", 3, 10f),
+            });
+    }
+
+    // ================================================================
+    // 拉线机 — 电子链阶段1：铜锭→电线/电缆
+    // ================================================================
+
+    static void CreateWireDrawer()
+    {
+        Create("WireDrawer", "拉线机",
+            WorkstationTier.ElectronicsAssembly, interval: 4f, batchSize: 1,
+            requiresFuel: true, fuel: GetItem("Coal"), fuelPerCycle: 1f,
+            recipes: new[]
+            {
+                R("CopperIngot", 1, "Wire", 6, 4f),
+                RM("Cable", 3, 5f, ("CopperIngot", 1), ("Rubber", 1)),
+            });
+    }
+
+    // ================================================================
+    // 电池生产线 — 电子链阶段2：电池制造
+    // ================================================================
+
+    static void CreateBatteryLine()
+    {
+        Create("BatteryLine", "电池生产线",
+            WorkstationTier.Machining, interval: 6f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("Battery", 5, 6f, ("LeadOre", 2), ("Sulfur", 1), ("CopperIngot", 2)),
+                RM("BatteryPack", 3, 8f, ("Battery", 2), ("SulfuricAcid", 1), ("CopperIngot", 1)),
+            });
+    }
+
+    // ================================================================
+    // 电子装配机 — 电子链阶段2：元件批量制造
+    // ================================================================
+
+    static void CreateElectronicsAssembler()
+    {
+        Create("ElectronicsAssembler", "电子装配机",
+            WorkstationTier.ElectronicsAssembly, interval: 5f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("Electronic", 4, 5f, ("Wire", 2), ("PlasticScrap", 1), ("CopperIngot", 1)),
+                RM("Coil", 3, 5f, ("Wire", 2), ("Rubber", 1), ("CopperIngot", 1)),
+                RM("CapacitorBank", 2, 6f, ("BatteryPack", 1), ("CopperIngot", 2)),
+            });
+    }
+
+    // ================================================================
+    // 电路印刷机 — 电子链阶段3：电路板批量生产
+    // ================================================================
+
+    static void CreateCircuitPrinter()
+    {
+        Create("CircuitPrinter", "电路印刷机",
+            WorkstationTier.ElectronicsAssembly, interval: 6f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("CircuitBoard", 2, 6f, ("Electronic", 2), ("Wire", 1), ("PlasticScrap", 1), ("CopperIngot", 1)),
+            });
+    }
+
+    // ================================================================
+    // 火药厂 — 化学链阶段3：火药+塑料量产
+    // ================================================================
+
+    static void CreateGunpowderFactory()
+    {
+        Create("GunpowderFactory", "火药厂",
+            WorkstationTier.Chemistry, interval: 6f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("BlackPowder", 5, 6f, ("Niter", 1), ("Sulfur", 1), ("Coal", 2)),
+                RM("Gunpowder", 3, 8f, ("SulfuricAcid", 1), ("Alcohol", 1), ("BlackPowder", 2)),
+                RM("PlasticScrap", 4, 5f, ("ChemicalAgent", 1), ("PlantFiber", 3)),
+            });
+    }
+
+    // ================================================================
+    // 弹药装填机 — 金属链阶段5：子弹批量装填
+    // ================================================================
+
+    static void CreateAmmoLoader()
+    {
+        Create("AmmoLoader", "弹药装填机",
+            WorkstationTier.Machining, interval: 8f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("Ammo_9mm", 20, 8f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("BlackPowder", 1)),
+                RM("Ammo_12Gauge", 10, 8f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("BlackPowder", 1)),
+                RM("Ammo_762mm", 15, 8f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("Gunpowder", 1)),
+                RM("Ammo_556mm", 15, 8f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("Gunpowder", 1)),
+                RM("Ammo_45ACP", 10, 8f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("Gunpowder", 1)),
+                RM("Ammo_22LR", 20, 6f, ("BulletCasing", 2), ("BulletHead", 2), ("Primer", 2), ("BlackPowder", 1)),
+                RM("Ammo_AP", 8, 10f, ("SteelIngot", 1), ("LeadIngot", 1), ("Gunpowder", 1)),
+            });
+    }
+
+    // ================================================================
+    // 武器组装台 — 金属链阶段5：枪械/防具组装
+    // ================================================================
+
+    static void CreateWeaponAssembly()
+    {
+        Create("WeaponAssembly", "武器组装台",
+            WorkstationTier.Machining, interval: 12f, batchSize: 1,
+            requiresFuel: false,
+            recipes: new[]
+            {
+                RM("Pistol", 1, 12f, ("SteelIngot", 2), ("WoodPlank", 1), ("AdvancedParts", 1)),
+                RM("Rifle", 1, 12f, ("SteelIngot", 3), ("WoodPlank", 1), ("AdvancedParts", 1)),
+                RM("Shotgun", 1, 15f, ("SteelIngot", 2), ("WoodPlank", 1), ("AdvancedParts", 1), ("Gear", 1)),
+                RM("HeavySniper", 1, 20f, ("TitaniumAlloy", 2), ("SteelPipe", 2), ("AdvancedParts", 2)),
+                RM("BulletproofVest", 1, 12f, ("ClothRoll", 2), ("SteelIngot", 2), ("AdvancedParts", 1)),
             });
     }
 

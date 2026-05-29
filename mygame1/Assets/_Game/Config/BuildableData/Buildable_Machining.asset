@@ -58,3 +58,5 @@ MonoBehaviour:
   isWorkstation: 1
   workstationTier: 7
   productionDeviceRef: {fileID: 0}
+  industrialChain: 0
+  producedItems: []

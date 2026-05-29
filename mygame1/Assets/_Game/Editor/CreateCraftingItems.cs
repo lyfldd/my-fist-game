@@ -408,7 +408,7 @@ public static class CreateCraftingItems
         MakeWS(F, "WS_Furnace",        "熔炉套件",       WorkstationTier.Furnace,         8f, 3);
         MakeWS(F, "WS_MediumBench",    "中级工作台套件", WorkstationTier.MediumBench,     8f, 3);
         MakeWS(F, "WS_AdvancedBench",  "高级工作台套件", WorkstationTier.AdvancedBench,  12f, 3);
-        MakeWS(F, "WS_Chemistry",      "化学台套件",     WorkstationTier.Chemistry,      15f, 2);
+        MakeWS(F, "WS_Chemistry",      "研究中心套件", WorkstationTier.Chemistry,      15f, 2);
         MakeWS(F, "WS_Machining",             "机械加工台套件",  WorkstationTier.Machining,            20f, 2);
         MakeWS(F, "WS_ElectronicsAssembly", "电子装配台套件",  WorkstationTier.ElectronicsAssembly,  22f, 2);
     }

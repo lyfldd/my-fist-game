@@ -1,0 +1,189 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c4f30878ca33bf4b8a9c80cd1185fe2, type: 3}
+  m_Name: ChemicalResearchData
+  m_EditorClassIdentifier: 
+  projects:
+  - researchId: Metal_Basic
+    displayName: "\u57FA\u7840\u91D1\u5C5E\u52A0\u5DE5"
+    description: "\u89E3\u9501\u51B2\u538B\u673A\u3001\u7C89\u788E\u673A\u3001\u56DE\u6536\u7AD9"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 5
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 3
+    unlockedDeviceNames:
+    - "\u51B2\u538B\u673A"
+    - "\u7C89\u788E\u673A"
+    - "\u56DE\u6536\u7AD9"
+    requiredIntellectLevel: 1
+  - researchId: Metal_Precision
+    displayName: "\u7CBE\u5BC6\u91D1\u5C5E\u5236\u9020"
+    description: "\u89E3\u9501\u8F66\u5E8A\u3001\u88C5\u914D\u53F0\u3001\u5DE5\u4E1A\u7089"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 5
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 3
+    unlockedDeviceNames:
+    - "\u8F66\u5E8A"
+    - "\u88C5\u914D\u53F0"
+    - "\u5DE5\u4E1A\u7089"
+    requiredIntellectLevel: 3
+  - researchId: Metal_Weapon
+    displayName: "\u6B66\u5668\u5F39\u836F\u5DE5\u827A"
+    description: "\u89E3\u9501\u5F39\u836F\u88C5\u586B\u673A\u3001\u6B66\u5668\u7EC4\u88C5\u53F0"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 4
+    unlockedDeviceNames:
+    - "\u5F39\u836F\u88C5\u586B\u673A"
+    - "\u6B66\u5668\u7EC4\u88C5\u53F0"
+    requiredIntellectLevel: 5
+  - researchId: Elec_Basic
+    displayName: "\u57FA\u7840\u7535\u5DE5\u5B66"
+    description: "\u89E3\u9501\u62C9\u7EBF\u673A\u3001\u7535\u6C60\u751F\u4EA7\u7EBF"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 1
+    unlockedDeviceNames:
+    - "\u62C9\u7EBF\u673A"
+    - "\u7535\u6C60\u751F\u4EA7\u7EBF"
+    requiredIntellectLevel: 4
+  - researchId: Elec_Advanced
+    displayName: "\u7535\u5B50\u5DE5\u7A0B"
+    description: "\u89E3\u9501\u7535\u5B50\u88C5\u914D\u673A\u3001\u7535\u8DEF\u5370\u5237\u673A"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 2
+    unlockedDeviceNames:
+    - "\u7535\u5B50\u88C5\u914D\u673A"
+    - "\u7535\u8DEF\u5370\u5237\u673A"
+    requiredIntellectLevel: 6
+  - researchId: Elec_Precision
+    displayName: "\u7CBE\u5BC6\u7535\u5B50\u6280\u672F"
+    description: "\u89E3\u9501\u7CBE\u5BC6\u88C5\u914D\u53F0\u3001\u7535\u89E3\u69FD"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 4
+    unlockedDeviceNames:
+    - "\u7CBE\u5BC6\u88C5\u914D\u53F0"
+    - "\u7535\u89E3\u69FD"
+    requiredIntellectLevel: 8
+  - researchId: Chem_Organic
+    displayName: "\u6709\u673A\u5316\u5B66"
+    description: "\u89E3\u9501\u53D1\u9175\u7F50\u3001\u84B8\u998F\u5668\u3001\u5236\u836F\u53F0"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 3
+    unlockedDeviceNames:
+    - "\u53D1\u9175\u7F50"
+    - "\u84B8\u998F\u5668"
+    - "\u5236\u836F\u53F0"
+    requiredIntellectLevel: 2
+  - researchId: Chem_Explosive
+    displayName: "\u7206\u70B8\u7269\u5316\u5B66"
+    description: "\u89E3\u9501\u706B\u836F\u5382\u3001\u79BB\u5FC3\u673A"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 5b27705889f568f439bade8882695125, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+      count: 4
+    unlockedDeviceNames:
+    - "\u706B\u836F\u5382"
+    - "\u79BB\u5FC3\u673A"
+    requiredIntellectLevel: 5
+  - researchId: Chem_Bio
+    displayName: "\u751F\u7269\u5316\u5B66\u6280\u672F"
+    description: "\u89E3\u9501\u57FA\u56E0\u5206\u6790\u53F0\u3001\u51C0\u6C34\u5382"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 5
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 4
+    unlockedDeviceNames:
+    - "\u57FA\u56E0\u5206\u6790\u53F0"
+    - "\u51C0\u6C34\u5382"
+    requiredIntellectLevel: 8
+  - researchId: Energy_Core
+    displayName: "\u6838\u5FC3\u80FD\u6E90\u6280\u672F"
+    description: "\u89E3\u9501\u53D1\u7535\u673A\u3001\u592A\u9633\u80FD\u677F"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 5
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 3
+    unlockedDeviceNames:
+    - "\u53D1\u7535\u673A"
+    - "\u592A\u9633\u80FD\u677F"
+    requiredIntellectLevel: 5
+  - researchId: Energy_Nuclear
+    displayName: "\u6838\u7269\u7406\u5E94\u7528"
+    description: "\u89E3\u9501\u6838\u7535\u7AD9"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: e00357cbb5a67844ea7ef50cfcf11b55, type: 2}
+      count: 8
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 6
+    unlockedDeviceNames:
+    - "\u6838\u7535\u7AD9"
+    requiredIntellectLevel: 10

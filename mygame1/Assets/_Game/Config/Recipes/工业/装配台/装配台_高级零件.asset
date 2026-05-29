@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc35678326b098458937d0366d8984e, type: 3}
+  m_Name: "\u88C5\u914D\u53F0_\u9AD8\u7EA7\u96F6\u4EF6"
+  m_EditorClassIdentifier: 
+  recipeName: "\u88C5\u914D\u53F0_\u9AD8\u7EA7\u96F6\u4EF6"
+  icon: {fileID: 0}
+  description: "\u88C5\u914D\u53F0\u81EA\u52A8\u751F\u4EA7\uFF1A\u901A\u7528\u96F6\u4EF6
+    x4 \u2192 \u9AD8\u7EA7\u96F6\u4EF6 x1"
+  category: 10
+  requiredStation: 7
+  isIndustrial: 1
+  productionDeviceName: "\u88C5\u914D\u53F0"
+  skillRequirements: []
+  materials:
+  - itemData: {fileID: 11400000, guid: 7922bfbd3bb04f84dbde89edda930acc, type: 2}
+    count: 4
+  resultItem: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+  resultCount: 1
+  craftTime: 6
+  xpReward: 0
+  canDeconstruct: 0
+  deconstructReturnRate: 0.5

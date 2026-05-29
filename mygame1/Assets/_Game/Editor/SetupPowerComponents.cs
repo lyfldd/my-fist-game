@@ -140,7 +140,7 @@ namespace _Game.Editor
 
             // 后期 — 可烧煤兜底
             count += ConfigConsumer("工业炉", 50, true, 20, 3);
-            count += ConfigConsumer("化学台", 55, true, 20, 1.5f);
+            count += ConfigConsumer("研究中心", 55, true, 20, 1.5f);
             count += ConfigConsumer("电解槽", 60, true, 20, 2);
             count += ConfigConsumer("机械加工台", 35, true, 15, 2);
             count += ConfigConsumer("回收站", 45, true, 15, 2);

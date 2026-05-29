@@ -22,5 +22,15 @@ namespace _Game.Config
         {
             return recipes.Where(r => r != null && r.category == cat).ToArray();
         }
+
+        public RecipeData[] GetByDevice(string deviceName)
+        {
+            return recipes.Where(r => r != null && r.isIndustrial && r.productionDeviceName == deviceName).ToArray();
+        }
+
+        public RecipeData[] GetByStationAndMode(WorkstationTier tier, bool industrial)
+        {
+            return recipes.Where(r => r != null && r.requiredStation == tier && r.isIndustrial == industrial).ToArray();
+        }
     }
 }

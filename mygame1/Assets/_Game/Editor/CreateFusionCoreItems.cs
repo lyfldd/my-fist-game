@@ -194,7 +194,7 @@ public static class CreateFusionCoreItems
         var b = ScriptableObject.CreateInstance<BuildableData>();
         b.displayName = "元素合成炉";
         b.description = "终局工业设备。在极高温度下将浓缩铀与多种燃料聚合成聚变核心。需2000W电力供应。";
-        b.category = BuildableCategory.LateIndustrial;
+        b.category = BuildableCategory.EnergyIndustry;
         b.buildDuration = 45f;
         b.maxHealth = 1500f;
         b.isWorkstation = true;
@@ -226,7 +226,7 @@ public static class CreateFusionCoreItems
             case WorkstationTier.SimpleBench: return "简易工作台";
             case WorkstationTier.Machining: return "机械加工台";
             case WorkstationTier.ElectronicsAssembly: return "电子装配台";
-            case WorkstationTier.Chemistry: return "化学台";
+            case WorkstationTier.Chemistry: return "研究中心";
             default: return "元素合成炉";
         }
     }

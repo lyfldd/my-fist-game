@@ -351,7 +351,7 @@ namespace _Game.Systems.Crafting
                 WorkstationTier.Furnace => "熔炉",
                 WorkstationTier.MediumBench => "中级工作台",
                 WorkstationTier.AdvancedBench => "高级工作台",
-                WorkstationTier.Chemistry => "化学台",
+                WorkstationTier.Chemistry => "研究中心",
                 WorkstationTier.Machining => "机械加工台",
                 _ => "工作台"
             };

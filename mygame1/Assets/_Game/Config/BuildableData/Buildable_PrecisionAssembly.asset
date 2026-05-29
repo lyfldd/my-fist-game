@@ -60,3 +60,5 @@ MonoBehaviour:
   isWorkstation: 0
   workstationTier: 0
   productionDeviceRef: {fileID: 11400000, guid: de23e65a43eda0c4f92f5ae6d6b5a211, type: 2}
+  industrialChain: 0
+  producedItems: []

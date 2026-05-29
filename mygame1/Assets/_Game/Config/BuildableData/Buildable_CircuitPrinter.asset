@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:yousandi.cn,2023:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 518e29df93df32941ba7eff134a7312e, type: 3}
+  m_Name: Buildable_CircuitPrinter
+  m_EditorClassIdentifier: 
+  displayName: "\u7535\u8DEF\u5370\u5237\u673A"
+  description: "PCB\u7535\u8DEF\u677F\u5370\u5237\u8BBE\u5907\u3002\u6279\u91CF\u751F\u4EA7\u7535\u8DEF\u677F\u3002"
+  icon: {fileID: 0}
+  category: 6
+  previewPrefab: {fileID: 0}
+  builtPrefab: {fileID: 0}
+  placementSize: {x: 2, y: 1.5, z: 2}
+  snapSize: 1
+  buildDuration: 20
+  requiredTool: {fileID: 0}
+  materials:
+  - itemData: {fileID: 11400000, guid: efe3b93c2bc06054c956d611620d4cd6, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    count: 4
+  - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+    count: 3
+  - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+    count: 1
+  - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+    count: 2
+  skillRequirements:
+  - skill: 7
+    level: 7
+  - skill: 9
+    level: 5
+  hungerDrainPerSec: 0
+  thirstDrainPerSec: 0
+  staminaDrainPerSec: 0
+  maxHealth: 130
+  blocksNavMesh: 1
+  deconstructReturnRate: 0.5
+  powerSupplyRadius: 0
+  powerOutput: 0
+  powerSourceType: 0
+  powerRequiresFuel: 0
+  powerFuelPerHour: 1
+  powerFuelItemName: 
+  powerFuelItemData: {fileID: 0}
+  powerDaytimeOnly: 0
+  powerRequiresOpenAir: 0
+  powerRequiresWater: 0
+  powerNoiseRadius: 10
+  powerRequired: 0
+  powerAllowCoal: 0
+  powerCoalPower: 0
+  powerElectricSpeedMul: 2
+  isWorkstation: 0
+  workstationTier: 0
+  productionDeviceRef: {fileID: 11400000, guid: cdb15d948bc81cf4b82cf64fd2c5f30a, type: 2}
+  industrialChain: 0
+  producedItems: []

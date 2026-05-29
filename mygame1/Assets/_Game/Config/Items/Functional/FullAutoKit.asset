@@ -31,6 +31,13 @@ MonoBehaviour:
   storageHeight: 0
   armorValue: 0
   worldPrefab: {fileID: 0}
+  behaviours:
+  - behaviourName: "\u6B66\u5668\u6539\u9020"
+    system: 1
+    componentTypeName: WeaponModKit
+    implemented: 0
+    notes: "\u6B66\u5668\u6539\u88C5\u7CFB\u7EDF\u672A\u5B9E\u73B0\uFF0C\u66FF\u6362
+      fireRate \u7B49\u53C2\u6570"
   useTime: 1
   itemEffects: []
   warmthValue: 0
