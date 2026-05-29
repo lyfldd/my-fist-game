@@ -659,6 +659,50 @@ namespace _Game.Systems.Inventory
             return total;
         }
 
+        /// <summary> 按物品名称统计背包中的总数量（供弹药/燃料系统使用）</summary>
+        public int CountItemByName(string itemName)
+        {
+            if (string.IsNullOrEmpty(itemName)) return 0;
+            int total = 0;
+            foreach (var c in containers)
+                foreach (var p in c.placedItems)
+                    if (!p.isGhost && p.itemData != null && p.itemData.itemName == itemName)
+                        total += p.count;
+            return total;
+        }
+
+        /// <summary> 按物品名称从背包中移除指定数量（返回是否成功）</summary>
+        public bool RemoveItemByName(string itemName, int count)
+        {
+            if (string.IsNullOrEmpty(itemName) || count <= 0) return false;
+            int remaining = count;
+            foreach (var c in containers)
+            {
+                for (int i = c.placedItems.Count - 1; i >= 0; i--)
+                {
+                    var p = c.placedItems[i];
+                    if (p.isGhost || p.itemData == null || p.itemData.itemName != itemName) continue;
+                    int take = Mathf.Min(p.count, remaining);
+                    p.count -= take;
+                    remaining -= take;
+                    if (p.count <= 0)
+                        c.placedItems.RemoveAt(i);
+                    if (remaining <= 0)
+                    {
+                        EventBus.Publish(new InventoryChanged("removed", itemName, count));
+                        PublishView();
+                        return true;
+                    }
+                }
+            }
+            if (remaining < count)
+            {
+                EventBus.Publish(new InventoryChanged("removed", itemName, count - remaining));
+                PublishView();
+            }
+            return remaining <= 0;
+        }
+
         /// <summary>
         /// 把物品丢在地上
         /// </summary>

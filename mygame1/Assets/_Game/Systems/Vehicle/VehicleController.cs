@@ -19,6 +19,8 @@ namespace _Game.Systems.Vehicle
     {
         [Header("配置")]
         public VehicleData vehicleData;
+        [Tooltip("燃料物品名（如 SyntheticGasoline），留空=不需要燃料")]
+        public string fuelItemName = "SyntheticGasoline";
 
         [Header("车轮引用")]
         public WheelCollider wheelFL;
@@ -39,6 +41,7 @@ namespace _Game.Systems.Vehicle
         private float _currentBrake;      // 0 ~ 1
         private bool _isEngineOn;
         private bool _isBoosting;
+        private Inventory.Inventory _driverInventory;
 
         // 有效最高速度（根据是否加速动态计算）
         private float EffectiveMaxSpeed => _isBoosting
@@ -157,6 +160,7 @@ namespace _Game.Systems.Vehicle
         {
             Driver = driver;
             _isEngineOn = Driver != null;
+            _driverInventory = driver != null ? driver.GetComponent<Inventory.Inventory>() : null;
             if (!_isEngineOn)
             {
                 _currentThrottle = 0;
@@ -239,6 +243,18 @@ namespace _Game.Systems.Vehicle
                 if (CurrentFuel <= 0)
                 {
                     CurrentFuel = 0;
+                    // 尝试从驾驶员背包自动加油
+                    if (!string.IsNullOrEmpty(fuelItemName) && _driverInventory != null)
+                    {
+                        int count = _driverInventory.CountItemByName(fuelItemName);
+                        if (count > 0)
+                        {
+                            _driverInventory.RemoveItemByName(fuelItemName, 1);
+                            CurrentFuel += 20f; // 1单位燃料≈20升
+                            _isEngineOn = true;
+                            return;
+                        }
+                    }
                     _isEngineOn = false;
                 }
             }

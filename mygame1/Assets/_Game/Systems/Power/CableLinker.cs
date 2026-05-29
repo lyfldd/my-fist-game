@@ -163,42 +163,16 @@ namespace _Game.Systems.Power
 
         bool ConsumeCable()
         {
-            var item = FindCableItem();
-            if (item == null) return false;
-
             var inv = FindObjectOfType<InventorySystem>();
             if (inv == null) return false;
-
-            if (inv.HasItem(item, 1))
-            {
-                inv.RemoveItem(item, 1);
-                return true;
-            }
-            return false;
-        }
-
-        static ItemData FindCableItem()
-        {
-#if UNITY_EDITOR
-            var guids = UnityEditor.AssetDatabase.FindAssets("t:ItemData");
-            foreach (var g in guids)
-            {
-                var data = UnityEditor.AssetDatabase.LoadAssetAtPath<ItemData>(
-                    UnityEditor.AssetDatabase.GUIDToAssetPath(g));
-                if (data != null && data.itemName == CABLE_ITEM_NAME)
-                    return data;
-            }
-#endif
-            return null;
+            return inv.RemoveItemByName(CABLE_ITEM_NAME, 1);
         }
 
         public static int CountCables()
         {
-            var item = FindCableItem();
-            if (item == null) return 0;
             var inv = Object.FindObjectOfType<InventorySystem>();
             if (inv == null) return 0;
-            return inv.GetItemCount(item);
+            return inv.CountItemByName(CABLE_ITEM_NAME);
         }
 
         void OnGUI()

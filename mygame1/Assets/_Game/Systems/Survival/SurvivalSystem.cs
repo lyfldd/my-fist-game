@@ -30,6 +30,11 @@ namespace _Game.Systems.Survival
         private Dictionary<SurvivalStateType, bool> survivalStates = new();
         private Dictionary<ItemEffectType, float> temporaryEffects = new();
 
+        // 食物类型 + 药品冷却
+        private float _lastEatTime;
+        private string _lastFoodType;
+        private Dictionary<string, float> _medCooldowns = new();
+
         private float lastTickTime;
         private const float TICK_INTERVAL = GameConstants.SURVIVAL_TICK_INTERVAL;
 
@@ -91,6 +96,7 @@ namespace _Game.Systems.Survival
                 EventBus.Subscribe<TimeOfDayChanged>(OnTimeChanged);
             EventBus.Subscribe<EquipmentChangedEvent>(OnEquipmentChanged);
             EventBus.Subscribe<PlayerDamaged>(OnPlayerDamaged);
+            EventBus.Subscribe<ItemUsedEvent>(OnItemUsed);
         }
 
         private void OnPlayerDamaged(PlayerDamaged evt)
@@ -233,15 +239,47 @@ namespace _Game.Systems.Survival
             if (health <= 0) EventBus.Publish(new CharacterDeath(gameObject));
         }
 
-        /// <summary> 应用物品效果（吃食物/用药）</summary>
-        public void ApplyItemEffect(ItemEffect effect)
+        /// <summary> 物品使用（直接订阅 ItemUsedEvent，不再经过 ItemUsageSystem 中转）</summary>
+        void OnItemUsed(ItemUsedEvent evt)
         {
+            if (evt.ItemData == null || evt.ItemData.itemEffects == null || evt.ItemData.itemEffects.Count == 0)
+                return;
+
+            var item = evt.ItemData;
+
+            // 药品冷却检查
+            if (item.foodType == "Medicine" && _medCooldowns.TryGetValue(item.itemName, out var cdEnd)
+                && UnityEngine.Time.time < cdEnd)
+                return;
+
+            // 食物类型连续递减
+            float foodMultiplier = 1f;
+            if (!string.IsNullOrEmpty(item.foodType) && item.foodType != "Medicine")
+            {
+                if (item.foodType == _lastFoodType && UnityEngine.Time.time - _lastEatTime < 300f)
+                    foodMultiplier = 0.5f; // 5分钟内同类食物效果减半
+                _lastFoodType = item.foodType;
+                _lastEatTime = UnityEngine.Time.time;
+            }
+
+            // 药品冷却记录
+            if (item.foodType == "Medicine")
+                _medCooldowns[item.itemName] = UnityEngine.Time.time + 30f;
+
+            foreach (var eff in item.itemEffects)
+                ApplyItemEffect(eff, foodMultiplier);
+        }
+
+        /// <summary> 应用物品效果（吃食物/用药）</summary>
+        public void ApplyItemEffect(ItemEffect effect, float multiplier = 1f)
+        {
+            float v = effect.value * multiplier;
             switch (effect.effectType)
             {
-                case ItemEffectType.RestoreHealth:      ModifyHealth(effect.value, "物品"); break;
-                case ItemEffectType.RestoreHunger:      hunger = Mathf.Min(GameConstants.SURVIVAL_HUNGER_MAX, hunger + effect.value); break;
-                case ItemEffectType.RestoreThirst:      thirst = Mathf.Min(GameConstants.SURVIVAL_THIRST_MAX, thirst + effect.value); break;
-                case ItemEffectType.RestoreTemperature: temperature = Mathf.Clamp(temperature + effect.value, GameConstants.SURVIVAL_TEMP_MIN, GameConstants.SURVIVAL_TEMP_MAX); break;
+                case ItemEffectType.RestoreHealth:      ModifyHealth(v, "物品"); break;
+                case ItemEffectType.RestoreHunger:      hunger = Mathf.Min(GameConstants.SURVIVAL_HUNGER_MAX, hunger + v); break;
+                case ItemEffectType.RestoreThirst:      thirst = Mathf.Min(GameConstants.SURVIVAL_THIRST_MAX, thirst + v); break;
+                case ItemEffectType.RestoreTemperature: temperature = Mathf.Clamp(temperature + v, GameConstants.SURVIVAL_TEMP_MIN, GameConstants.SURVIVAL_TEMP_MAX); break;
                 case ItemEffectType.CureBleeding:       SetSurvivalState(SurvivalStateType.Bleeding, false); break;
                 case ItemEffectType.CureInfected:       SetSurvivalState(SurvivalStateType.Infected, false); break;
                 case ItemEffectType.FixFracture:        SetSurvivalState(SurvivalStateType.Fracture, false); break;
@@ -307,6 +345,8 @@ namespace _Game.Systems.Survival
             if (timeManager != null)
                 EventBus.Unsubscribe<TimeOfDayChanged>(OnTimeChanged);
             EventBus.Unsubscribe<EquipmentChangedEvent>(OnEquipmentChanged);
+            EventBus.Unsubscribe<PlayerDamaged>(OnPlayerDamaged);
+            EventBus.Unsubscribe<ItemUsedEvent>(OnItemUsed);
         }
 
         #endregion

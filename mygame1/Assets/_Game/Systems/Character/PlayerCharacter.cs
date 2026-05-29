@@ -23,9 +23,10 @@ namespace _Game.Systems.Character
         public int Constitution => SurvivalXPSystem.Instance?.GetAttributeValue(AttributeType.体质) ?? 5;
         public int Endurance => SurvivalXPSystem.Instance?.GetAttributeValue(AttributeType.耐力) ?? 5;
 
+        private Inventory.Inventory _inventory;
+
         void Awake()
         {
-            // 自动挂载驾驶输入锁定组件
             var pilotLock = GetComponent<_Game.Systems.AIBot.AIBotPilotInputLock>();
             if (pilotLock == null)
                 gameObject.AddComponent<_Game.Systems.AIBot.AIBotPilotInputLock>();
@@ -39,15 +40,48 @@ namespace _Game.Systems.Character
                     Debug.LogWarning("PlayerCharacter 未绑定 CharacterData，已使用默认值");
                 }
             }
+
+            _inventory = GetComponent<Inventory.Inventory>();
         }
 
         void Start()
         {
-            // 确保 SurvivalXPSystem 存在
             if (SurvivalXPSystem.Instance == null)
             {
                 var go = new GameObject("SurvivalXPSystem");
                 go.AddComponent<SurvivalXPSystem>();
+            }
+        }
+
+        void OnEnable()
+        {
+            EventBus.Subscribe<InventoryChanged>(OnInventoryChanged);
+        }
+
+        void OnDisable()
+        {
+            EventBus.Unsubscribe<InventoryChanged>(OnInventoryChanged);
+        }
+
+        void OnInventoryChanged(InventoryChanged evt)
+        {
+            UpdateWeightPenalty();
+        }
+
+        void UpdateWeightPenalty()
+        {
+            if (_inventory == null) return;
+            float ratio = _inventory.EffectiveMaxWeight > 0f
+                ? _inventory.CurrentWeight / _inventory.EffectiveMaxWeight
+                : 0f;
+            if (ratio > 0.7f)
+            {
+                float penalty = 1f - (ratio - 0.7f) * 1.5f;
+                SetMoveSpeedModifier(Mathf.Max(0.3f, penalty));
+            }
+            else
+            {
+                SetMoveSpeedModifier(1f);
             }
         }
 

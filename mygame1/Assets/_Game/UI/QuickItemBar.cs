@@ -486,7 +486,8 @@ namespace _Game.UI
                 globalProgressGo.SetActive(false);
             }
 
-            // 使用完成 → 发布事件（ItemUsageSystem 处理扣物品+加效果）
+            // 使用完成 → 直接扣物品 + 发布事件（SurvivalSystem 自己处理效果）
+            inventory.RemoveItem(item.itemData, 1);
             EventBus.Publish(new ItemUsedEvent(item.itemData, 1));
 
             isUsingItem = false;

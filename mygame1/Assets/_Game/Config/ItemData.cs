@@ -26,9 +26,9 @@ namespace _Game.Config
         public int maxStack = GameConstants.DEFAULT_MAX_STACK;
         public float weight = GameConstants.DEFAULT_ITEM_WEIGHT;
 
-        [Header("品质 & 耐久")]
+        [Header("品质 & 耐久（字段预留，耐久系统待接入）")]
         public ItemQuality quality = ItemQuality.Scavenged;
-        public bool hasDurability;
+        public bool hasDurability;          // TODO: 耐久系统 — 武器/护甲/工具消耗耐久
         public float maxDurability = 100f;
 
         [Header("用途标签")]
@@ -57,6 +57,12 @@ namespace _Game.Config
         public List<ItemEffect> itemEffects;
         public float warmthValue;
         public bool isWaterproof;
+        [Tooltip("食物类型：留空=非食物  Meat=荤  Vegetable=素  Drink=饮品  Medicine=药品")]
+        public string foodType;
+        [Tooltip("作为燃料时的能量值（0=非燃料，汽油100/煤50/铀500）")]
+        public float fuelValue;
+        [Tooltip("药品治疗量（>0 药品生效，医疗技能可加成），非药品填0")]
+        public float healAmount;
 
         [Header("武器属性（category==Weapon 生效）")]
         public bool isFirearm = false;        // true=枪械(远程)，false=近战
@@ -69,5 +75,15 @@ namespace _Game.Config
         public float spreadPerShot = 1.5f;    // 每发散射增量(度)
         public int magazineSize = GameConstants.DEFAULT_MAGAZINE_SIZE;  // 弹匣容量(0=无弹药限制/近战)
         public float range = GameConstants.DEFAULT_WEAPON_RANGE;  // 别名(同weaponRange, 向上兼容)
+
+        [Header("武器→弹药/声音/VFX 连接")]
+        [Tooltip("消耗的弹药物品名（如 Ammo_9mm），留空=无需弹药（电磁炮/近战）")]
+        public string ammoItemName;
+        [Tooltip("枪声音色：留空=静音  Pistol/Rifle/Shotgun/Heavy")]
+        public string gunshotSoundType;
+        [Tooltip("枪口火焰：留空=无火焰  Small/Medium/Large")]
+        public string muzzleFlashType;
+        [Tooltip("换弹耗时（秒）")]
+        public float reloadTime = 1.5f;
     }
 }

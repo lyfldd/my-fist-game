@@ -50,7 +50,6 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponSwitcher");
             AddIfMissing(player, "_Game.Systems.Character.ProfessionApplier");
             AddIfMissing(player, "_Game.Systems.Vehicle.VehicleInputLock");
-            AddIfMissing(player, "_Game.Systems.ItemUsage.ItemUsageSystem");
             AddIfMissing(player, "_Game.Systems.Inventory.InventoryTest");
 
             EnsureInputRouter();
@@ -62,6 +61,13 @@ namespace _Game.Core
             var go = GameObject.Find("Managers") ?? new GameObject("Managers");
             Object.DontDestroyOnLoad(go);
             go.AddComponent<InputRouter>();
+
+            // SoundEmitter 从静态类改为 MonoBehaviour，确保实例存在
+            if (go.GetComponent<_Game.Systems.Audio.SoundEmitter>() == null)
+                go.AddComponent<_Game.Systems.Audio.SoundEmitter>();
+            // MuzzleFlashSystem — 枪口火焰 VFX
+            if (go.GetComponent<_Game.Systems.VFX.MuzzleFlashSystem>() == null)
+                go.AddComponent<_Game.Systems.VFX.MuzzleFlashSystem>();
         }
 
         static void AddIfMissing(GameObject go, string fullTypeName)

@@ -195,6 +195,12 @@ namespace _Game.Systems.AIBot
             return ConsumeItemByName(ammoItemName, count);
         }
 
+        public bool ConsumeAmmo(ItemData ammoItem, int count)
+        {
+            if (ammoItem == null) return false;
+            return ConsumeItemByName(ammoItem.itemName, count);
+        }
+
         // ============================================================
         // 内部
         // ============================================================

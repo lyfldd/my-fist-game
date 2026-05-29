@@ -3,7 +3,6 @@ using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Character;
 using _Game.Systems.Combat;
-using _Game.Systems.Audio;
 
 namespace _Game.Systems.Weapon
 {
@@ -32,6 +31,13 @@ namespace _Game.Systems.Weapon
         private float _currentSpread;
         private bool _lastFrameFiring;
 
+        // 弹药系统
+        private int _currentMag;
+        private bool _isReloading;
+        private float _reloadTimer;
+        private Inventory.Inventory _inventory;
+        public bool IsReloading => _isReloading;
+
         void Awake()
         {
             _aiming = GetComponent<WeaponAiming>();
@@ -40,6 +46,7 @@ namespace _Game.Systems.Weapon
             if (_switcher == null)
                 _switcher = gameObject.AddComponent<WeaponSwitcher>();
             _playerCharacter = GetComponent<PlayerCharacter>();
+            _inventory = GetComponent<Inventory.Inventory>();
         }
 
         void OnEnable()
@@ -47,8 +54,13 @@ namespace _Game.Systems.Weapon
             _fireTimer = 0f;
             _lastFrameFiring = false;
             _wantsSemiFire = false;
+            _isReloading = false;
             var weapon = GetActiveWeapon();
-            if (weapon != null) _currentSpread = weapon.baseSpread;
+            if (weapon != null)
+            {
+                _currentSpread = weapon.baseSpread;
+                _currentMag = weapon.magazineSize;
+            }
             InputRouter.BindMouse(0, InputPriority.Gameplay, OnFireButton, this);
         }
 
@@ -73,6 +85,15 @@ namespace _Game.Systems.Weapon
 
             if (_fireTimer > 0f)
                 _fireTimer -= UnityEngine.Time.deltaTime;
+
+            // 换弹计时
+            if (_isReloading)
+            {
+                _reloadTimer -= UnityEngine.Time.deltaTime;
+                if (_reloadTimer <= 0f)
+                    FinishReload(weapon);
+                return;
+            }
 
             bool wantFire = weapon.fireRate <= semiAutoFireRateThreshold
                 ? Input.GetKey(fireKey)
@@ -110,10 +131,22 @@ namespace _Game.Systems.Weapon
         void TryFire(ItemData weapon)
         {
             if (_fireTimer > 0f) return;
+            if (_isReloading) return;
+
+            // 弹药检查：有弹药需求且弹匣为空 → 自动换弹
+            if (!string.IsNullOrEmpty(weapon.ammoItemName) && _currentMag <= 0)
+            {
+                StartReload(weapon);
+                return;
+            }
 
             // 扣动扳机：散射扩大
             _currentSpread = Mathf.Min(_currentSpread + weapon.spreadPerShot, weapon.maxSpread);
             _fireTimer = weapon.fireRate;
+
+            // 扣弹匣
+            if (!string.IsNullOrEmpty(weapon.ammoItemName))
+                _currentMag--;
 
             Vector3 aimDir = _aiming != null ? _aiming.AimDirection : transform.forward;
 
@@ -128,7 +161,6 @@ namespace _Game.Systems.Weapon
 
             if (hitSomething)
             {
-                // 跳过AI机器人（友军）
                 if (hit.collider.GetComponentInParent<_Game.Systems.AIBot.AIBot>() == null)
                 {
                     var damageable = hit.collider.GetComponentInParent<IDamageable>();
@@ -138,8 +170,6 @@ namespace _Game.Systems.Weapon
                         Debug.Log($"命中 {hit.collider.name}！伤害={weapon.weaponDamage}");
                     }
                 }
-
-                // 调试射线
                 Debug.DrawRay(muzzle, spreadDir * hit.distance, Color.red, debugRayDuration);
             }
             else
@@ -147,16 +177,52 @@ namespace _Game.Systems.Weapon
                 Debug.DrawRay(muzzle, spreadDir * weapon.weaponRange, Color.yellow, debugRayDuration);
             }
 
-            // 发布事件（供音效/特效系统订阅）
+            // 发布事件（携带完整武器数据，供音效/特效/噪音系统订阅）
             EventBus.Publish(new WeaponFiredEvent(
+                weapon,
+                weapon.ammoItemName,
+                weapon.gunshotSoundType,
+                weapon.muzzleFlashType,
+                muzzle,
                 EquipSlot.RightHand,
                 spreadDir,
                 hitSomething,
                 hitSomething ? hit.collider.gameObject : null
             ));
+        }
 
-            // 声音
-            SoundEmitter.EmitGunshot(muzzle);
+        void StartReload(ItemData weapon)
+        {
+            if (_inventory == null) return;
+
+            int inInventory = CountAmmoInInventory(weapon.ammoItemName);
+            if (inInventory <= 0)
+            {
+                // 背包没弹药 → 空仓咔咔声
+                EventBus.Publish(new WeaponDryFireEvent(weapon, GetMuzzlePosition()));
+                return;
+            }
+
+            int need = weapon.magazineSize - _currentMag;
+            int take = Mathf.Min(need, inInventory);
+            _inventory.RemoveItemByName(weapon.ammoItemName, take);
+            _currentMag += take;
+
+            _isReloading = true;
+            _reloadTimer = weapon.reloadTime;
+        }
+
+        void FinishReload(ItemData weapon)
+        {
+            _isReloading = false;
+            EventBus.Publish(new ItemReloadedEvent(weapon, weapon.ammoItemName,
+                weapon.magazineSize - _currentMag));
+        }
+
+        int CountAmmoInInventory(string ammoItemName)
+        {
+            if (_inventory == null || string.IsNullOrEmpty(ammoItemName)) return 0;
+            return _inventory.CountItemByName(ammoItemName);
         }
 
         /// <summary>

@@ -52,9 +52,12 @@ namespace _Game.Systems.Power
             PowerSourceUI.Show(this);
         }
 
+        Inventory.Inventory _inventory;
+
         void Start()
         {
-            _fuelRemaining = requiresFuel ? 1f : 999f; // 非燃料型不用关心
+            _fuelRemaining = requiresFuel ? 1f : 999f;
+            _inventory = FindObjectOfType<Inventory.Inventory>();
         }
 
         void Update()
@@ -77,6 +80,18 @@ namespace _Game.Systems.Power
                     _fuelTimer = 0f;
                     _fuelRemaining -= 1f;
                 }
+
+                // 燃料耗尽时自动从玩家背包补充
+                if (_fuelRemaining <= 0f && _inventory != null && fuelItemData != null)
+                {
+                    int count = _inventory.CountItemByName(fuelItemData.itemName);
+                    if (count > 0)
+                    {
+                        _inventory.RemoveItemByName(fuelItemData.itemName, 1);
+                        _fuelRemaining += fuelItemData.fuelValue > 0f ? fuelItemData.fuelValue : 1f;
+                    }
+                }
+
                 if (_fuelRemaining <= 0f)
                     conditionsMet = false;
             }

@@ -307,21 +307,65 @@ namespace _Game.Core
     }
 
     /// <summary>
-    /// 武器开火时触发（WeaponShooting 发布，音效/特效系统订阅）
+    /// 武器开火时触发（WeaponShooting 发布，音效/特效/噪音系统订阅）
     /// </summary>
     public readonly struct WeaponFiredEvent
     {
+        public ItemData Weapon { get; }       // 武器 ItemData
+        public string AmmoItemName { get; }   // 消耗的弹药类型（如 "Ammo_9mm"）
+        public string SoundType { get; }      // 枪声音色（Pistol/Rifle/Shotgun/Heavy）
+        public string VfxType { get; }        // 枪口火焰（Small/Medium/Large）
+        public Vector3 MuzzlePos { get; }     // 枪口世界坐标
         public EquipSlot Slot { get; }
         public Vector3 Direction { get; }
         public bool HitSomething { get; }
         public GameObject Target { get; }
 
-        public WeaponFiredEvent(EquipSlot slot, Vector3 direction, bool hitSomething, GameObject target)
+        public WeaponFiredEvent(ItemData weapon, string ammoItemName, string soundType,
+            string vfxType, Vector3 muzzlePos, EquipSlot slot, Vector3 direction,
+            bool hitSomething, GameObject target)
         {
+            Weapon = weapon;
+            AmmoItemName = ammoItemName;
+            SoundType = soundType;
+            VfxType = vfxType;
+            MuzzlePos = muzzlePos;
             Slot = slot;
             Direction = direction;
             HitSomething = hitSomething;
             Target = target;
+        }
+    }
+
+    /// <summary>
+    /// 武器换弹完成时触发（WeaponShooting 发布，UI 订阅更新弹药显示）
+    /// </summary>
+    public readonly struct ItemReloadedEvent
+    {
+        public ItemData Weapon { get; }
+        public string AmmoItemName { get; }
+        public int AmmoConsumed { get; }      // 从背包扣了多少发
+
+        public ItemReloadedEvent(ItemData weapon, string ammoItemName, int ammoConsumed)
+        {
+            Weapon = weapon;
+            AmmoItemName = ammoItemName;
+            AmmoConsumed = ammoConsumed;
+        }
+    }
+
+    /// <summary>
+    /// 武器空仓击发时触发（WeaponShooting 发布，声音系统订阅播放咔咔声）
+    /// </summary>
+    public readonly struct WeaponDryFireEvent
+    {
+        public ItemData Weapon { get; }
+        public Vector3 MuzzlePos { get; }
+
+        public WeaponDryFireEvent(ItemData weapon, Vector3 muzzlePos)
+        {
+            Weapon = weapon;
+            MuzzlePos = muzzlePos;
         }
     }
 
