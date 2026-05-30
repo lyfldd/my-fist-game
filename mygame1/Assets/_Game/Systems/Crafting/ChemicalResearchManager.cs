@@ -117,6 +117,27 @@ namespace _Game.Systems.Crafting
             return true;
         }
 
+        /// <summary>
+        /// 获取指定大类的所有子研究项目。
+        /// </summary>
+        public List<ChemicalResearchProject> GetChildProjects(string parentId)
+        {
+            var list = new List<ChemicalResearchProject>();
+            if (_researchData?.projects == null) return list;
+            foreach (var p in _researchData.projects)
+                if (p.parentResearchId == parentId)
+                    list.Add(p);
+            return list;
+        }
+
+        /// <summary>
+        /// 检查大类是否已研究（子项的前置条件）。
+        /// </summary>
+        public bool IsCategoryResearched(string categoryId)
+        {
+            return IsResearched(categoryId);
+        }
+
         public void ForceUnlock(string researchId)
         {
             if (!_completedIds.Contains(researchId))

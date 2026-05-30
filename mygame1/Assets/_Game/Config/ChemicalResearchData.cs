@@ -22,12 +22,18 @@ namespace _Game.Config
         [TextArea(2, 3)]
         public string description;
         public ItemRequirement[] cost;
-        [Tooltip("解锁的工业设备名称（对应 ProductionDeviceData.deviceName）。前期/中期用")]
+        [Tooltip("解锁的工业设备名称（对应 ProductionDeviceData.deviceName）")]
         public string[] unlockedDeviceNames;
-        [Tooltip("解锁的配方 ID（对应 RecipeData.recipeId）。后期/终局用")]
+        [Tooltip("解锁的配方 ID（对应 RecipeData.recipeId）")]
         public string[] unlockedRecipeIds;
         public int requiredIntellectLevel;
         public ResearchTier tier;
+
+        // ── v2.0 科技树字段 ──
+        [Tooltip("前置研究ID（子项才有值，指向父大类）")]
+        public string parentResearchId;
+        [Tooltip("是否为分类大类（可展开子列表）")]
+        public bool isCategory;
     }
 
     [CreateAssetMenu(menuName = "Game/Chemical Research Data")]
