@@ -16,7 +16,7 @@ namespace _Game.Systems.Crafting
     {
         [Header("布局")]
         public float panelWidth = 540f;
-        public float panelHeight = 380f;
+        public float panelHeight = 520f;
         public float leftWidth = 260f;
         public float rightWidth = 260f;
         public float buttonHeight = 28f;
@@ -311,8 +311,11 @@ namespace _Game.Systems.Crafting
             GUI.color = Color.white;
 
             float curY = y + 6f;
+            float contentBottom = y + h - 6f; // 可用区域底部
 
-            // ---- 电力/煤模式状态 ----
+            // ====== 上半区：状态 + 产出 ======
+
+            // 电力/煤模式状态
             var consumer = _currentDevice?.GetComponent<Power.PowerConsumer>();
             if (consumer != null)
             {
@@ -320,69 +323,67 @@ namespace _Game.Systems.Crafting
                 Color statusColor;
                 if (_currentDevice.IsElectricPowered)
                 {
-                    statusText = $"电网供电 ({consumer.requiredPower}W)";
+                    statusText = $"⚡ 电网供电 ({consumer.requiredPower}W)";
                     statusColor = Color.green;
                 }
                 else if (_currentDevice.IsCoalPowered)
                 {
-                    statusText = "烧煤运转";
+                    statusText = "🔥 烧煤运转";
                     statusColor = new Color(1f, 0.7f, 0.2f);
                 }
                 else
                 {
-                    statusText = consumer.allowCoal ? "等待供电/加煤" : "无电力 - 设备停摆";
+                    statusText = consumer.allowCoal ? "⏳ 等待供电/加煤" : "❌ 无电力 - 设备停摆";
                     statusColor = new Color(1f, 0.35f, 0.35f);
                 }
                 GUI.color = statusColor;
-                GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 20f), statusText, _sectionHeaderStyle);
+                GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 18f), statusText, _sectionHeaderStyle);
                 GUI.color = Color.white;
                 curY += 18f;
 
                 if (_currentDevice.IsElectricPowered)
                 {
-                    GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 16f),
+                    GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 14f),
                         $"速度倍率: ×{consumer.electricSpeedMultiplier}", _dimStyle);
-                    curY += 16f;
+                    curY += 14f;
                 }
-
-                curY += 6f;
+                curY += 2f;
             }
 
             // 燃料状态（非通电模式下显示）
             if (!_currentDevice.IsElectricPowered && _deviceData.requiresFuel)
             {
-                GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 20f),
-                    $"燃料: {_currentDevice.FuelRemaining:F0} 轮  ({(_currentDevice.FuelRemaining > 0 ? "运行中" : "待加注")})",
+                GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 18f),
+                    $"燃料: {_currentDevice.FuelRemaining:F0} 轮  {(_currentDevice.FuelRemaining > 0 ? "运行中" : "待加注")}",
                     _currentDevice.FuelRemaining > 5f ? _labelStyle : _dimStyle);
-                curY += 22f;
+                curY += 18f;
 
-                // 燃料条
                 float fuelPct = Mathf.Clamp01(_currentDevice.FuelRemaining / (_deviceData.fuelPerCycle * 30f));
-                Rect fuelBarBg = new Rect(x + 6f, curY, rightWidth - 14f, 10f);
+                Rect fuelBarBg = new Rect(x + 6f, curY, rightWidth - 14f, 8f);
                 GUI.color = new Color(0.2f, 0.2f, 0.2f, 1f);
                 GUI.DrawTexture(fuelBarBg, Texture2D.whiteTexture);
                 GUI.color = fuelColor;
-                GUI.DrawTexture(new Rect(x + 6f, curY, (rightWidth - 14f) * fuelPct, 10f), Texture2D.whiteTexture);
+                GUI.DrawTexture(new Rect(x + 6f, curY, (rightWidth - 14f) * fuelPct, 8f), Texture2D.whiteTexture);
                 GUI.color = Color.white;
-                curY += 16f;
+                curY += 12f;
             }
 
-            curY += 4f;
+            // 流水线链接（紧凑型）
+            DrawLinkSectionCompact(x, ref curY, rightWidth);
 
-            // ---- 流水线链接 ----
-            DrawLinkSection(x, ref curY, rightWidth);
+            curY += 2f;
 
-            // 输出槽
-            GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 20f), "产出物品", _sectionHeaderStyle);
-            curY += 22f;
+            // 产出物品
+            GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 18f), "┃ 产出物品", _sectionHeaderStyle);
+            curY += 20f;
 
             var outSlot = _currentDevice.OutputSlot;
             if (outSlot != null && outSlot.placedItems != null && outSlot.placedItems.Count > 0)
             {
-                float outViewH = 120f;
-                float outTotalH = outSlot.placedItems.Count * (buttonHeight + 4f);
+                float outViewH = 80f; // 精简高度
+                float outTotalH = outSlot.placedItems.Count * (buttonHeight + 3f);
                 _outputScrollPos = GUI.BeginScrollView(
-                    new Rect(x + 2f, curY, rightWidth - 6f, Mathf.Min(outViewH, outTotalH + 8f)),
+                    new Rect(x + 2f, curY, rightWidth - 6f, Mathf.Min(outViewH, outTotalH + 6f)),
                     _outputScrollPos,
                     new Rect(0, 0, rightWidth - 24f, outTotalH));
 
@@ -392,10 +393,10 @@ namespace _Game.Systems.Crafting
                 {
                     if (pi.itemData == null) continue;
                     Rect itemRect = new Rect(2f, itemY, rightWidth - 28f, buttonHeight);
-                    GUI.Label(new Rect(itemRect.x, itemRect.y, itemRect.width - 70f, itemRect.height),
+                    GUI.Label(new Rect(itemRect.x, itemRect.y, itemRect.width - 68f, itemRect.height),
                         $"{pi.itemData.itemName} ×{pi.count}", _labelStyle);
 
-                    Rect takeBtn = new Rect(itemRect.x + itemRect.width - 66f, itemRect.y, 62f, buttonHeight);
+                    Rect takeBtn = new Rect(itemRect.x + itemRect.width - 64f, itemRect.y + 1f, 60f, 24f);
                     GUI.backgroundColor = btnColor;
                     if (GUI.Button(takeBtn, "取出", _btnStyle))
                     {
@@ -408,44 +409,45 @@ namespace _Game.Systems.Crafting
                     }
                     GUI.backgroundColor = Color.white;
 
-                    itemY += buttonHeight + 4f;
+                    itemY += buttonHeight + 3f;
                 }
 
                 GUI.EndScrollView();
-                curY += Mathf.Min(outViewH, outSlot.placedItems.Count * (buttonHeight + 4f)) + 6f;
+                curY += Mathf.Min(outViewH, outSlot.placedItems.Count * (buttonHeight + 3f)) + 2f;
+
+                // 取出全部
+                Rect takeAllBtn = new Rect(x + 6f, curY, 90f, 22f);
+                GUI.backgroundColor = btnColor;
+                if (GUI.Button(takeAllBtn, "取出全部", _btnStyle))
+                    TakeAllOutput();
+                GUI.backgroundColor = Color.white;
+                curY += 26f;
             }
             else
             {
-                GUI.Label(new Rect(x + 8f, curY, rightWidth - 16f, 20f), "(空)", _dimStyle);
-                curY += 24f;
+                GUI.Label(new Rect(x + 8f, curY, rightWidth - 16f, 16f), "(空)", _dimStyle);
+                curY += 20f;
             }
 
-            // 取出全部
-            if (outSlot != null && outSlot.placedItems != null && outSlot.placedItems.Count > 0)
-            {
-                Rect takeAllBtn = new Rect(x + 6f, curY, 100f, 26f);
-                GUI.backgroundColor = btnColor;
-                if (GUI.Button(takeAllBtn, "取出全部", _btnStyle))
-                {
-                    TakeAllOutput();
-                }
-                GUI.backgroundColor = Color.white;
-                curY += 30f;
-            }
-
+            // ====== 分隔线 ======
             curY += 4f;
+            GUI.color = new Color(0.35f, 0.35f, 0.35f, 0.6f);
+            GUI.DrawTexture(new Rect(x + 8f, curY, rightWidth - 18f, 1f), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            curY += 6f;
 
-            // 输入槽
-            GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 20f), "输入材料", _sectionHeaderStyle);
-            curY += 22f;
+            // ====== 下半区：输入材料 + 提交按钮 ======
+
+            GUI.Label(new Rect(x + 6f, curY, rightWidth - 12f, 18f), "┃ 输入材料", _sectionHeaderStyle);
+            curY += 20f;
 
             var inSlot = _currentDevice.InputSlot;
             if (inSlot != null && inSlot.placedItems != null && inSlot.placedItems.Count > 0)
             {
-                float inViewH = 80f;
+                float inViewH = 50f; // 紧凑高度
                 float inTotalH = inSlot.placedItems.Count * (buttonHeight + 2f);
                 _inputScrollPos = GUI.BeginScrollView(
-                    new Rect(x + 2f, curY, rightWidth - 6f, Mathf.Min(inViewH, inTotalH + 6f)),
+                    new Rect(x + 2f, curY, rightWidth - 6f, Mathf.Min(inViewH, inTotalH + 4f)),
                     _inputScrollPos,
                     new Rect(0, 0, rightWidth - 24f, inTotalH));
 
@@ -454,21 +456,23 @@ namespace _Game.Systems.Crafting
                 foreach (var pi in inItems)
                 {
                     if (pi.itemData == null) continue;
-                    GUI.Label(new Rect(2f, itemY, rightWidth - 28f, buttonHeight),
+                    GUI.Label(new Rect(2f, itemY, rightWidth - 28f, 22f),
                         $"{pi.itemData.itemName} ×{pi.count}", _dimStyle);
-                    itemY += buttonHeight + 2f;
+                    itemY += 24f;
                 }
 
                 GUI.EndScrollView();
-                curY += Mathf.Min(inViewH, inSlot.placedItems.Count * (buttonHeight + 2f)) + 6f;
+                curY += Mathf.Min(inViewH, inSlot.placedItems.Count * 24f) + 4f;
             }
             else
             {
-                GUI.Label(new Rect(x + 8f, curY, rightWidth - 16f, 20f), "(空)", _dimStyle);
-                curY += 24f;
+                GUI.Label(new Rect(x + 8f, curY, rightWidth - 16f, 16f), "(空)", _dimStyle);
+                curY += 20f;
             }
 
-            // 补充材料按钮
+            curY += 4f;
+
+            // ====== 补充材料按钮（自然流布局，不钉死底部） ======
             if (_selectedRecipeIdx >= 0 && _deviceData.recipes != null &&
                 _selectedRecipeIdx < _deviceData.recipes.Length)
             {
@@ -477,8 +481,14 @@ namespace _Game.Systems.Crafting
 
                 if (isMulti)
                 {
-                    // 多材料：显示所有材料需求，逐一补充
                     var reqs = selRecipe.inputs;
+                    // 如果按钮会超出面板底部，则从底部往上排
+                    float totalBtnH = reqs.Length * 32f;
+                    float btnStartY = curY + 2f;
+                    float btnEndY = btnStartY + totalBtnH;
+                    if (btnEndY > contentBottom)
+                        btnStartY = Mathf.Max(y + 6f + 80f, contentBottom - totalBtnH);
+
                     for (int ri = 0; ri < reqs.Length; ri++)
                     {
                         var req = reqs[ri];
@@ -486,14 +496,13 @@ namespace _Game.Systems.Crafting
                         int canSupply = _playerInv != null ? _playerInv.GetItemCount(req.itemData) : 0;
                         bool canFeed = canSupply >= req.count;
 
-                        curY = Mathf.Max(curY + 2f, panel.y + panel.height - padding * 2 - 50f - (reqs.Length - 1 - ri) * 36f);
-
-                        Rect supplyBtn = new Rect(x + 6f, curY, rightWidth - 14f, 28f);
+                        float btnY = btnStartY + ri * 32f;
+                        Rect supplyBtn = new Rect(x + 6f, btnY, rightWidth - 14f, 28f);
                         GUI.enabled = canFeed;
                         GUI.backgroundColor = canFeed ? btnColor : new Color(0.3f, 0.3f, 0.3f, 0.6f);
                         string supplyText = canFeed
-                            ? $"补充 {ItemName(req.itemData)}×{req.count}  拥有: {canSupply}"
-                            : $"不足 {ItemName(req.itemData)}×{req.count}  拥有: {canSupply}";
+                            ? $"▼ 补充 {ItemName(req.itemData)}×{req.count}  (拥有:{canSupply})"
+                            : $"✗ 不足 {ItemName(req.itemData)}×{req.count}  (拥有:{canSupply})";
                         if (GUI.Button(supplyBtn, supplyText, _btnStyle))
                             SupplyInput(req.itemData, req.count);
                         GUI.backgroundColor = Color.white;
@@ -505,20 +514,56 @@ namespace _Game.Systems.Crafting
                     int canSupply = _playerInv != null ? _playerInv.GetItemCount(selRecipe.input) : 0;
                     bool canFeed = canSupply >= selRecipe.inputCount;
 
-                    curY = Mathf.Max(curY + 2f, panel.y + panel.height - padding * 2 - 50f);
+                    // 自然流，若贴底则上移
+                    float btnY = curY + 4f;
+                    if (btnY + 32f > contentBottom)
+                        btnY = contentBottom - 32f;
 
-                    Rect supplyBtn = new Rect(x + 6f, curY, rightWidth - 14f, 32f);
+                    Rect supplyBtn = new Rect(x + 6f, btnY, rightWidth - 14f, 30f);
                     GUI.enabled = canFeed;
                     GUI.backgroundColor = canFeed ? btnColor : new Color(0.3f, 0.3f, 0.3f, 0.6f);
                     string supplyText = canFeed
-                        ? $"补充材料 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  拥有: {canSupply}"
-                        : $"材料不足 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  拥有: {canSupply}";
+                        ? $"▼ 补充材料 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  (拥有:{canSupply})"
+                        : $"✗ 材料不足 ({ItemName(selRecipe.input)}×{selRecipe.inputCount})  (拥有:{canSupply})";
                     if (GUI.Button(supplyBtn, supplyText, _btnStyle))
-                    {
                         SupplyInput(selRecipe.input, selRecipe.inputCount);
-                    }
                     GUI.backgroundColor = Color.white;
                     GUI.enabled = true;
+                }
+            }
+        }
+
+        /// <summary>紧凑型链接区</summary>
+        void DrawLinkSectionCompact(float x, ref float curY, float width)
+        {
+            if (_currentDevice == null) return;
+
+            var dest = _currentDevice.OutputDestination;
+            if (dest != null)
+            {
+                string destName = dest.Data != null ? dest.Data.deviceName : "???";
+                GUI.Label(new Rect(x + 6f, curY, width - 80f, 18f),
+                    $"→ 链接: {destName}", _dimStyle);
+
+                Rect unlinkBtn = new Rect(x + width - 68f, curY, 62f, 20f);
+                GUI.backgroundColor = new Color(0.7f, 0.15f, 0.15f, 1f);
+                if (GUI.Button(unlinkBtn, "断开", _btnStyle))
+                    _currentDevice.OutputDestination = null;
+                GUI.backgroundColor = Color.white;
+                curY += 22f;
+            }
+            else if (_nearbyDevices != null && _nearbyDevices.Length > 0)
+            {
+                // 只显示一行可链接设备提示
+                int linkable = 0;
+                foreach (var d in _nearbyDevices)
+                    if (d != null && d.Data != null && CanLinkTo(d)) linkable++;
+
+                if (linkable > 0)
+                {
+                    GUI.Label(new Rect(x + 6f, curY, width - 12f, 18f),
+                        $"可链接 {linkable} 个设备", _dimStyle);
+                    curY += 18f;
                 }
             }
         }
