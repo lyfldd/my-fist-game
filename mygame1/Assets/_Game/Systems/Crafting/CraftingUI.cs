@@ -120,7 +120,7 @@ namespace _Game.Systems.Crafting
             _selectedRecipe = null;
         }
 
-        void Close()
+        public void Close()
         {
             _isVisible = false;
             _selectedRecipe = null;

@@ -23,7 +23,7 @@ namespace _Game.Systems.Crafting
         public float padding = 10f;
 
         [Header("颜色")]
-        public Color bgColor = new Color(0.08f, 0.08f, 0.08f, 0.92f);
+        public Color bgColor = new Color(0.06f, 0.06f, 0.06f, 0.97f);
         public Color headerColor = new Color(0.15f, 0.15f, 0.15f, 1f);
         public Color sectionBgColor = new Color(0.12f, 0.12f, 0.12f, 0.8f);
         public Color btnColor = new Color(0f, 0.5f, 0f, 1f);
@@ -129,6 +129,13 @@ namespace _Game.Systems.Crafting
             var containerWin = Object.FindObjectOfType<_Game.Systems.WorldContainer.ContainerWindowUI>();
             if (containerWin != null)
                 containerWin.CloseWindow();
+
+            // 关闭旧工作台UI，避免透出老UI残影
+            var craftingUI = Object.FindObjectOfType<CraftingUI>();
+            if (craftingUI != null) craftingUI.Close();
+
+            var researchUI = Object.FindObjectOfType<ChemicalResearchUI>();
+            if (researchUI != null) researchUI.Close();
         }
 
         void OnGUI()

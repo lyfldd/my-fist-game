@@ -41,6 +41,11 @@ namespace _Game.Systems.Crafting
             InputRouter.UnbindAll(this);
         }
 
+        public void Close()
+        {
+            _isVisible = false;
+        }
+
         bool HandleEsc()
         {
             if (!_isVisible) return false;
