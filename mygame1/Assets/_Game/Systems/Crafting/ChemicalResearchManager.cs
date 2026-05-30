@@ -21,6 +21,30 @@ namespace _Game.Systems.Crafting
                 _researchData = Resources.Load<ChemicalResearchData>("ChemicalResearchData");
         }
 
+        /// <summary>
+        /// 检查配方 ID 是否已被研究解锁。不在研究项目中的配方默认解锁。
+        /// </summary>
+        public bool IsRecipeUnlocked(string recipeId)
+        {
+            if (DevTools.FreeBuildEnabled) return true;
+            if (_researchData == null) return true;
+            foreach (var proj in _researchData.projects)
+            {
+                if (proj.unlockedRecipeIds == null) continue;
+                foreach (var rid in proj.unlockedRecipeIds)
+                    if (rid == recipeId && IsResearched(proj.researchId))
+                        return true;
+            }
+            // 检查该配方是否在任何研究项目中；若不在，默认解锁
+            foreach (var proj in _researchData.projects)
+            {
+                if (proj.unlockedRecipeIds == null) continue;
+                foreach (var rid in proj.unlockedRecipeIds)
+                    if (rid == recipeId) return false;
+            }
+            return true;
+        }
+
         public bool IsResearched(string researchId)
         {
             // 自由建造模式：所有研究视为已完成
