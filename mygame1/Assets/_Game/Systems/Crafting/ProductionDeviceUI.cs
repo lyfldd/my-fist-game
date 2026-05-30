@@ -47,6 +47,9 @@ namespace _Game.Systems.Crafting
         void Awake()
         {
             _playerInv = Object.FindObjectOfType<Inventory.Inventory>();
+            // 强制不透明，防止 Inspector 旧序列化值导致透出残影
+            bgColor = new Color(0.06f, 0.06f, 0.06f, 1f);
+            sectionBgColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
         }
 
         void OnEnable()
@@ -136,6 +139,10 @@ namespace _Game.Systems.Crafting
 
             var researchUI = Object.FindObjectOfType<ChemicalResearchUI>();
             if (researchUI != null) researchUI.Close();
+
+            // 关闭电力/终端面板（同在屏幕正中，会叠影）
+            _Game.UI.PowerSourceUI.Hide();
+            _Game.UI.TerminalUI.Hide();
         }
 
         void OnGUI()
