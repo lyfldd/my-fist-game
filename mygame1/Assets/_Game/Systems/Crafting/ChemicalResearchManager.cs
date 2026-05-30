@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using _Game.Config;
+using _Game.UI;
 
 namespace _Game.Systems.Crafting
 {
@@ -20,10 +21,17 @@ namespace _Game.Systems.Crafting
                 _researchData = Resources.Load<ChemicalResearchData>("ChemicalResearchData");
         }
 
-        public bool IsResearched(string researchId) => _completedIds.Contains(researchId);
+        public bool IsResearched(string researchId)
+        {
+            // 自由建造模式：所有研究视为已完成
+            if (DevTools.FreeBuildEnabled) return true;
+            return _completedIds.Contains(researchId);
+        }
 
         public bool IsDeviceUnlocked(string deviceName)
         {
+            // 自由建造模式：所有设备视为已解锁
+            if (DevTools.FreeBuildEnabled) return true;
             if (_researchData == null) return true; // 无研究数据时全部解锁
             foreach (var proj in _researchData.projects)
             {
