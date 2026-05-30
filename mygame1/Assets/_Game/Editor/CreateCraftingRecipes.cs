@@ -1066,6 +1066,7 @@ public static class CreateCraftingRecipes
             new[] { M("CarbonFiber", 4), M("ServoMotor", 3), M("OpticalLens", 2), M("ChipSet", 1) },
             new[] { (SkillType.建造拆解, 10), (SkillType.智力, 8) });
 
+
         // 电子/智能设备
         CreateRecipe(S, "气象预测仪", RecipeCategory.Tool,
             GetItem("Meteorologist"), 1, 10f, 45f,

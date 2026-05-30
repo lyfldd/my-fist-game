@@ -18,174 +18,937 @@ MonoBehaviour:
     description: "\u89E3\u9501\u51B2\u538B\u673A\u3001\u7C89\u788E\u673A\u3001\u56DE\u6536\u7AD9"
     cost:
     - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
-      count: 2
+      count: 6
     - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
-      count: 5
+      count: 15
     - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 3
+      count: 9
     unlockedDeviceNames:
     - "\u51B2\u538B\u673A"
     - "\u7C89\u788E\u673A"
     - "\u56DE\u6536\u7AD9"
-    requiredIntellectLevel: 1
-  - researchId: Metal_Precision
-    displayName: "\u7CBE\u5BC6\u91D1\u5C5E\u5236\u9020"
-    description: "\u89E3\u9501\u8F66\u5E8A\u3001\u88C5\u914D\u53F0\u3001\u5DE5\u4E1A\u7089"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 2
+    tier: 0
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Chem_Basic
+    displayName: "\u57FA\u7840\u5316\u5B66"
+    description: "\u89E3\u9501\u53D1\u9175\u7F50\u3001\u84B8\u998F\u5668"
     cost:
     - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 6
+    unlockedDeviceNames:
+    - "\u53D1\u9175\u7F50"
+    - "\u84B8\u998F\u5668"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 2
+    tier: 0
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Energy_Basic
+    displayName: "\u57FA\u7840\u80FD\u6E90"
+    description: "\u89E3\u9501\u811A\u8E0F\u53D1\u7535\u673A\u3001\u592A\u9633\u80FD\u677F\u3001\u98CE\u8F66"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
       count: 3
+    unlockedDeviceNames:
+    - "\u811A\u8E0F\u53D1\u7535\u673A"
+    - "\u592A\u9633\u80FD\u677F"
+    - "\u98CE\u8F66"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 3
+    tier: 0
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Textile_Food
+    displayName: "\u7EBA\u7EC7\u98DF\u54C1"
+    description: "\u89E3\u9501\u7EC7\u5E03\u673A\u3001\u952F\u6728\u673A\u3001\u718F\u5236\u623F\u3001\u70AD\u7A91\u3001\u7F50\u5934\u5C01\u88C5\u673A"
+    cost:
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 5035ff820c2e0df438f3c8974aa05954, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 58a40d65a9ad1fa43849e3e00f79a627, type: 2}
+      count: 30
+    unlockedDeviceNames:
+    - "\u7EC7\u5E03\u673A"
+    - "\u952F\u6728\u673A"
+    - "\u718F\u5236\u623F"
+    - "\u70AD\u7A91"
+    - "\u7F50\u5934\u5C01\u88C5\u673A"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 3
+    tier: 0
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Water_Basic
+    displayName: "\u6C34\u6E90\u5165\u95E8"
+    description: "\u89E3\u9501\u6C34\u6CF5"
+    cost:
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 44cc5e357208c3c4fa5ad3424733fe87, type: 2}
+      count: 6
+    unlockedDeviceNames:
+    - "\u6C34\u6CF5"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 4
+    tier: 0
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Metal_Precision
+    displayName: "\u7CBE\u5BC6\u91D1\u5C5E\u5236\u9020"
+    description: "\u89E3\u9501\u8F66\u5E8A\u3001\u88C5\u914D\u53F0\u3001\u5DE5\u4E1A\u7089\u3002\u7814\u7A76\u540E\u5C55\u5F00\u5B50\u9879"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 9
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
-      count: 2
+      count: 6
     - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
-      count: 5
+      count: 15
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 3
+      count: 9
     unlockedDeviceNames:
     - "\u8F66\u5E8A"
     - "\u88C5\u914D\u53F0"
     - "\u5DE5\u4E1A\u7089"
-    requiredIntellectLevel: 3
-  - researchId: Metal_Weapon
-    displayName: "\u6B66\u5668\u5F39\u836F\u5DE5\u827A"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 5
+    tier: 1
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_Pistol
+    displayName: "\u624B\u67AA\u914D\u65B9"
+    description: "\u7814\u7A76\u624B\u67AA\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 3
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Pistol
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_Shotgun
+    displayName: "\u9730\u5F39\u67AA\u914D\u65B9"
+    description: "\u7814\u7A76\u9730\u5F39\u67AA\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 8
+    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+      count: 4
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Shotgun
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_Rifle
+    displayName: "\u6B65\u67AA\u914D\u65B9"
+    description: "\u7814\u7A76\u6B65\u67AA\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 18
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 10
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Rifle
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_HuntingRifle
+    displayName: "\u730E\u67AA\u914D\u65B9"
+    description: "\u7814\u7A76\u730E\u67AA\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 2
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - HuntingRifle
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_PistolAmmo
+    displayName: "\u624B\u67AA\u5F39\u836F\u6279\u91CF"
+    description: "\u7814\u7A76\u624B\u67AA\u5F39\u836F\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - PistolAmmo_Bulk
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_ShotgunAmmo
+    displayName: "\u9730\u5F39\u5F39\u836F\u6279\u91CF"
+    description: "\u7814\u7A76\u9730\u5F39\u5F39\u836F\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 8
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - ShotgunAmmo_Bulk
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_RifleAmmo
+    displayName: "\u6B65\u67AA\u5F39\u836F\u6279\u91CF"
+    description: "\u7814\u7A76\u6B65\u67AA\u5F39\u836F\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 10
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - RifleAmmo_Bulk
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_Suppressor
+    displayName: "\u6D88\u97F3\u5668\u914D\u65B9"
+    description: "\u7814\u7A76\u6D88\u97F3\u5668\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 10c11da71af05654da841269abb6cff2, type: 2}
+      count: 3
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Suppressor
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_SemiAutoKit
+    displayName: "\u534A\u81EA\u52A8\u6539\u9020\u5957\u4EF6"
+    description: "\u7814\u7A76\u534A\u81EA\u52A8\u6539\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - SemiAutoKit
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Recipe_FullAutoKit
+    displayName: "\u5168\u81EA\u52A8\u6539\u9020\u5957\u4EF6"
+    description: "\u7814\u7A76\u5168\u81EA\u52A8\u6539\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 2
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - FullAutoKit
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Metal_Precision
+    isCategory: 0
+  - researchId: Weapon_Advanced
+    displayName: "\u9AD8\u7EA7\u6B66\u5668\u5DE5\u827A"
     description: "\u89E3\u9501\u5F39\u836F\u88C5\u586B\u673A\u3001\u6B66\u5668\u7EC4\u88C5\u53F0"
     cost:
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
-      count: 3
+      count: 9
     - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
-      count: 2
-    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
       count: 6
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 18
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 4
+      count: 12
     unlockedDeviceNames:
     - "\u5F39\u836F\u88C5\u586B\u673A"
     - "\u6B66\u5668\u7EC4\u88C5\u53F0"
-    requiredIntellectLevel: 5
-  - researchId: Elec_Basic
-    displayName: "\u57FA\u7840\u7535\u5DE5\u5B66"
-    description: "\u89E3\u9501\u62C9\u7EBF\u673A\u3001\u7535\u6C60\u751F\u4EA7\u7EBF"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 7
+    tier: 1
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_HeavySniper
+    displayName: "\u91CD\u72D9\u914D\u65B9"
+    description: "\u7814\u7A76\u91CD\u578B\u72D9\u51FB\u6B65\u67AA\u5236\u9020"
     cost:
-    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
-      count: 2
-    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 6
-    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
       count: 1
-    unlockedDeviceNames:
-    - "\u62C9\u7EBF\u673A"
-    - "\u7535\u6C60\u751F\u4EA7\u7EBF"
-    requiredIntellectLevel: 4
-  - researchId: Elec_Advanced
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - HeavySniper
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Weapon_Advanced
+    isCategory: 0
+  - researchId: Recipe_GrenadeLauncher
+    displayName: "\u69B4\u5F39\u914D\u65B9"
+    description: "\u7814\u7A76\u69B4\u5F39\u53D1\u5C04\u5668\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 18
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 12
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - GrenadeLauncher
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Weapon_Advanced
+    isCategory: 0
+  - researchId: Recipe_APRounds
+    displayName: "\u7A7F\u7532\u5F39\u914D\u65B9"
+    description: "\u7814\u7A76\u7A7F\u7532\u5F39\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 373aa88f14d49e04698c2239633356d2, type: 2}
+      count: 8
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - APRounds
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Weapon_Advanced
+    isCategory: 0
+  - researchId: Recipe_Railgun
+    displayName: "\u7535\u78C1\u6B65\u67AA\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u78C1\u6B65\u67AA\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 15
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Railgun
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Weapon_Advanced
+    isCategory: 0
+  - researchId: Elec_Engineering
     displayName: "\u7535\u5B50\u5DE5\u7A0B"
     description: "\u89E3\u9501\u7535\u5B50\u88C5\u914D\u673A\u3001\u7535\u8DEF\u5370\u5237\u673A\u3001\u5E7F\u64AD\u5854"
     cost:
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
-      count: 3
+      count: 9
     - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 4
+      count: 12
     - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
-      count: 3
+      count: 9
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 2
+      count: 6
     unlockedDeviceNames:
     - "\u7535\u5B50\u88C5\u914D\u673A"
     - "\u7535\u8DEF\u5370\u5237\u673A"
     - "\u5E7F\u64AD\u5854"
+    unlockedRecipeIds: []
     requiredIntellectLevel: 6
-  - researchId: Elec_Precision
-    displayName: "\u7CBE\u5BC6\u7535\u5B50\u6280\u672F"
-    description: "\u89E3\u9501\u7CBE\u5BC6\u88C5\u914D\u53F0\u3001\u7535\u89E3\u69FD"
+    tier: 1
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_ChipSet
+    displayName: "\u82AF\u7247\u7EC4\u914D\u65B9"
+    description: "\u7814\u7A76\u82AF\u7247\u7EC4\u6279\u91CF\u751F\u4EA7"
     cost:
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 12
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - ChipSet
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Elec_Engineering
+    isCategory: 0
+  - researchId: Recipe_AICore
+    displayName: "AI\u6838\u5FC3\u914D\u65B9"
+    description: "\u7814\u7A76AI\u6838\u5FC3\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
       count: 4
     - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
-      count: 4
-    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
-      count: 1
-    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 4
-    unlockedDeviceNames:
-    - "\u7CBE\u5BC6\u88C5\u914D\u53F0"
-    - "\u7535\u89E3\u69FD"
-    requiredIntellectLevel: 8
-  - researchId: Chem_Organic
-    displayName: "\u6709\u673A\u5316\u5B66"
-    description: "\u89E3\u9501\u53D1\u9175\u7F50\u3001\u84B8\u998F\u5668\u3001\u5236\u836F\u53F0\u3001\u7F50\u5934\u5C01\u88C5\u673A"
-    cost:
-    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
-      count: 3
-    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
-      count: 2
-    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
-      count: 4
-    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 3
-    unlockedDeviceNames:
-    - "\u53D1\u9175\u7F50"
-    - "\u84B8\u998F\u5668"
-    - "\u5236\u836F\u53F0"
-    - "\u7F50\u5934\u5C01\u88C5\u673A"
-    requiredIntellectLevel: 2
-  - researchId: Chem_Explosive
-    displayName: "\u7206\u70B8\u7269\u5316\u5B66"
-    description: "\u89E3\u9501\u706B\u836F\u5382\u3001\u79BB\u5FC3\u673A"
-    cost:
-    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
-      count: 4
+      count: 12
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - AICore
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Elec_Engineering
+    isCategory: 0
+  - researchId: Recipe_ServoMotor
+    displayName: "\u4F3A\u670D\u7535\u673A\u914D\u65B9"
+    description: "\u7814\u7A76\u4F3A\u670D\u7535\u673A\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
       count: 3
-    - itemData: {fileID: 11400000, guid: 5b27705889f568f439bade8882695125, type: 2}
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - ServoMotor
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Elec_Engineering
+    isCategory: 0
+  - researchId: Recipe_CapacitorBank
+    displayName: "\u7535\u5BB9\u7EC4\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u5BB9\u7EC4\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - CapacitorBank
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Elec_Engineering
+    isCategory: 0
+  - researchId: Recipe_AutoTurret
+    displayName: "\u81EA\u52A8\u70AE\u5854\u914D\u65B9"
+    description: "\u7814\u7A76\u81EA\u52A8\u70AE\u5854\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 0b58d8455c4405b43810bf897332e8b5, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: c0128cf8b31bdc048b87330dca405c4c, type: 2}
       count: 3
-    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
       count: 4
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - AutoTurret
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Elec_Engineering
+    isCategory: 0
+  - researchId: Chem_Advanced
+    displayName: "\u9AD8\u7B49\u5316\u5B66"
+    description: "\u89E3\u9501\u706B\u836F\u5382\u3001\u79BB\u5FC3\u673A\u3001\u5236\u836F\u53F0"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 5b27705889f568f439bade8882695125, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
+      count: 12
     unlockedDeviceNames:
     - "\u706B\u836F\u5382"
     - "\u79BB\u5FC3\u673A"
+    - "\u5236\u836F\u53F0"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 6
+    tier: 1
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_GunpowderBulk
+    displayName: "\u706B\u836F\u6279\u91CF\u914D\u65B9"
+    description: "\u7814\u7A76\u706B\u836F\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 01533d2526daaec4dac697ff434d4b5b, type: 2}
+      count: 12
+    - itemData: {fileID: 0}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Gunpowder_Bulk
     requiredIntellectLevel: 5
-  - researchId: Chem_Bio
-    displayName: "\u751F\u7269\u5316\u5B66\u6280\u672F"
-    description: "\u89E3\u9501\u57FA\u56E0\u5206\u6790\u53F0\u3001\u51C0\u6C34\u5382"
+    tier: 2
+    parentResearchId: Chem_Advanced
+    isCategory: 0
+  - researchId: Recipe_FirstAidKit
+    displayName: "\u6025\u6551\u5305\u914D\u65B9"
+    description: "\u7814\u7A76\u6025\u6551\u5305\u5236\u9020"
     cost:
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
-      count: 5
+      count: 6
     - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
-      count: 3
+      count: 6
+    - itemData: {fileID: 0}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - FirstAidKit
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Chem_Advanced
+    isCategory: 0
+  - researchId: Recipe_SurgeryKit
+    displayName: "\u624B\u672F\u5305\u914D\u65B9"
+    description: "\u7814\u7A76\u624B\u672F\u5305\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 9
     - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
       count: 6
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 4
-    unlockedDeviceNames:
-    - "\u57FA\u56E0\u5206\u6790\u53F0"
-    - "\u51C0\u6C34\u5382"
-    requiredIntellectLevel: 8
-  - researchId: Energy_Core
-    displayName: "\u6838\u5FC3\u80FD\u6E90\u6280\u672F"
-    description: "\u89E3\u9501\u53D1\u7535\u673A\u3001\u592A\u9633\u80FD\u677F"
-    cost:
-    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
       count: 3
-    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 5
-    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
-      count: 2
-    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 3
-    unlockedDeviceNames:
-    - "\u53D1\u7535\u673A"
-    - "\u592A\u9633\u80FD\u677F"
-    requiredIntellectLevel: 5
-  - researchId: Energy_Nuclear
-    displayName: "\u6838\u7269\u7406\u5E94\u7528"
-    description: "\u89E3\u9501\u6838\u7535\u7AD9"
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - SurgeryKit
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Chem_Advanced
+    isCategory: 0
+  - researchId: Recipe_Plastic
+    displayName: "\u5851\u6599\u914D\u65B9"
+    description: "\u7814\u7A76\u5851\u6599\u5408\u6210"
     cost:
     - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: f70cc5ce565e4a348983403880e801cb, type: 2}
       count: 6
-    - itemData: {fileID: 11400000, guid: e00357cbb5a67844ea7ef50cfcf11b55, type: 2}
-      count: 8
-    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
-      count: 2
+    - itemData: {fileID: 11400000, guid: 01533d2526daaec4dac697ff434d4b5b, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - Plastic
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Chem_Advanced
+    isCategory: 0
+  - researchId: Recipe_VaccineSerum
+    displayName: "\u75AB\u82D7\u8840\u6E05\u914D\u65B9"
+    description: "\u7814\u7A76\u75AB\u82D7\u8840\u6E05\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
+      count: 20
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - VaccineSerum
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Chem_Advanced
+    isCategory: 0
+  - researchId: Energy_Power
+    displayName: "\u7535\u529B\u5DE5\u7A0B"
+    description: "\u89E3\u9501\u53D1\u7535\u673A\u3001\u7535\u89E3\u69FD\u3001\u62C9\u7EBF\u673A\u3001\u7535\u6C60\u751F\u4EA7\u7EBF"
+    cost:
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 9
+    unlockedDeviceNames:
+    - "\u53D1\u7535\u673A"
+    - "\u7535\u89E3\u69FD"
+    - "\u62C9\u7EBF\u673A"
+    - "\u7535\u6C60\u751F\u4EA7\u7EBF"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 6
+    tier: 1
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_BatteryPackBulk
+    displayName: "\u7535\u6C60\u7EC4\u6279\u91CF\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u6C60\u7EC4\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: bf1625afe239fc6469f17f714cc4682b, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 3
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - BatteryPack_Bulk
+    requiredIntellectLevel: 5
+    tier: 2
+    parentResearchId: Energy_Power
+    isCategory: 0
+  - researchId: Recipe_CircuitBoardBulk
+    displayName: "\u7535\u8DEF\u677F\u6279\u91CF\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u8DEF\u677F\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - CircuitBoard_Bulk
+    requiredIntellectLevel: 6
+    tier: 2
+    parentResearchId: Energy_Power
+    isCategory: 0
+  - researchId: Recipe_CapacitorBankBulk
+    displayName: "\u7535\u5BB9\u7EC4\u6279\u91CF\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u5BB9\u7EC4\u91CF\u4EA7"
+    cost:
+    - itemData: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - CapacitorBank_Bulk
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Energy_Power
+    isCategory: 0
+  - researchId: Material_Science
+    displayName: "\u6750\u6599\u79D1\u5B66"
+    description: "\u89E3\u9501\u9AD8\u7EA7\u6750\u6599\u914D\u65B9"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: cb1ad6dc6447f2043b6112d714c8ae2e, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    unlockedDeviceNames: []
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_TitaniumAlloy
+    displayName: "\u949B\u5408\u91D1\u914D\u65B9"
+    description: "\u7814\u7A76\u949B\u5408\u91D1\u7194\u70BC"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: cb1ad6dc6447f2043b6112d714c8ae2e, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - TitaniumAlloy
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Material_Science
+    isCategory: 0
+  - researchId: Recipe_CarbonFiber
+    displayName: "\u78B3\u7EA4\u7EF4\u914D\u65B9"
+    description: "\u7814\u7A76\u78B3\u7EA4\u7EF4\u5408\u6210"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 44cc5e357208c3c4fa5ad3424733fe87, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 9
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
       count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - CarbonFiber
+    requiredIntellectLevel: 7
+    tier: 2
+    parentResearchId: Material_Science
+    isCategory: 0
+  - researchId: Recipe_AdvAlloy
+    displayName: "\u9AD8\u7EA7\u5408\u91D1\u590D\u5408\u6750\u6599"
+    description: "\u7814\u7A76\u9AD8\u7EA7\u5408\u91D1"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 10c11da71af05654da841269abb6cff2, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - AdvAlloyComposite
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Material_Science
+    isCategory: 0
+  - researchId: Recipe_GeneSample
+    displayName: "\u57FA\u56E0\u6837\u672C\u914D\u65B9"
+    description: "\u7814\u7A76\u57FA\u56E0\u6837\u672C\u63D0\u53D6"
+    cost:
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 15
+    - itemData: {fileID: 11400000, guid: 4556fab139e4c6848ae655f93cb18d76, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - GeneSample
+    requiredIntellectLevel: 8
+    tier: 2
+    parentResearchId: Material_Science
+    isCategory: 0
+  - researchId: Nuclear_Physics
+    displayName: "\u6838\u7269\u7406"
+    description: "\u89E3\u9501\u6838\u7535\u7AD9"
+    cost:
+    - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 15
+    - itemData: {fileID: 0}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 9
     unlockedDeviceNames:
     - "\u6838\u7535\u7AD9"
+    unlockedRecipeIds: []
+    requiredIntellectLevel: 9
+    tier: 3
+    parentResearchId: 
+    isCategory: 1
+  - researchId: Recipe_SmallReactor
+    displayName: "\u5C0F\u578B\u53CD\u5E94\u5806\u914D\u65B9"
+    description: "\u7814\u7A76\u5C0F\u578B\u6838\u53CD\u5E94\u5806\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 15
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - SmallReactor
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_FusionCoreSmall
+    displayName: "\u805A\u53D8\u6838\u5FC3(\u5C0F)\u914D\u65B9"
+    description: "\u7814\u7A76\u5C0F\u578B\u805A\u53D8\u6838\u5FC3"
+    cost:
+    - itemData: {fileID: 11400000, guid: 9456b7cb27bf9db489242b144929d6b6, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+      count: 6
+    - itemData: {fileID: 0}
+      count: 3
+    - itemData: {fileID: 0}
+      count: 1
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - FusionCore_Small
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_FusionCoreLarge
+    displayName: "\u805A\u53D8\u6838\u5FC3(\u5927)\u914D\u65B9"
+    description: "\u7814\u7A76\u5927\u578B\u805A\u53D8\u6838\u5FC3"
+    cost:
+    - itemData: {fileID: 11400000, guid: c2675b09ef039a14c9339d533d5262ca, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+      count: 12
+    - itemData: {fileID: 0}
+      count: 6
+    - itemData: {fileID: 0}
+      count: 2
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - FusionCore_Large
     requiredIntellectLevel: 10
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_PlasmaBattery
+    displayName: "\u7B49\u79BB\u5B50\u7535\u6C60\u914D\u65B9"
+    description: "\u7814\u7A76\u7B49\u79BB\u5B50\u7535\u6C60"
+    cost:
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 9a310524af253684ca90c616bb00ce31, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: 30a2605bb62fdad4ab7dcb7b1377f2f1, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - PlasmaBattery
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_SuperConductingCoil
+    displayName: "\u8D85\u5BFC\u7EBF\u5708\u914D\u65B9"
+    description: "\u7814\u7A76\u8D85\u5BFC\u7EBF\u5708"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 3
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - SuperConductingCoil
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_QuantumProcessor
+    displayName: "\u91CF\u5B50\u5904\u7406\u5668\u914D\u65B9"
+    description: "\u7814\u7A76\u91CF\u5B50\u5904\u7406\u5668"
+    cost:
+    - itemData: {fileID: 11400000, guid: 0b58d8455c4405b43810bf897332e8b5, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 12
+    - itemData: {fileID: 0}
+      count: 3
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 15
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - QuantumProcessor
+    requiredIntellectLevel: 10
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_EMFence
+    displayName: "\u7535\u78C1\u56F4\u680F\u914D\u65B9"
+    description: "\u7814\u7A76\u7535\u78C1\u56F4\u680F"
+    cost:
+    - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 12
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 6
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - EMFence
+    requiredIntellectLevel: 9
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0
+  - researchId: Recipe_MobileFortress
+    displayName: "\u79FB\u52A8\u8981\u585E\u914D\u65B9"
+    description: "\u7814\u7A76\u79FB\u52A8\u57FA\u5730\u8F66\u5236\u9020"
+    cost:
+    - itemData: {fileID: 11400000, guid: 0b58d8455c4405b43810bf897332e8b5, type: 2}
+      count: 2
+    - itemData: {fileID: 11400000, guid: c0128cf8b31bdc048b87330dca405c4c, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+      count: 20
+    - itemData: {fileID: 11400000, guid: 42097218651582744b45257b4d9b3cf1, type: 2}
+      count: 9
+    - itemData: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
+      count: 9
+    unlockedDeviceNames: []
+    unlockedRecipeIds:
+    - MobileFortress
+    requiredIntellectLevel: 10
+    tier: 2
+    parentResearchId: Nuclear_Physics
+    isCategory: 0

@@ -18,34 +18,38 @@ MonoBehaviour:
   tier: 3
   builtPrefab: {fileID: 940436833086658962, guid: 40ec9d7a734e41c499d02a71dfd644db, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
-    inputCount: 4
+  - recipeId: 
+    input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
+    inputCount: 12
     inputs: []
     output: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
     outputCount: 1
     baseTime: 5
-  - input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
-    inputCount: 6
+  - recipeId: 
+    input: {fileID: 11400000, guid: d16b4e6597f30c445beb3f822cbdf2cc, type: 2}
+    inputCount: 18
     inputs: []
     output: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
     outputCount: 1
-    baseTime: 6
-  - input: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
     inputCount: 1
     inputs: []
     output: {fileID: 11400000, guid: 83b0eec9edc39a249b7b742a01811b50, type: 2}
-    outputCount: 3
-    baseTime: 8
-  - input: {fileID: 11400000, guid: 3d7159b4f3d1c104ba1536d17a07840f, type: 2}
-    inputCount: 3
+    outputCount: 2
+    baseTime: 9
+  - recipeId: 
+    input: {fileID: 11400000, guid: 3d7159b4f3d1c104ba1536d17a07840f, type: 2}
+    inputCount: 9
     inputs: []
     output: {fileID: 11400000, guid: 44cc5e357208c3c4fa5ad3424733fe87, type: 2}
     outputCount: 1
     baseTime: 5
-  productionInterval: 6
+  productionInterval: 8
   batchSize: 1
   requiresFuel: 1
   fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
-  fuelPerCycle: 1
+  fuelPerCycle: 2
   acceptsAutomation: 1
   automationMultiplier: 2

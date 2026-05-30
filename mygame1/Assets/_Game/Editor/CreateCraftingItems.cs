@@ -203,6 +203,10 @@ public static class CreateCraftingItems
         Make(F, "VaccineSerum",  "疫苗原液",  C, 1, 1, 0.3f, 5,  ItemQuality.Professional);
         Make(F, "GeneSample",      "基因样本",  C, 1, 1, 0.1f, 5,  ItemQuality.Professional);
         Make(F, "EnrichedUranium","浓缩铀",    C, 1, 1, 3f,   3,  ItemQuality.Professional);
+
+        // 无人机组件（终局）
+        Make(F, "DroneBody",      "无人机机体",       C, 2, 1, 1.5f, 5, ItemQuality.Professional);
+        Make(F, "DroneChip",      "无人机操控芯片",   C, 1, 1, 0.3f, 5, ItemQuality.Professional);
     }
 
     // ================================================================
@@ -443,6 +447,10 @@ public static class CreateCraftingItems
         Make(F, "SemiAutoKit",        "半自动改造套件", C, 1, 1, 0.5f, 3, ItemQuality.Professional);
         Make(F, "FullAutoKit",        "全自动改造套件", C, 1, 1, 0.6f, 3, ItemQuality.Professional);
         Make(F, "SmallReactor",       "小型反应堆",     C, 2, 2, 6f,   1, ItemQuality.Professional);
+
+        // 无人机成品
+        Make(F, "Drone",              "无人机",           C, 2, 2, 3f,   3, ItemQuality.Professional);
+        Make(F, "DroneTerminal",      "无人机操控终端",   C, 2, 2, 2f,   1, ItemQuality.Professional);
     }
 
     // ================================================================

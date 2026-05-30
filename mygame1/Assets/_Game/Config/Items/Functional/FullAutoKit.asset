@@ -42,6 +42,9 @@ MonoBehaviour:
   itemEffects: []
   warmthValue: 0
   isWaterproof: 0
+  foodType: 
+  fuelValue: 0
+  healAmount: 0
   isFirearm: 0
   weaponDamage: 10
   weaponRange: 50
@@ -52,3 +55,7 @@ MonoBehaviour:
   spreadPerShot: 1.5
   magazineSize: 0
   range: 50
+  ammoItemName: 
+  gunshotSoundType: 
+  muzzleFlashType: 
+  reloadTime: 1.5

@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: "\u6811\u76AE\u7EF3"
   m_EditorClassIdentifier: 
   recipeName: "\u6811\u76AE\u7EF3"
+  recipeId: "\u6811\u76AE\u7EF3"
   icon: {fileID: 0}
   description: 
   category: 7
-  requiredStation: 4
+  requiredStation: 0
   isIndustrial: 0
   productionDeviceName: 
   skillRequirements: []

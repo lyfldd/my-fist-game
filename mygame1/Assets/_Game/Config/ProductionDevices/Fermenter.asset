@@ -18,25 +18,28 @@ MonoBehaviour:
   tier: 4
   builtPrefab: {fileID: 2866498013244288910, guid: 22ff41ed0f818cc43b64f4600e4885d7, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: f7f15f1b873d50b4db982012268e212a, type: 2}
-    inputCount: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: f7f15f1b873d50b4db982012268e212a, type: 2}
+    inputCount: 15
     inputs: []
     output: {fileID: 11400000, guid: 56ae03d1175e3614caabd50434675ccf, type: 2}
     outputCount: 2
-    baseTime: 6
-  - input: {fileID: 11400000, guid: ff9f65330505e0041972e6663a8c733d, type: 2}
-    inputCount: 4
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: ff9f65330505e0041972e6663a8c733d, type: 2}
+    inputCount: 12
     inputs: []
     output: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
     outputCount: 1
-    baseTime: 8
-  - input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
-    inputCount: 6
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: ac731062626bc3440898cf98dcdc03e8, type: 2}
+    inputCount: 18
     inputs: []
     output: {fileID: 11400000, guid: 646d183a3463227458e770c53429c614, type: 2}
     outputCount: 1
-    baseTime: 8
-  productionInterval: 6
+    baseTime: 5
+  productionInterval: 8
   batchSize: 1
   requiresFuel: 0
   fuelItem: {fileID: 0}

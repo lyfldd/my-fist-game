@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Buildable_DronePlatform
   m_EditorClassIdentifier: 
   displayName: "\u65E0\u4EBA\u673A\u5E73\u53F0"
-  description: "\u4FA6\u5BDF\u65E0\u4EBA\u673A\u8D77\u964D\u5E73\u53F0\u3002\u81EA\u52A8\u5DE1\u903B\u4FA6\u5BDF\uFF0C\u6807\u8BB0\u8303\u56F4\u5185\u50F5\u5C38\u4F4D\u7F6E\u3002"
+  description: "\u65E0\u4EBA\u673A\u96F6\u4EF6\u5236\u9020\u5DE5\u5382\u3002\u751F\u4EA7\u65E0\u4EBA\u673A\u673A\u4F53\u4E0E\u64CD\u63A7\u82AF\u7247\uFF0C\u4F9B\u7ED9\u7CBE\u5BC6\u88C5\u914D\u53F0\u7EC4\u88C5\u6210\u54C1\u3002"
   icon: {fileID: 0}
   category: 6
   previewPrefab: {fileID: 0}
@@ -61,6 +61,6 @@ MonoBehaviour:
   powerElectricSpeedMul: 2
   isWorkstation: 0
   workstationTier: 0
-  productionDeviceRef: {fileID: 0}
+  productionDeviceRef: {fileID: 11400000, guid: 6aea1191c6ba3654697e1a90cd95ac81, type: 2}
   industrialChain: 0
   producedItems: []

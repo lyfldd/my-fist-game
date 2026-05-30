@@ -18,34 +18,49 @@ MonoBehaviour:
   tier: 7
   builtPrefab: {fileID: 2359986791072710052, guid: cc310a1fbc0ffcb43910fde83627c724, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
-    inputCount: 2
+  - recipeId: 
+    input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 6
     inputs: []
     output: {fileID: 11400000, guid: ec2bb68afb3af7041af96a8ddff8dc0f, type: 2}
     outputCount: 1
     baseTime: 5
-  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
-    inputCount: 2
+  - recipeId: 
+    input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 6
     inputs: []
     output: {fileID: 11400000, guid: 2301d2e3f69788a4ca2eceab2497a5dc, type: 2}
     outputCount: 1
-    baseTime: 4
-  - input: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
-    inputCount: 2
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+    inputCount: 6
     inputs: []
     output: {fileID: 11400000, guid: fa9c547e61929f041b3345e0f6cbd6d5, type: 2}
     outputCount: 1
-    baseTime: 6
-  - input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
-    inputCount: 2
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+    inputCount: 6
     inputs: []
     output: {fileID: 11400000, guid: b6ddef43fdfcbbf4e98d21f448b8bb07, type: 2}
-    outputCount: 4
-    baseTime: 4
-  productionInterval: 5
+    outputCount: 3
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 685e9a232d2ee0348a98cc95e4829f38, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: cb1ad6dc6447f2043b6112d714c8ae2e, type: 2}
+      count: 3
+    output: {fileID: 11400000, guid: e2ecf0f963098a446bf40a5fdf687428, type: 2}
+    outputCount: 2
+    baseTime: 8
+  productionInterval: 6
   batchSize: 1
   requiresFuel: 1
   fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
-  fuelPerCycle: 1
+  fuelPerCycle: 2
   acceptsAutomation: 1
   automationMultiplier: 2

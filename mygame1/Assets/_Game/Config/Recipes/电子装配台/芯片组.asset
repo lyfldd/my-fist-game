@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: "\u82AF\u7247\u7EC4"
   m_EditorClassIdentifier: 
   recipeName: "\u82AF\u7247\u7EC4"
+  recipeId: "\u82AF\u7247\u7EC4"
   icon: {fileID: 0}
   description: 
   category: 7

@@ -18,19 +18,51 @@ MonoBehaviour:
   tier: 8
   builtPrefab: {fileID: 1946468266604860773, guid: f04633783bc58064090ade58eb95a933, type: 3}
   recipes:
-  - input: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
-    inputCount: 3
+  - recipeId: 
+    input: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+    inputCount: 9
     inputs: []
     output: {fileID: 11400000, guid: 3903d6682548a9b46b44ac7cecb80884, type: 2}
     outputCount: 1
-    baseTime: 10
-  - input: {fileID: 11400000, guid: 9207d954ab17788429f12e0c8233f1d3, type: 2}
-    inputCount: 2
+    baseTime: 12
+  - recipeId: 
+    input: {fileID: 11400000, guid: 9207d954ab17788429f12e0c8233f1d3, type: 2}
+    inputCount: 6
     inputs: []
     output: {fileID: 11400000, guid: c0128cf8b31bdc048b87330dca405c4c, type: 2}
     outputCount: 1
-    baseTime: 12
-  productionInterval: 10
+    baseTime: 14
+  - recipeId: 
+    input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: f772ee4ab1349f84ab3a235438cbab15, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: 49feaac9f9d52d942bad4da3cd42f281, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
+      count: 6
+    - itemData: {fileID: 11400000, guid: 632913750a821b44c85525bb0ed4008f, type: 2}
+      count: 1
+    output: {fileID: 11400000, guid: 5dc5f623761401e459177e458d369faf, type: 2}
+    outputCount: 1
+    baseTime: 20
+  - recipeId: 
+    input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 49feaac9f9d52d942bad4da3cd42f281, type: 2}
+      count: 1
+    - itemData: {fileID: 11400000, guid: 2bf3ec014e7dbff4f890bdd6770092fe, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: 8ed8a9cff28e7b449a719d05379b4329, type: 2}
+      count: 4
+    - itemData: {fileID: 11400000, guid: 83b0eec9edc39a249b7b742a01811b50, type: 2}
+      count: 8
+    output: {fileID: 11400000, guid: f2dfa4370293d85449ec118f181d813c, type: 2}
+    outputCount: 1
+    baseTime: 15
+  productionInterval: 12
   batchSize: 1
   requiresFuel: 0
   fuelItem: {fileID: 0}

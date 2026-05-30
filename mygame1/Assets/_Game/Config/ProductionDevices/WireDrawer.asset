@@ -18,26 +18,28 @@ MonoBehaviour:
   tier: 8
   builtPrefab: {fileID: 0}
   recipes:
-  - input: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-    inputCount: 1
+  - recipeId: 
+    input: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
+    inputCount: 3
     inputs: []
     output: {fileID: 11400000, guid: fa720b401b9e05043824730fc4d2d626, type: 2}
-    outputCount: 6
-    baseTime: 4
-  - input: {fileID: 0}
+    outputCount: 5
+    baseTime: 5
+  - recipeId: 
+    input: {fileID: 0}
     inputCount: 0
     inputs:
     - itemData: {fileID: 11400000, guid: 1e7d7d57fabaa5f44a3e6c9711ad42eb, type: 2}
-      count: 1
+      count: 3
     - itemData: {fileID: 11400000, guid: 44cc5e357208c3c4fa5ad3424733fe87, type: 2}
-      count: 1
+      count: 3
     output: {fileID: 11400000, guid: a4e85b03e38c88146b91ed7e8275985f, type: 2}
     outputCount: 3
-    baseTime: 5
-  productionInterval: 4
+    baseTime: 6
+  productionInterval: 5
   batchSize: 1
   requiresFuel: 1
   fuelItem: {fileID: 11400000, guid: b0555af55e301db4ab520fc307bb3f12, type: 2}
-  fuelPerCycle: 1
+  fuelPerCycle: 2
   acceptsAutomation: 1
   automationMultiplier: 2

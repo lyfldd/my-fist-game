@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: "\u53D1\u9175\u7F50\u5957\u4EF6"
   m_EditorClassIdentifier: 
   recipeName: "\u53D1\u9175\u7F50\u5957\u4EF6"
+  recipeId: "\u53D1\u9175\u7F50\u5957\u4EF6"
   icon: {fileID: 0}
   description: 
   category: 10

@@ -34,27 +34,28 @@ public static class CreateDefaultBuildables
         BuildItemLookup();
         EnsureDir();
 
-        // 先清空旧文件
-        var oldGuids = AssetDatabase.FindAssets("t:BuildableData", new[] { Dir });
-        foreach (var guid in oldGuids)
-            AssetDatabase.DeleteAsset(AssetDatabase.GUIDToAssetPath(guid));
-        AssetDatabase.Refresh();
-
-        // 阶段1: 在内存中创建所有 ScriptableObject，设完所有字段
+        // 阶段1: 加载或创建 ScriptableObject，设完所有字段
         _pendingAssets = new List<(BuildableData, string)>();
         CreateWorkstations();
         CreateIndustrialDevices();
         CreateAdditionalStructures();
 
-        // 阶段2: 字段全部设好后，一次性写入磁盘
+        // 阶段2: 字段全部设好后，写入磁盘（新资产创建，已有资产更新）
         foreach (var (asset, name) in _pendingAssets)
-            AssetDatabase.CreateAsset(asset, $"{Dir}/{name}.asset");
+        {
+            string path = $"{Dir}/{name}.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<BuildableData>(path);
+            if (existing == null)
+                AssetDatabase.CreateAsset(asset, path);
+            else
+                EditorUtility.SetDirty(existing); // 已在 Create() 中把字段拷到 existing 上了
+        }
 
         UpdateCatalog();
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log($"BuildableData 资产生成完毕（含材料）！路径: {Dir}");
+        Debug.Log($"BuildableData 资产生成完毕（不删已有资产）！路径: {Dir}");
     }
 
     static void BuildItemLookup()
@@ -96,8 +97,17 @@ public static class CreateDefaultBuildables
 
     static BuildableData Create(string assetName)
     {
+        string path = $"{Dir}/{assetName}.asset";
+        var existing = AssetDatabase.LoadAssetAtPath<BuildableData>(path);
+        if (existing != null)
+        {
+            // 已有资产：清空材料/技能字段（保留其他系统写入的字段如 productionDeviceRef）
+            existing.materials = null;
+            existing.skillRequirements = null;
+            _pendingAssets.Add((existing, assetName));
+            return existing;
+        }
         var b = ScriptableObject.CreateInstance<BuildableData>();
-        // 延迟到所有字段设完后再 CreateAsset，避免空数据写盘
         _pendingAssets.Add((b, assetName));
         return b;
     }
@@ -664,11 +674,12 @@ public static class CreateDefaultBuildables
         {
             var b = Create("Buildable_DronePlatform");
             b.displayName = "无人机平台";
-            b.description = "侦察无人机起降平台。自动巡逻侦察，标记范围内僵尸位置。";
+            b.description = "无人机零件制造工厂。生产无人机机体与操控芯片，供给精密装配台组装成品。";
             b.category = BuildableCategory.ElectronicsIndustry;
             b.buildDuration = 25f;
             b.maxHealth = 300f;
             b.isWorkstation = false;
+            b.productionDeviceRef = LoadProdRef("DronePlatform");
             b.skillRequirements = Skills((SkillType.建造拆解, 10), (SkillType.智力, 8));
             b.snapSize = 1f;
             b.placementSize = new Vector3(3f, 0.5f, 3f);
