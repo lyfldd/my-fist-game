@@ -21,6 +21,9 @@ public class CreateIndustrialDeviceEditor : EditorWindow
     float _fuelPerCycle = 1f;
     bool _acceptsAutomation = true;
 
+    // 配方成本倍率（后期/终局工业配方材料上调）
+    float _costMultiplier = 3f;
+
     // 配方
     List<RecipeEntry> _recipes = new List<RecipeEntry>();
 
@@ -94,6 +97,13 @@ public class CreateIndustrialDeviceEditor : EditorWindow
         _foldoutRecipes = EditorGUILayout.Foldout(_foldoutRecipes, $"生产配方 ({_recipes.Count})", true);
         if (_foldoutRecipes)
         {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("材料成本倍率", GUILayout.Width(80));
+            _costMultiplier = EditorGUILayout.FloatField(_costMultiplier, GUILayout.Width(40));
+            EditorGUILayout.LabelField("(生成时 inputCount × 倍率)", EditorStyles.miniLabel);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space(4);
+
             for (int i = 0; i < _recipes.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
@@ -247,7 +257,7 @@ public class CreateIndustrialDeviceEditor : EditorWindow
             prodRecipes[i] = new ProductionRecipe
             {
                 input = GetItem(_recipes[i].inputName),
-                inputCount = _recipes[i].inputCount,
+                inputCount = Mathf.Max(1, Mathf.RoundToInt(_recipes[i].inputCount * _costMultiplier)),
                 output = GetItem(_recipes[i].outputName),
                 outputCount = _recipes[i].outputCount,
                 baseTime = _recipes[i].baseTime,
@@ -286,7 +296,7 @@ public class CreateIndustrialDeviceEditor : EditorWindow
                 mats.Add(new ItemRequirement
                 {
                     itemData = GetItem(_recipes[i].inputName),
-                    count = _recipes[i].inputCount,
+                    count = Mathf.Max(1, Mathf.RoundToInt(_recipes[i].inputCount * _costMultiplier)),
                 });
             }
             rd.materials = mats.ToArray();
