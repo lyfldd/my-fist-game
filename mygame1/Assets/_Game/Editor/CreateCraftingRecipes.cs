@@ -184,7 +184,8 @@ public static class CreateCraftingRecipes
         RecipeCategory category, ItemData result, int resultCount = 1,
         float craftTime = 2f, float xp = 15f,
         (ItemData item, int count)[] materials = null,
-        (SkillType skill, int level)[] skills = null)
+        (SkillType skill, int level)[] skills = null,
+        string recipeId = null)
     {
         string dir = $"{RecipeBase}/{StationDirs[station]}";
         string path = $"{dir}/{recipeName}.asset";
@@ -194,6 +195,7 @@ public static class CreateCraftingRecipes
         {
             // 更新已有配方
             existing.recipeName = recipeName;
+            existing.recipeId = string.IsNullOrEmpty(recipeId) ? recipeName : recipeId;
             existing.category = category;
             existing.requiredStation = station;
             existing.resultItem = result;
@@ -208,6 +210,7 @@ public static class CreateCraftingRecipes
 
         var recipe = ScriptableObject.CreateInstance<RecipeData>();
         recipe.recipeName = recipeName;
+        recipe.recipeId = string.IsNullOrEmpty(recipeId) ? recipeName : recipeId;
         recipe.category = category;
         recipe.requiredStation = station;
         recipe.resultItem = result;

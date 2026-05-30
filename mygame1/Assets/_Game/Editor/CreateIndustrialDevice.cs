@@ -52,6 +52,8 @@ public class CreateIndustrialDeviceEditor : EditorWindow
         public string outputName;
         public int outputCount = 1;
         public float baseTime = 5f;
+        [Tooltip("配方ID，留空则自动用产出物品名。后期/终局配方需要研究中心解锁")]
+        public string recipeId;
     }
 
     [System.Serializable]
@@ -107,17 +109,24 @@ public class CreateIndustrialDeviceEditor : EditorWindow
             for (int i = 0; i < _recipes.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
-                _recipes[i].inputName = EditorGUILayout.TextField(_recipes[i].inputName, GUILayout.Width(100));
+                _recipes[i].inputName = EditorGUILayout.TextField(_recipes[i].inputName, GUILayout.Width(90));
                 EditorGUILayout.LabelField("×", GUILayout.Width(12));
-                _recipes[i].inputCount = EditorGUILayout.IntField(_recipes[i].inputCount, GUILayout.Width(40));
-                EditorGUILayout.LabelField("→", GUILayout.Width(16));
-                _recipes[i].outputName = EditorGUILayout.TextField(_recipes[i].outputName, GUILayout.Width(100));
+                _recipes[i].inputCount = EditorGUILayout.IntField(_recipes[i].inputCount, GUILayout.Width(36));
+                EditorGUILayout.LabelField("→", GUILayout.Width(14));
+                _recipes[i].outputName = EditorGUILayout.TextField(_recipes[i].outputName, GUILayout.Width(90));
                 EditorGUILayout.LabelField("×", GUILayout.Width(12));
-                _recipes[i].outputCount = EditorGUILayout.IntField(_recipes[i].outputCount, GUILayout.Width(40));
-                _recipes[i].baseTime = EditorGUILayout.FloatField(_recipes[i].baseTime, GUILayout.Width(40));
+                _recipes[i].outputCount = EditorGUILayout.IntField(_recipes[i].outputCount, GUILayout.Width(36));
+                _recipes[i].baseTime = EditorGUILayout.FloatField(_recipes[i].baseTime, GUILayout.Width(36));
+                EditorGUILayout.LabelField("ID:", GUILayout.Width(18));
+                _recipes[i].recipeId = EditorGUILayout.TextField(_recipes[i].recipeId, GUILayout.Width(60));
                 if (GUILayout.Button("×", GUILayout.Width(22)))
                     _recipes.RemoveAt(i--);
                 EditorGUILayout.EndHorizontal();
+                // 若 outputName 有值而 recipeId 为空，显示自动填充提示
+                if (!string.IsNullOrEmpty(_recipes[i].outputName) && string.IsNullOrEmpty(_recipes[i].recipeId))
+                {
+                    EditorGUILayout.LabelField($"  → 自动 recipeId = \"{_recipes[i].outputName}\"", EditorStyles.miniLabel);
+                }
             }
             if (GUILayout.Button("+ 添加配方"))
                 _recipes.Add(new RecipeEntry());
@@ -254,8 +263,14 @@ public class CreateIndustrialDeviceEditor : EditorWindow
         var prodRecipes = new ProductionRecipe[_recipes.Count];
         for (int i = 0; i < _recipes.Count; i++)
         {
+            // recipeId：手动填则用，否则自动取产出物品名
+            string rid = _recipes[i].recipeId;
+            if (string.IsNullOrEmpty(rid))
+                rid = _recipes[i].outputName;
+
             prodRecipes[i] = new ProductionRecipe
             {
+                recipeId = rid,
                 input = GetItem(_recipes[i].inputName),
                 inputCount = Mathf.Max(1, Mathf.RoundToInt(_recipes[i].inputCount * _costMultiplier)),
                 output = GetItem(_recipes[i].outputName),
@@ -283,6 +298,10 @@ public class CreateIndustrialDeviceEditor : EditorWindow
         {
             var rd = ScriptableObject.CreateInstance<RecipeData>();
             rd.recipeName = $"{_deviceName}_{_recipes[i].outputName}";
+            // recipeId：手动填则用，否则自动取产出物品名
+            string rid = _recipes[i].recipeId;
+            if (string.IsNullOrEmpty(rid)) rid = _recipes[i].outputName;
+            rd.recipeId = rid;
             rd.requiredStation = _tier;
             rd.isIndustrial = true;
             rd.productionDeviceName = _deviceName;
