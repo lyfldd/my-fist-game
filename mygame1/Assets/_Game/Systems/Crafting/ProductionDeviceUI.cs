@@ -45,8 +45,19 @@ namespace _Game.Systems.Crafting
         GUIStyle _bgBoxStyle;
         bool _stylesReady;
 
+        static ProductionDeviceUI _instance;
+
         void Awake()
         {
+            // 单例：防止 GameBootstrap 自动添加 + 场景已有 → 双实例同时画
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogWarning($"[ProductionDeviceUI] 检测到重复实例，销毁 {gameObject.name} 上的副本");
+                Destroy(this);
+                return;
+            }
+            _instance = this;
+
             _playerInv = Object.FindObjectOfType<Inventory.Inventory>();
             // 强制不透明，防止 Inspector 旧序列化值导致透出残影
             bgColor = new Color(0.06f, 0.06f, 0.06f, 1f);
@@ -65,6 +76,11 @@ namespace _Game.Systems.Crafting
             EventBus.Unsubscribe<DeviceOpenedEvent>(OnDeviceOpened);
             EventBus.Unsubscribe<DeviceClosedEvent>(OnDeviceClosed);
             InputRouter.UnbindAll(this);
+        }
+
+        void OnDestroy()
+        {
+            if (_instance == this) _instance = null;
         }
 
         bool HandleEsc()
@@ -163,13 +179,18 @@ namespace _Game.Systems.Crafting
 
             // BeginGroup 裁剪所有内容，防止越界绘制
             GUI.BeginGroup(panelRect);
-            Rect localRect = new Rect(0, 0, panelWidth, panelHeight);
+            try
+            {
+                Rect localRect = new Rect(0, 0, panelWidth, panelHeight);
 
-            DrawHeaderLocal(localRect);
-            DrawRecipePanelLocal(localRect);
-            DrawStatusPanelLocal(localRect);
-
-            GUI.EndGroup();
+                DrawHeaderLocal(localRect);
+                DrawRecipePanelLocal(localRect);
+                DrawStatusPanelLocal(localRect);
+            }
+            finally
+            {
+                GUI.EndGroup();
+            }
         }
 
         void InitStyles()

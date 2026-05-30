@@ -23,10 +23,25 @@ namespace _Game.Systems.Crafting
         GUIStyle _headerStyle, _itemStyle, _btnStyle, _doneStyle, _descStyle, _costStyle, _closeBtnStyle;
         bool _stylesReady;
 
+        static ChemicalResearchUI _instance;
+
         void Awake()
         {
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogWarning($"[ChemicalResearchUI] 检测到重复实例，销毁 {gameObject.name} 上的副本");
+                Destroy(this);
+                return;
+            }
+            _instance = this;
+
             _manager = GetComponent<ChemicalResearchManager>();
             _inventory = GetComponent<Inventory.Inventory>();
+        }
+
+        void OnDestroy()
+        {
+            if (_instance == this) _instance = null;
         }
 
         void OnEnable()

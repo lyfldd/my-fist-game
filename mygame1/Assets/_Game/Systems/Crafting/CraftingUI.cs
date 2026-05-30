@@ -57,11 +57,27 @@ namespace _Game.Systems.Crafting
         GUIStyle _categoryBtnStyle, _categoryActiveBtnStyle;
         bool _stylesReady;
 
+        static CraftingUI _instance;
+
         void Awake()
         {
+            // 单例：防止 GameBootstrap 自动添加导致双实例同时画
+            if (_instance != null && _instance != this)
+            {
+                Debug.LogWarning($"[CraftingUI] 检测到重复实例，销毁 {gameObject.name} 上的副本");
+                Destroy(this);
+                return;
+            }
+            _instance = this;
+
             _craftingSystem = CraftingSystem.Instance;
             if (_craftingSystem == null)
                 _craftingSystem = Object.FindObjectOfType<CraftingSystem>();
+        }
+
+        void OnDestroy()
+        {
+            if (_instance == this) _instance = null;
         }
 
         void OnEnable()
