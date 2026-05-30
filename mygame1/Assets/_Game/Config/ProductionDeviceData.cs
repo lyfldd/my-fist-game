@@ -47,6 +47,8 @@ namespace _Game.Config
     [Serializable]
     public struct ProductionRecipe
     {
+        [Tooltip("配方ID，用于研究中心后期/终局配方级解锁。留空则无需研究")]
+        public string recipeId;
         [Tooltip("单材料输入（兼容旧数据）")]
         public ItemData input;
         public int inputCount;

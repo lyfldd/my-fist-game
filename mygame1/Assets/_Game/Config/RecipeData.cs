@@ -26,6 +26,8 @@ namespace _Game.Config
     {
         [Header("基础信息")]
         public string recipeName;
+        [Tooltip("唯一配方ID，用于研究中心后期/终局配方级解锁。留空则无需研究")]
+        public string recipeId;
         public Sprite icon;
         [TextArea(2, 3)]
         public string description;

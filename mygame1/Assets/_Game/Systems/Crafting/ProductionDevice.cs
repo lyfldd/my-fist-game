@@ -151,6 +151,13 @@ namespace _Game.Systems.Crafting
             // 遍历配方（优先走 RecipeData，兜底 ProductionRecipe）
             foreach (var recipe in recipes)
             {
+                // 配方级研究门控（后期/终局）
+                if (!string.IsNullOrEmpty(recipe.recipeId))
+                {
+                    if (researchMgr != null && !researchMgr.IsRecipeUnlocked(recipe.recipeId))
+                        continue;
+                }
+
                 // 多材料输入检查
                 if (recipe.inputs != null && recipe.inputs.Length > 0)
                 {

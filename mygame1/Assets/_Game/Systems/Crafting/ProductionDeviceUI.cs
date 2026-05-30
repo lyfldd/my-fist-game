@@ -324,24 +324,40 @@ namespace _Game.Systems.Crafting
             {
                 var r = recipes[i];
                 bool selected = _selectedRecipeIdx == i;
+
+                // 配方级研究门控
+                bool recipeLocked = false;
+                if (!string.IsNullOrEmpty(r.recipeId) && researchMgr != null)
+                    recipeLocked = !researchMgr.IsRecipeUnlocked(r.recipeId);
+
                 Rect btnRect = new Rect(2f, i * (recipeBtnH + 6f), leftWidth - 24f, recipeBtnH);
 
                 Color prev = GUI.backgroundColor;
-                GUI.backgroundColor = selected ? new Color(0f, 0.45f, 0f, 1f) : new Color(0.18f, 0.18f, 0.18f, 1f);
+                if (recipeLocked)
+                    GUI.backgroundColor = new Color(0.12f, 0.12f, 0.12f, 0.7f);
+                else
+                    GUI.backgroundColor = selected ? new Color(0f, 0.45f, 0f, 1f) : new Color(0.18f, 0.18f, 0.18f, 1f);
+
+                string prefix = recipeLocked ? "🔒 " : "";
                 string label;
                 if (r.inputs != null && r.inputs.Length > 0)
                 {
                     var parts = new System.Collections.Generic.List<string>();
                     foreach (var req in r.inputs)
                         parts.Add($"{ItemName(req.itemData)}×{req.count}");
-                    label = $"{string.Join("+", parts)} → {ItemName(r.output)}×{r.outputCount}";
+                    label = $"{prefix}{string.Join("+", parts)} → {ItemName(r.output)}×{r.outputCount}";
                 }
                 else
                 {
-                    label = $"{ItemName(r.input)}×{r.inputCount} → {ItemName(r.output)}×{r.outputCount}";
+                    label = $"{prefix}{ItemName(r.input)}×{r.inputCount} → {ItemName(r.output)}×{r.outputCount}";
                 }
-                if (GUI.Button(btnRect, label, _labelStyle))
-                    _selectedRecipeIdx = i;
+
+                GUIStyle btnStyle = recipeLocked ? _dimStyle : _labelStyle;
+                if (GUI.Button(btnRect, label, btnStyle))
+                {
+                    if (!recipeLocked)
+                        _selectedRecipeIdx = i;
+                }
                 GUI.backgroundColor = prev;
             }
 

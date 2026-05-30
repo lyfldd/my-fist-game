@@ -6,22 +6,35 @@ using _Game.Core;
 namespace _Game.Systems.Crafting
 {
     /// <summary>
-    /// 研究中心面板。ResearchStationOpenedEvent 时显示研究项目列表。
+    /// 研究中心面板。四层递进：前期/中期/后期/终局。
+    /// ResearchStationOpenedEvent 时显示。
     /// </summary>
     public class ChemicalResearchUI : MonoBehaviour
     {
         [Header("布局")]
         public float panelX = 20f, panelY = 80f;
-        public float panelWidth = 380f;
-        public float rowHeight = 32f;
-        public float padding = 8f;
+        public float panelWidth = 500f;
+        public float rowHeight = 36f;
+        public float padding = 10f;
 
         bool _isVisible;
         ChemicalResearchManager _manager;
         Inventory.Inventory _inventory;
         Vector2 _scroll;
+        ResearchTier _activeTier = ResearchTier.Early;
         GUIStyle _headerStyle, _itemStyle, _btnStyle, _doneStyle, _descStyle, _costStyle, _closeBtnStyle;
+        GUIStyle _tabStyle, _tabActiveStyle;
         bool _stylesReady;
+
+        static readonly ResearchTier[] AllTiers = { ResearchTier.Early, ResearchTier.Mid, ResearchTier.Late, ResearchTier.Endgame };
+        static readonly string[] TierNames = { "前期", "中期", "后期", "终局" };
+        static readonly Color[] TierColors =
+        {
+            new Color(0.5f, 0.8f, 0.5f),  // 前期 绿
+            new Color(0.5f, 0.6f, 1f),    // 中期 蓝
+            new Color(0.9f, 0.6f, 0.3f),  // 后期 橙
+            new Color(1f, 0.35f, 0.35f),  // 终局 红
+        };
 
         static ChemicalResearchUI _instance;
 
@@ -78,45 +91,88 @@ namespace _Game.Systems.Crafting
             if (!_isVisible || _manager == null || _manager.Data == null) return;
             InitStyles();
 
-            var projects = _manager.Data.projects;
-            if (projects == null || projects.Length == 0) return;
+            var allProjects = _manager.Data.projects;
+            if (allProjects == null || allProjects.Length == 0) return;
 
-            float height = projects.Length * (rowHeight + 4f) + padding * 2 + 30f;
-            Rect bg = new Rect(panelX, panelY, panelWidth, Mathf.Min(height, Screen.height - panelY - 40f));
+            // 筛选当前 Tab 的项目
+            var projects = new List<ChemicalResearchProject>();
+            foreach (var p in allProjects)
+                if (p.tier == _activeTier) projects.Add(p);
 
-            GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.93f);
+            // 动态高度
+            float headerH = 70f;
+            float tabBarH = 34f;
+            float contentH = projects.Count * (rowHeight + 6f) + padding * 2;
+            float totalH = headerH + tabBarH + Mathf.Min(contentH, 400f) + padding;
+            float panelH = Mathf.Min(totalH, Screen.height - panelY - 40f);
+
+            Rect bg = new Rect(panelX, panelY, panelWidth, panelH);
+
+            GUI.color = new Color(0.06f, 0.06f, 0.08f, 0.95f);
             GUI.DrawTexture(bg, Texture2D.whiteTexture);
             GUI.color = Color.white;
 
-            GUILayout.BeginArea(new Rect(bg.x + padding, bg.y + 4f, bg.width - padding * 2, bg.height - 8f));
+            GUILayout.BeginArea(new Rect(bg.x + padding, bg.y + padding, bg.width - padding * 2, bg.height - padding * 2));
 
             // 标题栏
+            GUILayout.BeginHorizontal();
             GUILayout.Label("研究中心", _headerStyle);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("✕", _closeBtnStyle, GUILayout.Width(30f), GUILayout.Height(24f)))
+                _isVisible = false;
+            GUILayout.EndHorizontal();
             GUILayout.Space(4f);
 
-            // 关闭按钮（固定坐标，避免 GUILayout 嵌套问题）
-            Rect closeRect = new Rect(bg.width - padding * 2 - 28f, 4f, 28f, 24f);
-            if (GUI.Button(closeRect, "✕", _closeBtnStyle ?? GUI.skin.button))
-                _isVisible = false;
+            // Tab 栏
+            GUILayout.BeginHorizontal();
+            for (int i = 0; i < AllTiers.Length; i++)
+            {
+                var tier = AllTiers[i];
+                int count = 0;
+                foreach (var p in allProjects) if (p.tier == tier) count++;
 
-            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(bg.height - 30f));
+                bool active = _activeTier == tier;
+                var style = active ? _tabActiveStyle : _tabStyle;
+                GUI.backgroundColor = active ? TierColors[i] : new Color(0.2f, 0.2f, 0.2f, 1f);
+                if (GUILayout.Button($"{TierNames[i]} ({count})", style, GUILayout.Height(26f)))
+                {
+                    _activeTier = tier;
+                    _scroll = Vector2.zero;
+                }
+            }
+            GUI.backgroundColor = Color.white;
+            GUILayout.EndHorizontal();
+            GUILayout.Space(4f);
+
+            // 项目列表
+            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.ExpandHeight(true));
+
+            if (projects.Count == 0)
+            {
+                GUILayout.Label("该阶段暂无研究项目", _descStyle);
+            }
 
             foreach (var proj in projects)
             {
                 bool done = _manager.IsResearched(proj.researchId);
                 bool canDo = _manager.CanResearch(proj.researchId, _inventory);
 
-                GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(rowHeight + 10f));
+                GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.Height(rowHeight + 8f));
 
                 // 状态图标
                 var statusStyle = done ? _doneStyle : (canDo ? _btnStyle : _costStyle);
                 string statusIcon = done ? "✓" : (canDo ? "→" : "✗");
-                GUILayout.Label(statusIcon, statusStyle, GUILayout.Width(24f));
+                GUILayout.Label(statusIcon, statusStyle, GUILayout.Width(28f));
 
                 // 名称 + 描述
                 GUILayout.BeginVertical();
                 GUILayout.Label(proj.displayName, _itemStyle);
-                GUILayout.Label(proj.description, _descStyle);
+                string desc = proj.description;
+                if (proj.unlockedDeviceNames != null && proj.unlockedDeviceNames.Length > 0)
+                    desc += "  解锁设备: " + string.Join("、", proj.unlockedDeviceNames);
+                if (proj.unlockedRecipeIds != null && proj.unlockedRecipeIds.Length > 0)
+                    desc += "  解锁配方: " + string.Join("、", proj.unlockedRecipeIds);
+                GUILayout.Label(desc, _descStyle);
                 GUILayout.EndVertical();
 
                 GUILayout.FlexibleSpace();
@@ -128,9 +184,15 @@ namespace _Game.Systems.Crafting
                     var parts = new List<string>();
                     foreach (var c in proj.cost)
                         parts.Add($"{ItemName(c.itemData)}×{c.count}");
-                    costStr = string.Join(" ", parts);
+                    costStr = string.Join("  ", parts);
                 }
-                GUILayout.Label(costStr, _costStyle, GUILayout.Width(140f));
+                GUILayout.Label(costStr, _costStyle, GUILayout.Width(150f));
+
+                // 智力要求
+                if (proj.requiredIntellectLevel > 0)
+                {
+                    GUILayout.Label($"智{proj.requiredIntellectLevel}", _descStyle, GUILayout.Width(32f));
+                }
 
                 // 研究按钮
                 if (!done)
@@ -139,6 +201,10 @@ namespace _Game.Systems.Crafting
                     if (GUILayout.Button("研究", GUILayout.Width(50f), GUILayout.Height(rowHeight - 4f)))
                         _manager.TryResearch(proj.researchId, _inventory);
                     GUI.enabled = true;
+                }
+                else
+                {
+                    GUILayout.Label("已研究", _doneStyle, GUILayout.Width(50f));
                 }
 
                 GUILayout.EndHorizontal();
@@ -188,6 +254,18 @@ namespace _Game.Systems.Crafting
             {
                 fontSize = 16, fontStyle = FontStyle.Bold,
                 normal = { textColor = new Color(0.3f, 0.8f, 0.3f) }
+            };
+            _tabStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 13, fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.7f, 0.7f, 0.7f) },
+                padding = new RectOffset(10, 10, 4, 4)
+            };
+            _tabActiveStyle = new GUIStyle(GUI.skin.button)
+            {
+                fontSize = 13, fontStyle = FontStyle.Bold,
+                normal = { textColor = Color.white },
+                padding = new RectOffset(10, 10, 4, 4)
             };
         }
 
