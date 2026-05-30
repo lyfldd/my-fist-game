@@ -232,8 +232,8 @@ namespace _Game.Systems.Crafting
             if (_deviceData == null) return;
 
             float x = panel.x + padding;
-            float y = panel.y + padding + 40f;
-            float h = panel.height - padding * 2 - 44f;
+            float y = panel.y + padding + 48f;
+            float h = panel.height - padding * 2 - 52f;
 
             Rect bg = new Rect(x, y, leftWidth, h);
             GUI.color = sectionBgColor;
@@ -260,7 +260,8 @@ namespace _Game.Systems.Crafting
                 return;
             }
 
-            float totalH = recipes.Length * (buttonHeight + 4f);
+            float recipeBtnH = buttonHeight + 2f; // 配方按钮稍高
+            float totalH = recipes.Length * (recipeBtnH + 6f);
             float viewH = h - 30f;
             _recipeScrollPos = GUI.BeginScrollView(
                 new Rect(x, y, leftWidth, viewH),
@@ -271,7 +272,7 @@ namespace _Game.Systems.Crafting
             {
                 var r = recipes[i];
                 bool selected = _selectedRecipeIdx == i;
-                Rect btnRect = new Rect(2f, i * (buttonHeight + 4f), leftWidth - 24f, buttonHeight);
+                Rect btnRect = new Rect(2f, i * (recipeBtnH + 6f), leftWidth - 24f, recipeBtnH);
 
                 Color prev = GUI.backgroundColor;
                 GUI.backgroundColor = selected ? new Color(0f, 0.45f, 0f, 1f) : new Color(0.18f, 0.18f, 0.18f, 1f);
@@ -302,8 +303,8 @@ namespace _Game.Systems.Crafting
             if (_deviceData == null) return;
 
             float x = panel.x + padding + leftWidth + 8f;
-            float y = panel.y + padding + 40f;
-            float h = panel.height - padding * 2 - 44f;
+            float y = panel.y + padding + 48f;
+            float h = panel.height - padding * 2 - 52f;
 
             Rect bg = new Rect(x, y, rightWidth, h);
             GUI.color = sectionBgColor;
