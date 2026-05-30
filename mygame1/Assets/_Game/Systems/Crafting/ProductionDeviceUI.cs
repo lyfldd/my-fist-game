@@ -42,6 +42,7 @@ namespace _Game.Systems.Crafting
 
         GUIStyle _headerStyle, _sectionHeaderStyle, _labelStyle, _dimStyle;
         GUIStyle _btnStyle, _disabledBtnStyle, _closeBtnStyle, _greenBtnStyle;
+        GUIStyle _bgBoxStyle;
         bool _stylesReady;
 
         void Awake()
@@ -155,13 +156,20 @@ namespace _Game.Systems.Crafting
                 (Screen.height - panelHeight) * 0.5f,
                 panelWidth, panelHeight);
 
+            // 全不透明黑底（覆盖老UI残留），用 Box 裁剪
             GUI.color = bgColor;
-            GUI.DrawTexture(panelRect, Texture2D.whiteTexture);
+            GUI.Box(panelRect, "", _bgBoxStyle);
             GUI.color = Color.white;
 
-            DrawHeader(panelRect);
-            DrawRecipePanel(panelRect);
-            DrawStatusPanel(panelRect);
+            // BeginGroup 裁剪所有内容，防止越界绘制
+            GUI.BeginGroup(panelRect);
+            Rect localRect = new Rect(0, 0, panelWidth, panelHeight);
+
+            DrawHeaderLocal(localRect);
+            DrawRecipePanelLocal(localRect);
+            DrawStatusPanelLocal(localRect);
+
+            GUI.EndGroup();
         }
 
         void InitStyles()
@@ -220,19 +228,28 @@ namespace _Game.Systems.Crafting
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = textColor }
             };
+
+            _bgBoxStyle = new GUIStyle(GUI.skin.box)
+            {
+                normal = { background = Texture2D.whiteTexture },
+                border = new RectOffset(0, 0, 0, 0),
+                margin = new RectOffset(0, 0, 0, 0),
+                padding = new RectOffset(0, 0, 0, 0)
+            };
         }
 
-        void DrawHeader(Rect panel)
+        void DrawHeaderLocal(Rect panel)
         {
-            Rect headerRect = new Rect(panel.x + padding, panel.y + padding,
+            // panel 已是局部坐标 (0,0,w,h)
+            Rect headerRect = new Rect(padding, padding,
                 panel.width - padding * 2, 30f);
             GUI.Label(headerRect, $"  {_deviceData.deviceName}", _headerStyle);
 
-            Rect closeRect = new Rect(panel.x + panel.width - 60f, panel.y + padding, 48f, 28f);
+            Rect closeRect = new Rect(panel.width - 60f, padding, 48f, 28f);
             if (GUI.Button(closeRect, "✕", _closeBtnStyle))
                 Close();
 
-            Rect lineRect = new Rect(panel.x + padding, headerRect.y + headerRect.height + 2f,
+            Rect lineRect = new Rect(padding, headerRect.y + headerRect.height + 2f,
                 panel.width - padding * 2, 2f);
             GUI.color = new Color(0.3f, 0.3f, 0.3f, 1f);
             GUI.DrawTexture(lineRect, Texture2D.whiteTexture);
@@ -241,12 +258,12 @@ namespace _Game.Systems.Crafting
 
         // ---- 左侧：配方列表 ----
 
-        void DrawRecipePanel(Rect panel)
+        void DrawRecipePanelLocal(Rect panel)
         {
             if (_deviceData == null) return;
 
-            float x = panel.x + padding;
-            float y = panel.y + padding + 48f;
+            float x = padding;
+            float y = padding + 48f;
             float h = panel.height - padding * 2 - 52f;
 
             Rect bg = new Rect(x, y, leftWidth, h);
@@ -312,12 +329,12 @@ namespace _Game.Systems.Crafting
 
         // ---- 右侧：设备状态 ----
 
-        void DrawStatusPanel(Rect panel)
+        void DrawStatusPanelLocal(Rect panel)
         {
             if (_deviceData == null) return;
 
-            float x = panel.x + padding + leftWidth + 8f;
-            float y = panel.y + padding + 48f;
+            float x = padding + leftWidth + 8f;
+            float y = padding + 48f;
             float h = panel.height - padding * 2 - 52f;
 
             Rect bg = new Rect(x, y, rightWidth, h);
