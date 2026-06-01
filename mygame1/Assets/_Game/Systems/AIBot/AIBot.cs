@@ -224,6 +224,11 @@ namespace _Game.Systems.AIBot
             if (GetComponent<AIBotPilot>() == null)
                 gameObject.AddComponent<AIBotPilot>();
 
+            // 设置阵营（RequireComponent 保证 FactionComponent 已存在，必须在 Start 前设好）
+            var factionComp = GetComponent<FactionComponent>();
+            if (factionComp != null)
+                factionComp.SetFaction(FactionType.AIBot);
+
             currentHP = maxHP;
             batteryCurrent = batteryMax;
             solarRechargeRate = 120f;
@@ -236,11 +241,6 @@ namespace _Game.Systems.AIBot
 
             _lastPosition = transform.position;
             guardPosition = transform.position;
-
-            // 设置阵营（僵尸通过 ThreatSystem 感知 AIBot）
-            var factionComp = GetComponent<FactionComponent>();
-            if (factionComp != null)
-                factionComp.SetFaction(FactionType.AIBot);
         }
 
         void Update()

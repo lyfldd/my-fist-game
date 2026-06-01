@@ -44,12 +44,16 @@ namespace _Game.Systems.Threat
                 ThreatSystem.Instance.RegisterEntity(id, faction);
         }
 
-#if UNITY_EDITOR
-        void OnValidate()
+        void Start()
         {
             if (_factionData == null && _directFaction == null)
-                Debug.LogWarning($"[FactionComponent] {name} 未设置阵营数据！", this);
+            {
+                Debug.LogWarning($"[FactionComponent] {name} 运行时未设置阵营数据！将使用 Neutral。", this);
+            }
+            else
+            {
+                Debug.Log($"[FactionComponent] {name} 阵营 = {Faction}", this);
+            }
         }
-#endif
     }
 }
