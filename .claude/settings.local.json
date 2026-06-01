@@ -68,7 +68,8 @@
       "Read(//dev/**)",
       "Bash(powershell *)",
       "Bash(dir /s /b \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\Unity学习一\\\\mygame\\\\mygame1\\\\Assets\\\\_Game\\\\Scripts\")",
-      "Bash(dir *)"
+      "Bash(dir *)",
+      "Bash(echo \"EXIT: $?\")"
     ]
   }
 }
