@@ -1,6 +1,7 @@
 using UnityEngine;
 using _Game.Config;
 using _Game.Systems.Crafting;
+using _Game.Systems.Threat;
 
 namespace _Game.Core
 {
@@ -740,6 +741,64 @@ namespace _Game.Core
         {
             Bot = bot;
             Pilot = pilot;
+        }
+    }
+
+    // ===== 威胁系统事件 =====
+
+    public readonly struct ThreatReportEvent
+    {
+        public int SourceInstanceId { get; }
+        public int TargetInstanceId { get; }
+        public float DamageAmount { get; }
+        public Vector3? Position { get; }
+
+        public ThreatReportEvent(int sourceId, int targetId, float damage, Vector3? position = null)
+        {
+            SourceInstanceId = sourceId;
+            TargetInstanceId = targetId;
+            DamageAmount = damage;
+            Position = position;
+        }
+    }
+
+    public readonly struct EntityDeathEvent
+    {
+        public int DeadEntityId { get; }
+
+        public EntityDeathEvent(int deadEntityId)
+        {
+            DeadEntityId = deadEntityId;
+        }
+    }
+
+    public readonly struct FactionRelationChangedEvent
+    {
+        public FactionType FactionA { get; }
+        public FactionType FactionB { get; }
+        public FactionSystem.FactionRelation NewRelation { get; }
+
+        public FactionRelationChangedEvent(FactionType a, FactionType b, FactionSystem.FactionRelation relation)
+        {
+            FactionA = a;
+            FactionB = b;
+            NewRelation = relation;
+        }
+    }
+
+    public readonly struct AllyAlertEvent
+    {
+        public int SourceId { get; }
+        public Vector3 Position { get; }
+        public float Radius { get; }
+        public FactionType Faction { get; }
+
+        public AllyAlertEvent(int sourceId, Vector3 position, float radius, FactionType faction)
+        {
+            SourceId = sourceId;
+            Position = position;
+            Radius = radius;
+            Faction = faction;
         }
     }
 

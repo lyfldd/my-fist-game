@@ -63,7 +63,12 @@
       "Bash(mkdir -p __TRACKED_VAR__/.ssh)",
       "Bash(ssh-keygen -t ed25519 -C 2807927453@qq.com -f __TRACKED_VAR__/.ssh/id_ed25519 -N '')",
       "Bash(ssh *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Read(//mnt/c/Users/Administrator/Desktop/**)",
+      "Read(//dev/**)",
+      "Bash(powershell *)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\Administrator\\\\Desktop\\\\Unity学习一\\\\mygame\\\\mygame1\\\\Assets\\\\_Game\\\\Scripts\")",
+      "Bash(dir *)"
     ]
   }
 }

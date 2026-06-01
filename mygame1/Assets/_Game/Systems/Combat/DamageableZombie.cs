@@ -59,10 +59,13 @@ namespace _Game.Systems.Combat
             IsDead = true;
             Debug.Log("僵尸死亡！");
 
-            // 通知状态机进入 Dead
+            // 通知 ThreatSystem 清理
+            EventBus.Publish(new EntityDeathEvent(gameObject.GetInstanceID()));
+
+            // 通知 AI 进入死亡
             var stateMachine = GetComponent<ZombieStateMachine>();
             if (stateMachine != null)
-                stateMachine.TransitionTo(ZombieState_Dead.Instance);
+                stateMachine.Die();
 
             EventBus.Publish(new ZombieDied(
                 transform.position.x,

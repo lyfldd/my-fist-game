@@ -4,6 +4,7 @@ using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Character;
 using _Game.Systems.Combat;
+using _Game.Systems.Threat;
 
 namespace _Game.Systems.AIBot
 {
@@ -29,6 +30,7 @@ namespace _Game.Systems.AIBot
     /// 由 AIBotBuildable 在放置后初始化。
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
+    [RequireComponent(typeof(FactionComponent))]
     public class AIBot : MonoBehaviour, IDamageable
     {
         [Header("血量")]
@@ -235,9 +237,10 @@ namespace _Game.Systems.AIBot
             _lastPosition = transform.position;
             guardPosition = transform.position;
 
-            // 注册为僵尸目标
-            if (Zombie.ZombieAwarenessSystem.Instance != null)
-                Zombie.ZombieAwarenessSystem.Instance.RegisterAIBot(transform);
+            // 设置阵营（僵尸通过 ThreatSystem 感知 AIBot）
+            var factionComp = GetComponent<FactionComponent>();
+            if (factionComp != null)
+                factionComp.SetFaction(FactionType.AIBot);
         }
 
         void Update()
@@ -661,16 +664,15 @@ namespace _Game.Systems.AIBot
         {
             isDead = true;
 
+            // 通知 ThreatSystem 清理
+            EventBus.Publish(new EntityDeathEvent(gameObject.GetInstanceID()));
+
             // 如果被驾驶中，强制退出（必须在禁用Agent之前）
             if (IsPiloted && GetComponent<AIBotPilot>() is AIBotPilot pilot && pilot.IsPiloting)
                 pilot.ExitPilot();
 
             if (_agent != null && _agent.enabled)
                 _agent.enabled = false;
-
-            // 从僵尸感知系统移除
-            if (Zombie.ZombieAwarenessSystem.Instance != null)
-                Zombie.ZombieAwarenessSystem.Instance.UnregisterAIBot(transform);
 
             Debug.Log("[AIBot] 机器人已报废");
             EventBus.Publish(new AIBotDestroyedEvent(transform.position));

@@ -1,0 +1,36 @@
+# Unity generated
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+*.csproj
+*.unityproj
+*.sln
+*.userprefs
+
+# Unity cache
+Assets/AssetStoreTools*
+*.log
+*.pidb
+
+# VS
+.vs/
+*.suo
+*.user
+*.dbmdl
+
+# Rider
+.idea/
+*.sln.DotSettings
+
+# Mac
+.DS_Store
+
+# Project specific
+Library/
+Temp/
+
+# Editor layout
+UserSettings/
+
+# 团结引擎 editor connection
+.com-unity-codely.json

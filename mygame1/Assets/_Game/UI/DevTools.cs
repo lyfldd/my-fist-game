@@ -240,7 +240,6 @@ namespace _Game.UI
                 int chunkId = ChunkManager.GetChunkId(spawnPos);
                 ChunkManager.Instance?.RegisterZombie(sm, chunkId);
                 agent.enabled = true;
-                ZombieAwarenessSystem.Instance?.Register(sm);
                 spawned++;
             }
 

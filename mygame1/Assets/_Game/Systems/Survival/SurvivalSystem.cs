@@ -236,7 +236,11 @@ namespace _Game.Systems.Survival
 
             EventBus.Publish(new SurvivalStatChanged(SurvivalStatType.Health, old, health, gameObject));
             if (amount < 0) EventBus.Publish(new HealthDamaged(-amount, reason, gameObject));
-            if (health <= 0) EventBus.Publish(new CharacterDeath(gameObject));
+            if (health <= 0)
+            {
+                EventBus.Publish(new CharacterDeath(gameObject));
+                EventBus.Publish(new EntityDeathEvent(gameObject.GetInstanceID()));
+            }
         }
 
         /// <summary> 物品使用（直接订阅 ItemUsedEvent，不再经过 ItemUsageSystem 中转）</summary>

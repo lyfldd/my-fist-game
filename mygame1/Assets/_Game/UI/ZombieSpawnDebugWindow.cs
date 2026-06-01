@@ -178,9 +178,8 @@ namespace _Game.UI
                 int chunkId = ChunkManager.GetChunkId(spawnPos);
                 ChunkManager.Instance?.RegisterZombie(stateMachine, chunkId);
 
-                // 立即激活感知
+                // AIAgent 自行处理感知，不再需要手动注册
                 agent.enabled = true;
-                ZombieAwarenessSystem.Instance?.Register(stateMachine);
 
                 spawned++;
             }

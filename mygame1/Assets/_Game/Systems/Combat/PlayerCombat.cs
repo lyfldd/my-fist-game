@@ -77,6 +77,11 @@ namespace _Game.Systems.Combat
                 if (damageable != null && !damageable.IsDead)
                 {
                     damageable.TakeDamage(finalDamage);
+                    // ThreatSystem 旁路通知
+                    EventBus.Publish(new ThreatReportEvent(
+                        gameObject.GetInstanceID(),
+                        hit.GetComponent<Collider>().gameObject.GetInstanceID(),
+                        finalDamage));
                     hitSomething = true;
                     hitPoint = hit.ClosestPoint(origin);
                     break;

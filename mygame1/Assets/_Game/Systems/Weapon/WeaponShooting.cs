@@ -167,6 +167,10 @@ namespace _Game.Systems.Weapon
                     if (damageable != null)
                     {
                         damageable.TakeDamage(weapon.weaponDamage);
+                        EventBus.Publish(new ThreatReportEvent(
+                            gameObject.GetInstanceID(),
+                            hit.collider.gameObject.GetInstanceID(),
+                            weapon.weaponDamage));
                         Debug.Log($"命中 {hit.collider.name}！伤害={weapon.weaponDamage}");
                     }
                 }

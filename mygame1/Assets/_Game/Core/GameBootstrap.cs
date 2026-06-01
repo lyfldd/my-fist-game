@@ -1,4 +1,5 @@
 using UnityEngine;
+using _Game.Systems.Threat;
 
 namespace _Game.Core
 {
@@ -47,10 +48,16 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Building.BuildModeController");
             AddIfMissing(player, "_Game.Systems.Building.BuildModeInputLock");
             AddIfMissing(player, "_Game.Systems.Combat.DamageablePlayer");
+            AddIfMissing(player, "_Game.Systems.Threat.FactionComponent");
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponSwitcher");
             AddIfMissing(player, "_Game.Systems.Character.ProfessionApplier");
             AddIfMissing(player, "_Game.Systems.Vehicle.VehicleInputLock");
             AddIfMissing(player, "_Game.Systems.Inventory.InventoryTest");
+
+            // 设置玩家阵营
+            var playerFaction = player.GetComponent<FactionComponent>();
+            if (playerFaction != null)
+                playerFaction.SetFaction(_Game.Config.FactionType.Player);
 
             EnsureInputRouter();
         }
@@ -68,6 +75,12 @@ namespace _Game.Core
             // MuzzleFlashSystem — 枪口火焰 VFX
             if (go.GetComponent<_Game.Systems.VFX.MuzzleFlashSystem>() == null)
                 go.AddComponent<_Game.Systems.VFX.MuzzleFlashSystem>();
+            // FactionSystem — 阵营系统
+            if (go.GetComponent<_Game.Systems.Threat.FactionSystem>() == null)
+                go.AddComponent<_Game.Systems.Threat.FactionSystem>();
+            // ThreatSystem — 威胁/仇恨系统
+            if (go.GetComponent<_Game.Systems.Threat.ThreatSystem>() == null)
+                go.AddComponent<_Game.Systems.Threat.ThreatSystem>();
         }
 
         static void AddIfMissing(GameObject go, string fullTypeName)

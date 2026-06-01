@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
+using _Game.Core;
 using _Game.Systems.Combat;
+using _Game.Systems.Threat;
 
 namespace _Game.Systems.AIBot
 {
@@ -71,6 +73,9 @@ namespace _Game.Systems.AIBot
 
         [Header("检测层级")]
         public LayerMask zombieLayer = ~0;
+
+        [Header("ThreatSystem 集成")]
+        public bool useThreatSystem = true;
 
         [Header("弹药存储 (4×4=16格, 每格上限999)")]
         [SerializeField] private List<AmmoSlotData> ammoSlots = new List<AmmoSlotData>();
@@ -195,6 +200,27 @@ namespace _Game.Systems.AIBot
             Vector3 sortOrigin = _nearPlayer ? _bot.PlayerTransform.position : transform.position;
             System.Array.Sort(_hitBuffer, 0, validCount, new ZombieDistanceComparer(sortOrigin));
 
+            // ThreatSystem 优先：最高威胁目标排到最前面
+            if (useThreatSystem && ThreatSystem.Instance != null)
+            {
+                int botId = _bot.gameObject.GetInstanceID();
+                int? topThreatId = ThreatSystem.Instance.GetTopRealTarget(botId);
+                if (topThreatId.HasValue)
+                {
+                    for (int i = 0; i < validCount; i++)
+                    {
+                        if (_hitBuffer[i].gameObject.GetInstanceID() == topThreatId.Value)
+                        {
+                            // 交换到最前面
+                            var temp = _hitBuffer[0];
+                            _hitBuffer[0] = _hitBuffer[i];
+                            _hitBuffer[i] = temp;
+                            break;
+                        }
+                    }
+                }
+            }
+
             // 按优先级给每个武器分配目标：高优先级武器获得更近的僵尸
             int laserTarget = -1, rightArmTarget = -1, leftArmTarget = -1;
             int nextTarget = 0;
@@ -286,6 +312,8 @@ namespace _Game.Systems.AIBot
             if (dz == null) return;
 
             dz.TakeDamage(damage);
+            EventBus.Publish(new ThreatReportEvent(
+                gameObject.GetInstanceID(), targetCollider.gameObject.GetInstanceID(), damage));
             _laserTimer = laserCooldown;
 
             _bot.ConsumeEnergyForAction(AIBot.ENERGY_LASER_PER_SHOT);
@@ -343,7 +371,12 @@ namespace _Game.Systems.AIBot
         void FireSingleTarget(Collider targetCollider, float damage)
         {
             var dz = targetCollider.GetComponentInParent<DamageableZombie>();
-            if (dz != null) dz.TakeDamage(damage);
+            if (dz != null)
+            {
+                dz.TakeDamage(damage);
+                EventBus.Publish(new ThreatReportEvent(
+                    gameObject.GetInstanceID(), targetCollider.gameObject.GetInstanceID(), damage));
+            }
             Debug.DrawLine(transform.position, targetCollider.transform.position, Color.yellow, 0.3f);
         }
 
@@ -362,6 +395,8 @@ namespace _Game.Systems.AIBot
                 if (Vector3.Angle(transform.forward, toTarget) < 45f)
                 {
                     dz.TakeDamage(shotgunDamage);
+                    EventBus.Publish(new ThreatReportEvent(
+                        gameObject.GetInstanceID(), _hitBuffer[i].gameObject.GetInstanceID(), shotgunDamage));
                     Debug.DrawLine(transform.position, _hitBuffer[i].transform.position, Color.yellow, 0.3f);
                     hit++;
                 }
@@ -381,6 +416,8 @@ namespace _Game.Systems.AIBot
                 if (dz != null && !dz.IsDead)
                 {
                     dz.TakeDamage(emRifleDamage);
+                    EventBus.Publish(new ThreatReportEvent(
+                        gameObject.GetInstanceID(), hit.collider.gameObject.GetInstanceID(), emRifleDamage));
                     Debug.DrawLine(transform.position, hit.point, Color.cyan, 0.5f);
                 }
             }

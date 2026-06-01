@@ -1,8 +1,9 @@
 using UnityEngine;
 using UnityEngine.AI;
 using _Game.Config;
-using _Game.Systems.Combat;
 using _Game.Core;
+using _Game.Systems.Combat;
+using _Game.Systems.Threat;
 
 namespace _Game.Systems.Zombie
 {
@@ -25,20 +26,7 @@ namespace _Game.Systems.Zombie
             }
             else
             {
-                var stateMachine = GetComponent<ZombieStateMachine>();
-                stateMachine.moveSpeed = GameConstants.ZOMBIE_MOVE_SPEED;
-                stateMachine.detectRange = GameConstants.ZOMBIE_DETECT_RANGE;
-                stateMachine.attackRange = GameConstants.ZOMBIE_ATTACK_RANGE;
-                stateMachine.attackDamage = GameConstants.ZOMBIE_ATTACK_DAMAGE;
-                stateMachine.attackCooldown = GameConstants.ZOMBIE_ATTACK_COOLDOWN;
-
-                var agent = GetComponent<NavMeshAgent>();
-                agent.speed = stateMachine.moveSpeed;
-                agent.stoppingDistance = stateMachine.attackRange * 0.8f;
-                agent.acceleration = 8f;
-                agent.angularSpeed = 360f;
-                agent.radius = 0.3f;
-                agent.height = 1.8f;
+                ApplyDefaults();
             }
         }
 
@@ -53,16 +41,40 @@ namespace _Game.Systems.Zombie
         {
             var stateMachine = GetComponent<ZombieStateMachine>();
             var damageable = GetComponent<DamageableZombie>();
-            var agent = GetComponent<NavMeshAgent>();
+            var factionComp = GetComponent<FactionComponent>();
 
-            stateMachine.ApplyZombieData(data);
+            // 设置阵营
+            if (factionComp != null)
+                factionComp.SetFaction(FactionType.Zombie);
+
+            // 从 ZombieData 初始化 AIAgent 参数
+            stateMachine.ApplyFromZombieData(data);
             damageable.maxHealth = data.maxHealth;
-            agent.speed = data.moveSpeed;
-            agent.stoppingDistance = data.attackRange * 0.8f;
-            agent.acceleration = 8f;
-            agent.angularSpeed = 360f;
-            agent.radius = 0.3f;
-            agent.height = 1.8f;
+        }
+
+        void ApplyDefaults()
+        {
+            var stateMachine = GetComponent<ZombieStateMachine>();
+            var damageable = GetComponent<DamageableZombie>();
+            var factionComp = GetComponent<FactionComponent>();
+
+            if (factionComp != null)
+                factionComp.SetFaction(FactionType.Zombie);
+
+            // 使用默认 ZombieData（内联创建一个临时 SO）
+            var defaultData = ScriptableObject.CreateInstance<ZombieData>();
+            defaultData.zombieName = "普通僵尸";
+            defaultData.maxHealth = GameConstants.ZOMBIE_MAX_HEALTH;
+            defaultData.moveSpeed = GameConstants.ZOMBIE_MOVE_SPEED;
+            defaultData.detectRange = GameConstants.ZOMBIE_DETECT_RANGE;
+            defaultData.loseRange = 30f;
+            defaultData.visionAngle = 90f;
+            defaultData.attackRange = GameConstants.ZOMBIE_ATTACK_RANGE;
+            defaultData.attackDamage = GameConstants.ZOMBIE_ATTACK_DAMAGE;
+            defaultData.attackCooldown = GameConstants.ZOMBIE_ATTACK_COOLDOWN;
+
+            stateMachine.ApplyFromZombieData(defaultData);
+            damageable.maxHealth = defaultData.maxHealth;
         }
     }
 }

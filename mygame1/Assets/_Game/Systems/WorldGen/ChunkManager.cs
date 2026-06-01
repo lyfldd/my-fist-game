@@ -412,7 +412,6 @@ namespace _Game.Systems.WorldGen
         {
             var chunk = GetChunk(chunkId);
             if (chunk == null) return;
-            var awareness = ZombieAwarenessSystem.Instance;
             for (int i = chunk.zombieInstances.Count - 1; i >= 0; i--)
             {
                 var zombie = chunk.zombieInstances[i];
@@ -421,8 +420,8 @@ namespace _Game.Systems.WorldGen
                     chunk.zombieInstances.RemoveAt(i);
                     continue;
                 }
-                if (zombie.agent != null) zombie.agent.enabled = true;
-                awareness?.Register(zombie);
+                if (zombie.Agent != null) zombie.Agent.enabled = true;
+                // AIAgent 通过 EventBus 自行处理感知，不再需要 ZombieAwarenessSystem
             }
         }
 
@@ -430,7 +429,6 @@ namespace _Game.Systems.WorldGen
         {
             var chunk = GetChunk(chunkId);
             if (chunk == null) return;
-            var awareness = ZombieAwarenessSystem.Instance;
             for (int i = chunk.zombieInstances.Count - 1; i >= 0; i--)
             {
                 var zombie = chunk.zombieInstances[i];
@@ -439,8 +437,7 @@ namespace _Game.Systems.WorldGen
                     chunk.zombieInstances.RemoveAt(i);
                     continue;
                 }
-                awareness?.Unregister(zombie);
-                if (zombie.agent != null) zombie.agent.enabled = false;
+                if (zombie.Agent != null) zombie.Agent.enabled = false;
             }
         }
 
@@ -448,7 +445,6 @@ namespace _Game.Systems.WorldGen
         {
             var chunk = GetChunk(chunkId);
             if (chunk == null) return;
-            var awareness = ZombieAwarenessSystem.Instance;
             for (int i = chunk.zombieInstances.Count - 1; i >= 0; i--)
             {
                 var zombie = chunk.zombieInstances[i];
@@ -457,7 +453,6 @@ namespace _Game.Systems.WorldGen
                     chunk.zombieInstances.RemoveAt(i);
                     continue;
                 }
-                awareness?.Unregister(zombie);
                 if (zombie.gameObject != null)
                     Destroy(zombie.gameObject);
             }

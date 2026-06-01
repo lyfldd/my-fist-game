@@ -1,200 +1,157 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using _Game.Config;
-using _Game.Systems.Combat;
-using _Game.Systems.WorldGen;
 using _Game.Core;
+using _Game.Systems.AI;
+using _Game.Systems.Combat;
+using _Game.Systems.Threat;
 
 namespace _Game.Systems.Zombie
 {
     /// <summary>
-    /// 僵尸状态机。挂每只僵尸上，持有组件引用和运行时数据。
-    /// 状态类为全局单例，所有数据存在此 ctx 上。
+    /// 僵尸 AI — 继承 AIAgent 基类，使用 ThreatSystem + 感知 + FSM。
+    /// 替代旧 ZombieState 单例模式。
     /// </summary>
-    public class ZombieStateMachine : MonoBehaviour
+    [RequireComponent(typeof(FactionComponent))]
+    public class ZombieStateMachine : AIAgent
     {
-        // ── 运行时参数（由 ZombieController 或 ZombieSpawner 通过 ApplyZombieData 写入）──
-        public float moveSpeed;
-        public float wanderSpeedMultiplier = 0.5f;
-        public float detectRange;
-        public float loseRange = 30f;
-        public float visionAngle;
-        public float attackRange;
-        public int attackDamage;
-        public float attackCooldown;
+        // 公共访问器（ChunkManager / DamageableZombie 兼容）
+        public NavMeshAgent Agent => _agent;
 
-        // 组件引用
-        [HideInInspector] public NavMeshAgent agent;
-        [HideInInspector] public DamageableZombie damageable;
+        DamageableZombie _damageable;
+        bool _isDead;
 
-        // 当前状态
-        public ZombieState currentState { get; private set; }
+        public bool IsDead => _isDead;
 
-        // 感知（由 ZombieAwarenessSystem 写入）
-        [HideInInspector] public Transform playerTarget;
-        [HideInInspector] public bool playerDetected;
-
-        // Idle 用
-        [HideInInspector] public float idleTimer;
-        [HideInInspector] public float idleDuration;
-
-        // Wander 用
-        [HideInInspector] public Vector3 wanderTarget;
-
-        // Attack 用
-        [HideInInspector] public float attackTimer;
-
-        // 声音
-        [HideInInspector] public Vector3 lastHeardPosition;
-
-        // 内部
-        private float _destinationUpdateTimer;
-        private float _lastHeardTime;
-        private float _lastHeardRadius;
-        private const float ZombieHearCooldown = 2f;
-
-        void Awake()
-        {
-            agent = GetComponent<NavMeshAgent>();
-            if (agent == null)
-                agent = gameObject.AddComponent<NavMeshAgent>();
-            agent.enabled = false; // 默认禁用，由 ChunkManager 激活
-
-            damageable = GetComponent<DamageableZombie>();
-        }
-
-        void Start()
-        {
-            // 仅当尚未被 ZombieSpawner 注册时才注册（避免重复）
-            int chunkId = ChunkManager.GetChunkId(transform.position);
-            var chunk = ChunkManager.Instance?.GetChunk(chunkId);
-            if (chunk != null && !chunk.zombieInstances.Contains(this))
-                ChunkManager.Instance?.RegisterZombie(this, chunkId);
-
-            if (currentState == null)
-                TransitionTo(ZombieState_Idle.Instance);
-        }
-
-        /// <summary>从 ZombieData SO 或预制体数据批量应用参数。</summary>
-        public void ApplyZombieData(ZombieData data)
+        // ═══ 从 ZombieData 初始化 ═══
+        public void ApplyFromZombieData(ZombieData data)
         {
             if (data == null) return;
-            moveSpeed = data.moveSpeed;
-            detectRange = data.detectRange;
-            loseRange = data.loseRange;
-            visionAngle = data.visionAngle;
-            attackRange = data.attackRange;
-            attackDamage = data.attackDamage;
-            attackCooldown = data.attackCooldown;
 
-            if (agent != null)
+            _damageable = GetComponent<DamageableZombie>();
+
+            // 运行时创建 AIAgentData
+            if (_data == null)
             {
-                agent.speed = moveSpeed;
-                agent.stoppingDistance = attackRange * 0.8f;
-                agent.acceleration = 8f;
-                agent.angularSpeed = 360f;
+                _data = ScriptableObject.CreateInstance<AIAgentData>();
+                _data.name = data.zombieName;
+            }
+
+            _data.displayName = data.zombieName;
+            _data.factionType = FactionType.Zombie;
+            _data.idleSpeed = data.moveSpeed * 0.5f;
+            _data.combatSpeed = data.moveSpeed;
+            _data.fleeSpeed = data.moveSpeed;
+            _data.activityRadius = 100f;
+            _data.hasActivityConstraint = false;
+            _data.perceptionRange = data.detectRange;
+            _data.visionConeAngle = data.visionAngle;
+            _data.centralVisionAngle = data.visionAngle;
+            _data.peripheralVisionAngle = 0f;
+            _data.peripheralRecognitionChance = 0f;
+            _data.motionThreshold = 0.5f;
+            _data.attackRange = data.attackRange;
+            _data.attackCooldown = data.attackCooldown;
+            _data.attackDamage = data.attackDamage;
+            _data.idleBehavior = IdleBehavior.Wander;
+            _data.wanderRadius = 10f;
+            _data.wanderInterval = 4f;
+            _data.investigateTime = 3f;
+            _data.canFlee = false;
+            _data.fleeThreshold = 0.3f;
+            _data.fleeDistance = 10f;
+            _data.canAllyAlert = true;
+            _data.allyAlertRange = 15f;
+            _data.targetLostTimeout = 5f;
+            _data.targetReassessInterval = 2f;
+            _data.targetSwitchThreshold = 1.5f;
+            _data.angularSpeed = 360f;
+            _data.obstacleMask = LayerMask.GetMask("Default", "Building");
+            _data.reactsToSoundTags = new List<SoundTag>
+                { SoundTag.Footstep, SoundTag.Combat, SoundTag.Gunshot, SoundTag.Building, SoundTag.Impact };
+
+            if (_agent != null)
+            {
+                _agent.speed = _data.idleSpeed;
+                _agent.stoppingDistance = _data.attackRange * 0.8f;
+                _agent.acceleration = 8f;
+                _agent.angularSpeed = 360f;
             }
         }
 
-        void Update()
+        // ═══ AIAgent 抽象方法覆写 ═══
+
+        protected override void DoAttack(GameObject target)
         {
-            currentState?.Update(this);
-        }
+            if (_isDead) return;
+            if (_data == null) return;
 
-        void OnDestroy()
-        {
-            if (ZombieAwarenessSystem.Instance != null)
-                ZombieAwarenessSystem.Instance.Unregister(this);
-        }
-
-        /// <summary>切换状态：Exit 旧 → Enter 新。</summary>
-        public void TransitionTo(ZombieState newState)
-        {
-            if (currentState != null)
-                currentState.Exit(this);
-            currentState = newState;
-            if (currentState != null)
-                currentState.Enter(this);
-        }
-
-        /// <summary>由 ZombieAwarenessSystem 调用。</summary>
-        public void OnPlayerDetected(Transform player)
-        {
-            playerTarget = player;
-            playerDetected = true;
-        }
-
-        /// <summary>由 ZombieAwarenessSystem 调用。</summary>
-        public void OnPlayerLost()
-        {
-            playerTarget = null;
-            playerDetected = false;
-        }
-
-        /// <summary>由 DecibelSystem 调用。节流3: 冷却内忽略更小声音，只有更大的才切目标。</summary>
-        public void OnSoundHeard(NoiseEvent noise)
-        {
-            if ((noise.Source & (SoundSource.Zombie | SoundSource.Environment)) != 0)
-                return;
-
-            float now = UnityEngine.Time.time;
-            float oldRadius = _lastHeardRadius;
-
-            bool inCooldown = now - _lastHeardTime < ZombieHearCooldown;
-            if (inCooldown && noise.Radius <= oldRadius)
-                return;
-
-            _lastHeardTime = now;
-            _lastHeardRadius = noise.Radius;
-            lastHeardPosition = noise.Position;
-
-            bool isBigger = noise.Radius > oldRadius;
-
-            if (currentState is ZombieState_Idle || currentState is ZombieState_Wander)
+            var damageable = target.GetComponent<IDamageable>();
+            if (damageable != null && !damageable.IsDead)
             {
-                if (noise.SourceObject != null)
-                {
-                    playerTarget = noise.SourceObject.transform;
-                    playerDetected = true;
-                }
-                else
-                {
-                    playerTarget = null;
-                    playerDetected = false;
-                }
-                TransitionTo(ZombieState_Chase.Instance);
-            }
-            else if (isBigger)
-            {
-                lastHeardPosition = noise.Position;
-                if (noise.SourceObject != null)
-                {
-                    playerTarget = noise.SourceObject.transform;
-                    playerDetected = true;
-                }
+                damageable.TakeDamage(_data.attackDamage);
+                EventBus.Publish(new ThreatReportEvent(
+                    gameObject.GetInstanceID(),
+                    target.GetInstanceID(),
+                    _data.attackDamage));
             }
         }
 
-        /// <summary>更新 NavMeshAgent 目标点，按 interval 节流。</summary>
-        public void UpdateDestination(Vector3 target, float interval = 0.5f)
+        protected override Vector3? GetHomePosition() => null;
+
+        // ═══ 简单视觉（僵尸不使用三档视觉） ═══
+        protected override bool CanSee(Transform target)
         {
-            _destinationUpdateTimer -= UnityEngine.Time.deltaTime;
-            if (_destinationUpdateTimer <= 0f)
+            if (target == null || _data == null) return false;
+
+            Vector3 eyes = GetEyesPosition();
+            Vector3 targetEyes = target.position + Vector3.up * 1.5f;
+            float dist = Vector3.Distance(eyes, targetEyes);
+
+            if (dist > _data.perceptionRange) return false;
+
+            // 视线遮蔽
+            if (_data.obstacleMask.value != 0 &&
+                Physics.Linecast(eyes, targetEyes, _data.obstacleMask))
+                return false;
+
+            // 视觉锥
+            if (_data.visionConeAngle > 0f && _data.visionConeAngle < 360f)
             {
-                _destinationUpdateTimer = interval;
-                if (agent.enabled && agent.isOnNavMesh)
-                    agent.SetDestination(target);
+                Vector3 toTarget = (targetEyes - eyes).normalized;
+                toTarget.y = 0f;
+                Vector3 forward = transform.forward;
+                forward.y = 0f;
+                float halfAngle = _data.visionConeAngle * 0.5f;
+                float angle = Vector3.Angle(forward, toTarget);
+                if (angle > halfAngle) return false;
             }
+
+            return true;
         }
 
-        /// <summary>设置移动速度。</summary>
-        public void SetSpeed(float speed)
+        // ═══ 死亡 ═══
+        public void Die()
         {
-            if (agent.enabled)
-                agent.speed = speed;
+            if (_isDead) return;
+            _isDead = true;
+
+            // enabled=false 触发 AIAgent.OnDisable() 自动取消事件订阅
+            enabled = false;
+
+            if (_agent != null && _agent.enabled)
+            {
+                _agent.isStopped = true;
+                _agent.enabled = false;
+            }
+
+            var col = GetComponent<Collider>();
+            if (col != null)
+                col.enabled = false;
         }
 
-        /// <summary>找一个 NavMesh 上的随机点，radius 半径内。</summary>
+        // ═══ 导航辅助（保持兼容） ═══
         public bool SampleRandomPoint(float radius, out Vector3 result)
         {
             for (int i = 0; i < 5; i++)
@@ -210,5 +167,16 @@ namespace _Game.Systems.Zombie
             result = transform.position;
             return false;
         }
+
+        protected override Vector3 GetEyesPosition()
+            => transform.position + Vector3.up * 1.5f;
+
+#if UNITY_EDITOR
+        protected override void OnDrawGizmosSelected()
+        {
+            if (_data == null) return;
+            base.OnDrawGizmosSelected();
+        }
+#endif
     }
 }

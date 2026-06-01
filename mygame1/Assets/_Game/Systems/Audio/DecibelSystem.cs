@@ -207,18 +207,8 @@ namespace _Game.Systems.Audio
             var cm = ChunkManager.Instance;
             if (cm == null) return;
 
-            _tempZombieList.Clear();
-            CollectZombiesInRadius(cm, noise.Position, noise.Radius, _tempZombieList);
-
-            for (int i = 0; i < _tempZombieList.Count; i++)
-            {
-                var zombie = _tempZombieList[i];
-                if (zombie == null) continue;
-
-                float dist = Vector3.Distance(zombie.transform.position, noise.Position);
-                if (dist <= noise.Radius)
-                    zombie.OnSoundHeard(noise);
-            }
+            // AIAgent 僵尸通过 EventBus 订阅 NoiseEvent，不再直接调用
+            EventBus.Publish(noise);
         }
 
         void CollectZombiesInRadius(ChunkManager cm, Vector3 position, float radius,
