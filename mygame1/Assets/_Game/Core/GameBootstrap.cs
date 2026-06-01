@@ -26,6 +26,8 @@ namespace _Game.Core
 
             if (player == null) return;
 
+            // Animator 兜底（正常情况 Prefab 已自带）
+
             // 按依赖顺序添加组件
             AddIfMissing(player, "_Game.Systems.Player.PlayerController");
             AddIfMissing(player, "_Game.Systems.Inventory.Inventory");

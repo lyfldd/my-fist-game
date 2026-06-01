@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     private PlayerCharacter _playerCharacter;
     private StaminaSystem _stamina;
     private MouseGroundProjector _projector;
+    private Animator _animator;
 
     private const string FootstepKey = "player_footstep";
 
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
         _playerCharacter = GetComponent<PlayerCharacter>();
         _stamina = GetComponent<StaminaSystem>();
         _projector = GetComponent<MouseGroundProjector>();
+        _animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -78,6 +80,10 @@ public class PlayerController : MonoBehaviour
 
         if (_playerCharacter != null)
             currentSpeed *= _playerCharacter.GetMoveSpeedModifier();
+
+        // 动画：将归一化速度传给 Animator Blend Tree（1=Walk, 1.6=Run）
+        if (_animator != null)
+            _animator.SetFloat("Speed", moveInput.sqrMagnitude > 0.01f ? currentSpeed / moveSpeed : 0f);
 
         // 应用移动
         Vector3 velocity = moveInput * currentSpeed;
