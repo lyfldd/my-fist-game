@@ -1,6 +1,7 @@
 using UnityEngine;
 using _Game.Config;
 using _Game.Core;
+using _Game.Systems.Audio;
 
 namespace _Game.Systems.Vehicle
 {
@@ -43,6 +44,10 @@ namespace _Game.Systems.Vehicle
         private bool _isBoosting;
         private Inventory.Inventory _driverInventory;
 
+        // 引擎声音 key（每辆车唯一）
+        private string _engineSoundKey;
+        private static bool _vehicleSoundDebugOnce;
+
         // 有效最高速度（根据是否加速动态计算）
         private float EffectiveMaxSpeed => _isBoosting
             ? _maxSpeed * (vehicleData != null ? vehicleData.boostSpeedMultiplier : 2f)
@@ -58,6 +63,12 @@ namespace _Game.Systems.Vehicle
         void Awake()
         {
             _rb = GetComponent<Rigidbody>();
+            _engineSoundKey = $"vehicle_engine_{GetInstanceID()}";
+        }
+
+        void OnDestroy()
+        {
+            SoundEmitter.StopVehicleEngine(_engineSoundKey);
         }
 
         void Start()
@@ -74,6 +85,10 @@ namespace _Game.Systems.Vehicle
             ClampSpeed();
             ApplyAntiRoll();
             ApplyRollStabilization();
+
+            // 引擎声音跟随车辆位置
+            if (_currentThrottle != 0)
+                SoundEmitter.UpdateVehicleEngine(_engineSoundKey, transform.position);
         }
 
         /// <summary>
@@ -159,13 +174,25 @@ namespace _Game.Systems.Vehicle
         public void SetDriver(GameObject driver)
         {
             Driver = driver;
+            bool wasEngineOn = _isEngineOn;
             _isEngineOn = Driver != null;
             _driverInventory = driver != null ? driver.GetComponent<Inventory.Inventory>() : null;
-            if (!_isEngineOn)
+
+            if (_isEngineOn && !wasEngineOn)
+            {
+                SoundEmitter.StartVehicleEngine(_engineSoundKey, transform.position);
+                if (!_vehicleSoundDebugOnce)
+                {
+                    _vehicleSoundDebugOnce = true;
+                    Debug.Log($"[VehicleController] 引擎声音启动: key={_engineSoundKey}, pos={transform.position}");
+                }
+            }
+            else if (!_isEngineOn)
             {
                 _currentThrottle = 0;
                 _currentSteer = 0;
                 _currentBrake = 1f;
+                SoundEmitter.StopVehicleEngine(_engineSoundKey);
             }
         }
 
@@ -256,6 +283,7 @@ namespace _Game.Systems.Vehicle
                         }
                     }
                     _isEngineOn = false;
+                    SoundEmitter.StopVehicleEngine(_engineSoundKey);
                 }
             }
         }

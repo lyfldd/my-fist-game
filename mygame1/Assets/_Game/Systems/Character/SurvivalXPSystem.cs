@@ -63,7 +63,7 @@ namespace _Game.Systems.Character
 
         void InitFromCharacterData()
         {
-            var pc = FindObjectOfType<PlayerCharacter>();
+            var pc = ServiceLocator.Get<PlayerCharacter>();
             CharacterData data = pc != null ? pc.characterData : null;
 
             // 属性

@@ -38,7 +38,7 @@ namespace _Game.Systems.Weapon
 
         void Start()
         {
-            // 找第一个有武器的槽，没有则默认 RightHand
+            // 找第一个有武器的槽，没有则默认 None
             foreach (var slot in _cycleOrder)
             {
                 if (HasWeapon(slot))
@@ -50,8 +50,43 @@ namespace _Game.Systems.Weapon
             SwitchTo(EquipSlot.None);
         }
 
-        void OnEnable() { InputRouter.BindKey(KeyCode.Q, InputPriority.Gameplay, HandleCycleWeapon, this); }
-        void OnDisable() { InputRouter.UnbindAll(this); }
+        void OnEnable()
+        {
+            InputRouter.BindKey(KeyCode.Q, InputPriority.Gameplay, HandleCycleWeapon, this);
+            EventBus.Subscribe<WeaponEquippedEvent>(OnWeaponEquipped);
+            EventBus.Subscribe<WeaponUnequippedEvent>(OnWeaponUnequipped);
+        }
+
+        void OnDisable()
+        {
+            InputRouter.UnbindAll(this);
+            EventBus.Unsubscribe<WeaponEquippedEvent>(OnWeaponEquipped);
+            EventBus.Unsubscribe<WeaponUnequippedEvent>(OnWeaponUnequipped);
+        }
+
+        void OnWeaponEquipped(WeaponEquippedEvent evt)
+        {
+            // 装备武器后自动切换（如果当前空手或新武器优先级更高）
+            if (_activeSlot == EquipSlot.None || evt.Slot == EquipSlot.RightHand)
+                SwitchTo(evt.Slot);
+        }
+
+        void OnWeaponUnequipped(WeaponUnequippedEvent evt)
+        {
+            if (_activeSlot == evt.Slot)
+            {
+                // 当前槽武器被卸下 → 尝试切到其他武器
+                foreach (var slot in _cycleOrder)
+                {
+                    if (HasWeapon(slot))
+                    {
+                        SwitchTo(slot);
+                        return;
+                    }
+                }
+                SwitchTo(EquipSlot.None);
+            }
+        }
 
         bool HandleCycleWeapon() { CycleNext(); return true; }
 

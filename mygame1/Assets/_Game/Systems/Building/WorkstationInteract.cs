@@ -19,7 +19,7 @@ namespace _Game.Systems.Building
         {
             _craftingSystem = CraftingSystem.Instance;
             if (_craftingSystem == null)
-                _craftingSystem = Object.FindObjectOfType<CraftingSystem>();
+                _craftingSystem = ServiceLocator.Get<CraftingSystem>();
         }
 
         string IInteractable.InteractionPrompt

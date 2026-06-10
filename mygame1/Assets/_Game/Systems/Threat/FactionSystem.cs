@@ -33,6 +33,7 @@ namespace _Game.Systems.Threat
                 return;
             }
             Instance = this;
+            ServiceLocator.Register(this);
             LoadDefaults();
         }
 
@@ -41,6 +42,9 @@ namespace _Game.Systems.Threat
         {
             _relations.Clear();
             _lookup.Clear();
+
+            if (_defaultFactions == null || _defaultFactions.Length == 0)
+                _defaultFactions = Resources.LoadAll<FactionData>("Factions");
 
             if (_defaultFactions != null)
             {

@@ -57,7 +57,7 @@ namespace _Game.Systems.Crafting
         void Awake()
         {
             if (_inventoryFallback == null)
-                _inventoryFallback = Object.FindObjectOfType<Inventory.Inventory>();
+                _inventoryFallback = ServiceLocator.Get<Inventory.Inventory>();
         }
 
         public void Init(ProductionDeviceData data)
@@ -115,7 +115,7 @@ namespace _Game.Systems.Crafting
         void TryProduce()
         {
             // 研究门控
-            var researchMgr = Object.FindObjectOfType<ChemicalResearchManager>();
+            var researchMgr = ServiceLocator.Get<ChemicalResearchManager>();
             if (researchMgr != null && !researchMgr.IsDeviceUnlocked(_data.deviceName))
                 return;
 

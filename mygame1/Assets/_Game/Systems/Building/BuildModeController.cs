@@ -138,7 +138,7 @@ namespace _Game.Systems.Building
             // 4. 技能等级检查（自由建造模式跳过）
             if (!_Game.UI.DevTools.FreeBuildEnabled && activeBuildable.skillRequirements != null && activeBuildable.skillRequirements.Length > 0)
             {
-                var pc = FindObjectOfType<_Game.Systems.Character.PlayerCharacter>();
+                var pc = ServiceLocator.Get<_Game.Systems.Character.PlayerCharacter>();
                 foreach (var req in activeBuildable.skillRequirements)
                 {
                     int skillLevel = pc != null ? pc.GetSkillLevel(req.skill) : 0;
@@ -154,7 +154,7 @@ namespace _Game.Systems.Building
             if (activeBuildable.category == BuildableCategory.ElectronicsIndustry
                 && activeBuildable.displayName.Contains("AI"))
             {
-                var existing = FindObjectOfType<_Game.Systems.AIBot.AIBot>();
+                var existing = ServiceLocator.Get<_Game.Systems.AIBot.AIBot>();
                 if (existing != null && !existing.IsDead)
                 {
                     Debug.LogWarning("[BuildModeController] 已有AI机器人，限1台/玩家");

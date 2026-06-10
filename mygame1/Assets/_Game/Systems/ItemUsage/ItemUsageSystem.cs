@@ -16,8 +16,8 @@ namespace _Game.Systems.ItemUsage
 
         private void Start()
         {
-            _inventory = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
-            _survival = FindObjectOfType<SurvivalSystem>();
+            _inventory = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
+            _survival = ServiceLocator.Get<SurvivalSystem>();
             EventBus.Subscribe<ItemUsedEvent>(OnItemUsed);
         }
 

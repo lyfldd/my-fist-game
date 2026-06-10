@@ -29,11 +29,12 @@ namespace _Game.Systems.Crafting
                 return;
             }
             Instance = this;
-            _inventory = Object.FindObjectOfType<Inventory.Inventory>();
+            if (_catalog == null) _catalog = Resources.Load<RecipeCatalog>("RecipeCatalog");
+            _inventory = ServiceLocator.Get<Inventory.Inventory>();
             _xpSystem = SurvivalXPSystem.Instance;
             if (_xpSystem == null)
-                _xpSystem = Object.FindObjectOfType<SurvivalXPSystem>();
-            _stamina = Object.FindObjectOfType<StaminaSystem>();
+                _xpSystem = ServiceLocator.Get<SurvivalXPSystem>();
+            _stamina = ServiceLocator.Get<StaminaSystem>();
         }
 
         /// <summary>

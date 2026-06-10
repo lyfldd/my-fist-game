@@ -1,6 +1,10 @@
 using UnityEngine;
 using _Game.Systems.Threat;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace _Game.Core
 {
     /// <summary>
@@ -12,21 +16,45 @@ namespace _Game.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {
-            // InputRouter 已自带 EnsureInstance（首次 BindKey 时自动创建），
-            // 这里提前创建以便更早可用
+            Debug.Log("[GameBootstrap] BeforeSceneLoad 开始");
             EnsureInputRouter();
+            Debug.Log("[GameBootstrap] BeforeSceneLoad 完成");
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
+            Debug.Log("[GameBootstrap] AfterSceneLoad 开始");
+
             var player = GameObject.FindWithTag("Player")
                       ?? GameObject.Find("player")
                       ?? GameObject.Find("Player");
 
-            if (player == null) return;
+            if (player == null)
+            {
+                Debug.LogError("[GameBootstrap] ❌ 找不到 Player！请确认场景中有 tag=Player 的对象");
+                return;
+            }
+            Debug.Log($"[GameBootstrap] 找到 Player: {player.name}");
 
-            // Animator 兜底（正常情况 Prefab 已自带）
+            // 注册玩家到全局注册表（所有系统通过 PlayerRegistry 访问）
+            PlayerRegistry.Register(player);
+
+            // Unity 基础组件兜底
+            if (player.GetComponent<Rigidbody>() == null)
+            {
+                var rb = player.AddComponent<Rigidbody>();
+                rb.constraints = RigidbodyConstraints.FreezeRotation;
+            }
+            if (player.GetComponent<CapsuleCollider>() == null)
+            {
+                var col = player.AddComponent<CapsuleCollider>();
+                col.center = new Vector3(0, 1f, 0);
+                col.height = 2f;
+                col.radius = 0.3f;
+            }
+            if (player.GetComponent<Animator>() == null)
+                player.AddComponent<Animator>();
 
             // 按依赖顺序添加组件
             AddIfMissing(player, "_Game.Systems.Player.PlayerController");
@@ -61,19 +89,149 @@ namespace _Game.Core
             if (playerFaction != null)
                 playerFaction.SetFaction(_Game.Config.FactionType.Player);
 
+            // 摄像机跟随
+            var cam = Camera.main;
+            if (cam != null)
+            {
+                var cf = cam.GetComponent<CameraFollow>();
+                if (cf == null)
+                    cf = cam.gameObject.AddComponent<CameraFollow>();
+                cf.target = player.transform;
+            }
+
+            // 自动填充 ScriptableObject 引用
+            AutoResolveReferences(player);
+
             EnsureInputRouter();
+
+            // ═══ 自检 ═══
+            Debug.Log($"[GameBootstrap] 自检: FactionSystem={FactionSystem.Instance != null}, ThreatSystem={ThreatSystem.Instance != null}, DecibelSystem={_Game.Systems.Audio.DecibelSystem.Instance != null}");
+            var pc = player.GetComponent<_Game.Systems.Character.PlayerCharacter>();
+            var fc = player.GetComponent<FactionComponent>();
+            var playerCol = player.GetComponent<CapsuleCollider>();
+            Debug.Log($"[GameBootstrap] 自检: PlayerCharacter={pc != null}, FactionComponent={fc != null}, Faction={fc?.Faction}");
+            Debug.Log($"[GameBootstrap] 碰撞体: CapsuleCollider={playerCol != null} center={playerCol?.center} height={playerCol?.height} radius={playerCol?.radius}, layer={player.layer}({LayerMask.LayerToName(player.layer)}), 子对象数={player.transform.childCount}");
+
+            // 检查所有子对象是否有碰撞体
+            foreach (var c in player.GetComponentsInChildren<Collider>())
+                Debug.Log($"[GameBootstrap] 子碰撞体: {c.gameObject.name} type={c.GetType().Name} layer={c.gameObject.layer}({LayerMask.LayerToName(c.gameObject.layer)}), FactionComponent={c.GetComponent<FactionComponent>() != null}");
+        }
+
+        // ═══════════════════════════════════════════
+        // 自动解析 ScriptableObject 引用
+        // ═══════════════════════════════════════════
+
+        static void AutoResolveReferences(GameObject player)
+        {
+            // SurvivalSystem → survivalData
+            var survival = player.GetComponent("_Game.Systems.Survival.SurvivalSystem");
+            if (survival != null)
+            {
+                TrySetField(survival, "survivalData", () => Resources.Load<ScriptableObject>("SurvivalData_Default"));
+                TrySetField(survival, "playerCharacter", () => player.GetComponent("_Game.Systems.Character.PlayerCharacter"));
+                TrySetField(survival, "timeManager", () => ServiceLocator.Get<_Game.Systems.Time.TimeManager>());
+            }
+
+            // PlayerCharacter → characterData
+            var pc = player.GetComponent("_Game.Systems.Character.PlayerCharacter");
+            if (pc != null)
+            {
+                TrySetField(pc, "characterData", () =>
+                {
+                    var so = Resources.Load<ScriptableObject>("DefaultCharacter");
+#if UNITY_EDITOR
+                    if (so == null)
+                        so = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/_Game/Config/Character/DefaultCharacter.asset");
+#endif
+                    // 终极兜底：创建空模板（技能/属性为默认值，职业为空）
+                    if (so == null)
+                    {
+                        so = ScriptableObject.CreateInstance<_Game.Config.CharacterData>();
+                        Debug.LogWarning("[GameBootstrap] CharacterData 未找到资源/Asset，已创建空模板");
+                    }
+                    return so;
+                });
+            }
+
+            // BuildMenuUI → catalog
+            var buildMenu = player.GetComponent("_Game.Systems.Building.BuildMenuUI");
+            if (buildMenu != null)
+            {
+                TrySetField(buildMenu, "catalog", () =>
+                {
+                    var so = Resources.Load<ScriptableObject>("BuildableCatalog");
+#if UNITY_EDITOR
+                    if (so == null)
+                        so = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/_Game/Config/BuildableCatalog.asset");
+#endif
+                    return so;
+                });
+            }
+
+            // ChemicalResearchManager → _researchData
+            var chem = player.GetComponent("_Game.Systems.Crafting.ChemicalResearchManager");
+            if (chem != null)
+            {
+                TrySetField(chem, "_researchData", () =>
+                {
+                    var so = Resources.Load<ScriptableObject>("ChemicalResearchData");
+#if UNITY_EDITOR
+                    if (so == null)
+                        so = AssetDatabase.LoadAssetAtPath<ScriptableObject>("Assets/_Game/Config/Resources/ChemicalResearchData.asset");
+#endif
+                    return so;
+                });
+            }
+
+            // FactionComponent → _factionData（没有 .asset 就跳过，代码里有自动创建）
+            var faction = player.GetComponent<FactionComponent>();
+            if (faction != null)
+            {
+                TrySetField(faction, "_factionData", () =>
+                {
+#if UNITY_EDITOR
+                    var guids = AssetDatabase.FindAssets("t:FactionData");
+                    if (guids.Length > 0)
+                        return AssetDatabase.LoadAssetAtPath<ScriptableObject>(AssetDatabase.GUIDToAssetPath(guids[0]));
+#endif
+                    return null;
+                });
+            }
+        }
+
+        static void TrySetField(object target, string fieldName, System.Func<Object> resolver)
+        {
+            if (target == null) return;
+            var field = target.GetType().GetField(fieldName,
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            if (field == null) return;
+
+            var current = field.GetValue(target);
+            if (current != null && !(current is UnityEngine.Object uo && uo == null)) return; // 已经设了
+
+            var value = resolver();
+            if (value != null)
+            {
+                field.SetValue(target, value);
+                Debug.Log($"[GameBootstrap] ✅ {target.GetType().Name}.{fieldName} = {value.name}");
+            }
         }
 
         static void EnsureInputRouter()
         {
-            if (InputRouter.Instance != null) return;
             var go = GameObject.Find("Managers") ?? new GameObject("Managers");
             Object.DontDestroyOnLoad(go);
-            go.AddComponent<InputRouter>();
 
-            // SoundEmitter 从静态类改为 MonoBehaviour，确保实例存在
+            // InputRouter
+            if (go.GetComponent<InputRouter>() == null)
+                go.AddComponent<InputRouter>();
+
+            // SoundEmitter — 声音事件中转（静态方法 → DecibelSystem）
             if (go.GetComponent<_Game.Systems.Audio.SoundEmitter>() == null)
                 go.AddComponent<_Game.Systems.Audio.SoundEmitter>();
+            // DecibelSystem — 分贝/噪音系统（僵尸感知 + 声音传播）
+            if (go.GetComponent<_Game.Systems.Audio.DecibelSystem>() == null)
+                go.AddComponent<_Game.Systems.Audio.DecibelSystem>();
             // MuzzleFlashSystem — 枪口火焰 VFX
             if (go.GetComponent<_Game.Systems.VFX.MuzzleFlashSystem>() == null)
                 go.AddComponent<_Game.Systems.VFX.MuzzleFlashSystem>();

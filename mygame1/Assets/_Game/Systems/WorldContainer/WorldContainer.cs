@@ -124,7 +124,7 @@ namespace _Game.Systems.WorldContainer
 
             if (registry != null)
             {
-                var timeManager = FindObjectOfType<_Game.Systems.Time.TimeManager>();
+                var timeManager = ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
                 registry.MarkOpened(containerId, timeManager != null ? timeManager.CurrentDay : 0);
             }
 
@@ -150,7 +150,7 @@ namespace _Game.Systems.WorldContainer
 
             EventBus.Publish(new ContainerOpenedEvent(gameObject, profile != null ? profile.displayName : ""));
 
-            var invUI = FindObjectOfType<_Game.UI.InventoryUI>();
+            var invUI = ServiceLocator.Get<_Game.UI.InventoryUI>();
             if (invUI != null)
                 invUI.ShowOverview();
         }

@@ -27,21 +27,24 @@ namespace _Game.Systems.Character
 
         void Awake()
         {
+            ServiceLocator.Register(this);
+
             var pilotLock = GetComponent<_Game.Systems.AIBot.AIBotPilotInputLock>();
             if (pilotLock == null)
                 gameObject.AddComponent<_Game.Systems.AIBot.AIBotPilotInputLock>();
 
+            // 尝试加载 CharacterData（空 fallback 由 GameBootstrap 兜底，避免空壳覆盖真实数据）
             if (characterData == null)
             {
                 characterData = Resources.Load<CharacterData>("DefaultCharacter");
-                if (characterData == null)
-                {
-                    characterData = ScriptableObject.CreateInstance<CharacterData>();
-                    Debug.LogWarning("PlayerCharacter 未绑定 CharacterData，已使用默认值");
-                }
             }
 
             _inventory = GetComponent<Inventory.Inventory>();
+        }
+
+        void OnDestroy()
+        {
+            ServiceLocator.Unregister<PlayerCharacter>();
         }
 
         void Start()

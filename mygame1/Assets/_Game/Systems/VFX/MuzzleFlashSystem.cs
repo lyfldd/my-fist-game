@@ -17,6 +17,13 @@ namespace _Game.Systems.VFX
         [Header("配置")]
         public float flashLifetime = 0.08f;
 
+        void Awake()
+        {
+            if (smallFlashPrefab == null) smallFlashPrefab = Resources.Load<GameObject>("VFX/MuzzleFlash_Small");
+            if (mediumFlashPrefab == null) mediumFlashPrefab = Resources.Load<GameObject>("VFX/MuzzleFlash_Medium");
+            if (largeFlashPrefab == null) largeFlashPrefab = Resources.Load<GameObject>("VFX/MuzzleFlash_Large");
+        }
+
         void OnEnable()
         {
             EventBus.Subscribe<WeaponFiredEvent>(OnWeaponFired);

@@ -582,26 +582,75 @@ namespace _Game.Systems.AI
         }
 
         // ═══ 感知 ═══
+        static bool _perceptionDebugOnce;
+        static int _perceptionDebugCount;
+        static float _perceptionDebugNextLogTime;
         void PerceptionTick()
         {
-            if (_data == null || ThreatSystem.Instance == null) return;
+            if (_data == null)
+            {
+                if (!_perceptionDebugOnce) { _perceptionDebugOnce = true; Debug.LogError($"[AIAgent] {name} _data 为 null！PerceptionTick 已禁用"); }
+                return;
+            }
+            if (ThreatSystem.Instance == null)
+            {
+                if (!_perceptionDebugOnce) { _perceptionDebugOnce = true; Debug.LogError($"[AIAgent] {name} ThreatSystem.Instance 为 null！"); }
+                return;
+            }
 
             int myId = gameObject.GetInstanceID();
             Vector3 eyes = GetEyesPosition();
 
             Collider[] hits = new Collider[16];
+            // 感知扫描用 AllLayers（障碍物过滤由 CanSee 的 Linecast 负责）
             int count = Physics.OverlapSphereNonAlloc(transform.position, _data.perceptionRange,
-                hits, _data.obstacleMask.value == 0 ? Physics.AllLayers : ~_data.obstacleMask);
+                hits, Physics.AllLayers);
 
+            _perceptionDebugCount++;
+            if (UnityTime.time > _perceptionDebugNextLogTime)
+            {
+                _perceptionDebugNextLogTime = UnityTime.time + 3f;
+                var player = PlayerRegistry.Transform;
+                float distToPlayer = player != null ? Vector3.Distance(transform.position, player.position) : -1f;
+
+                // 手动检查：玩家碰撞体是否在 OverlapSphere 结果里
+                bool playerColFound = false;
+                bool playerFacFound = false;
+                string playerFacIssue = "";
+                var playerCol = player != null ? player.GetComponent<Collider>() : null;
+                for (int i = 0; i < count; i++)
+                {
+                    if (hits[i] == playerCol)
+                    {
+                        playerColFound = true;
+                        var fac = hits[i].GetComponent<FactionComponent>();
+                        if (fac != null) playerFacFound = true;
+                        else playerFacIssue = "(无FactionComponent)";
+                        break;
+                    }
+                }
+                if (!playerColFound && playerCol != null)
+                    playerFacIssue = $"(玩家碰撞体不在结果中! col.enabled={playerCol.enabled}, col.gameObject.activeInHierarchy={playerCol.gameObject.activeInHierarchy})";
+
+                Debug.Log($"[AIAgent] {name} #PerceptionTick{_perceptionDebugCount}: 碰撞体={count}, myFaction={_data.factionType}, range={_data.perceptionRange}m, distToPlayer={distToPlayer:F1}m, 玩家碰撞体找到={playerColFound}, 阵营组件={playerFacFound} {playerFacIssue}");
+            }
+
+            int hostileSeen = 0;
+            int totalFactionComps = 0;
+            int blockedByCanSee = 0;
+            int blockedByNotHostile = 0;
+            string canSeeDetail = "";
             for (int i = 0; i < count; i++)
             {
                 var otherFaction = hits[i].GetComponent<FactionComponent>();
                 if (otherFaction == null) continue;
+                totalFactionComps++;
                 if (otherFaction.gameObject.GetInstanceID() == myId) continue;
 
                 // 只检测敌对阵营
                 if (FactionSystem.Instance == null) continue;
-                if (!FactionSystem.Instance.IsHostile(_data.factionType, otherFaction.Faction)) continue;
+                bool isHostile = FactionSystem.Instance.IsHostile(_data.factionType, otherFaction.Faction);
+                if (!isHostile) { blockedByNotHostile++; continue; }
 
                 if (CanSee(otherFaction.transform))
                 {
@@ -609,8 +658,23 @@ namespace _Game.Systems.AI
                         otherFaction.gameObject.GetInstanceID(),
                         50f, ThreatType.Visual,
                         otherFaction.transform.position);
+                    hostileSeen++;
+                }
+                else
+                {
+                    blockedByCanSee++;
+                    if (string.IsNullOrEmpty(canSeeDetail))
+                    {
+                        float d = Vector3.Distance(GetEyesPosition(), otherFaction.transform.position + Vector3.up * 1.5f);
+                        Vector3 toTarget = (otherFaction.transform.position - transform.position).normalized;
+                        float angle = Vector3.Angle(transform.forward, toTarget);
+                        canSeeDetail = $"dist={d:F1}m angle={angle:F0}° visionCone={_data.visionConeAngle:F0}°";
+                    }
                 }
             }
+
+            if (_perceptionDebugCount <= 3)
+                Debug.Log($"[AIAgent] {name} 结果: 阵营组件共{totalFactionComps}个, 非敌对跳过{blockedByNotHostile}个, 敌对通过{hostileSeen}个, CanSee阻挡{blockedByCanSee}个{(string.IsNullOrEmpty(canSeeDetail) ? "" : $" [{canSeeDetail}]")}");
         }
 
         protected virtual Vector3 GetEyesPosition()

@@ -58,7 +58,7 @@ namespace _Game.Systems.Crafting
             }
             _instance = this;
 
-            _playerInv = Object.FindObjectOfType<Inventory.Inventory>();
+            _playerInv = ServiceLocator.Get<Inventory.Inventory>();
             // 强制不透明，防止 Inspector 旧序列化值导致透出残影
             bgColor = new Color(0.06f, 0.06f, 0.06f, 1f);
             sectionBgColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
@@ -96,7 +96,7 @@ namespace _Game.Systems.Crafting
             _currentDevice = evt.Device;
             _deviceData = evt.Device.Data;
             if (_playerInv == null)
-                _playerInv = Object.FindObjectOfType<Inventory.Inventory>();
+                _playerInv = ServiceLocator.Get<Inventory.Inventory>();
             _selectedRecipeIdx = -1;
             _isVisible = true;
             ScanNearbyDevices();
@@ -134,7 +134,7 @@ namespace _Game.Systems.Crafting
 
         void CloseOtherUIs()
         {
-            var invUI = Object.FindObjectOfType<_Game.UI.InventoryUI>();
+            var invUI = ServiceLocator.Get<_Game.UI.InventoryUI>();
             if (invUI != null)
             {
                 if (invUI.overviewPanel != null) invUI.overviewPanel.SetActive(false);
@@ -142,19 +142,19 @@ namespace _Game.Systems.Crafting
                 invUI.SendMessage("SetOtherUIVisible", true, SendMessageOptions.DontRequireReceiver);
             }
 
-            var bmc = Object.FindObjectOfType<_Game.Systems.Building.BuildModeController>();
+            var bmc = ServiceLocator.Get<_Game.Systems.Building.BuildModeController>();
             if (bmc != null && bmc.IsBuildMode)
                 bmc.ForceExit();
 
-            var containerWin = Object.FindObjectOfType<_Game.Systems.WorldContainer.ContainerWindowUI>();
+            var containerWin = ServiceLocator.Get<_Game.Systems.WorldContainer.ContainerWindowUI>();
             if (containerWin != null)
                 containerWin.CloseWindow();
 
             // 关闭旧工作台UI，避免透出老UI残影
-            var craftingUI = Object.FindObjectOfType<CraftingUI>();
+            var craftingUI = ServiceLocator.Get<CraftingUI>();
             if (craftingUI != null) craftingUI.Close();
 
-            var researchUI = Object.FindObjectOfType<ChemicalResearchUI>();
+            var researchUI = ServiceLocator.Get<ChemicalResearchUI>();
             if (researchUI != null) researchUI.Close();
 
             // 关闭电力/终端面板（同在屏幕正中，会叠影）
@@ -296,7 +296,7 @@ namespace _Game.Systems.Crafting
             y += 24f;
 
             // 研究状态检查
-            var researchMgr = Object.FindObjectOfType<ChemicalResearchManager>();
+            var researchMgr = ServiceLocator.Get<ChemicalResearchManager>();
             bool researched = researchMgr == null || researchMgr.IsDeviceUnlocked(_deviceData.deviceName);
             if (!researched)
             {

@@ -38,6 +38,10 @@ namespace _Game.Systems.Weapon
         private Inventory.Inventory _inventory;
         public bool IsReloading => _isReloading;
 
+        private static bool _shootDebugOnce;
+        private int _updateDebugCount;
+        private ItemData _lastWeapon; // 跟踪武器切换，避免 OnEnable 不触发时扩散/弹匣未初始化
+
         void Awake()
         {
             _aiming = GetComponent<WeaponAiming>();
@@ -62,6 +66,8 @@ namespace _Game.Systems.Weapon
                 _currentMag = weapon.magazineSize;
             }
             InputRouter.BindMouse(0, InputPriority.Gameplay, OnFireButton, this);
+            _updateDebugCount = 0;
+            Debug.Log($"[WeaponShooting] OnEnable: activeSlot={_switcher?.ActiveSlot}, weapon={weapon?.name}, isFirearm={weapon?.isFirearm}, mag={_currentMag}/{weapon?.magazineSize}, ammoItem={weapon?.ammoItemName}, myEnabled={enabled}");
         }
 
         void OnDisable()
@@ -75,13 +81,36 @@ namespace _Game.Systems.Weapon
         bool OnFireButton()
         {
             _wantsSemiFire = true;
+            if (!_shootDebugOnce)
+                Debug.Log($"[WeaponShooting] OnFireButton 触发! weapon={GetActiveWeapon()?.name}, mag={_currentMag}");
             return true;
         }
 
         void Update()
         {
             var weapon = GetActiveWeapon();
-            if (weapon == null || !weapon.isFirearm) return;
+            _updateDebugCount++;
+            if (_updateDebugCount <= 5 || (_updateDebugCount % 120 == 0))
+            {
+                Debug.Log($"[WeaponShooting] Update#{_updateDebugCount}: activeSlot={_switcher?.ActiveSlot}, weapon={weapon?.name}, isFirearm={weapon?.isFirearm}, mag={_currentMag}, ammoItem={weapon?.ammoItemName}, wantsSemi={_wantsSemiFire}, reloading={_isReloading}, fireTimer={_fireTimer:F2}, myEnabled={enabled}");
+            }
+            if (weapon == null || !weapon.isFirearm)
+            {
+                _wantsSemiFire = false;
+                _lastWeapon = null;
+                return;
+            }
+
+            // 武器切换后重新初始化（OnEnable 可能不触发）
+            if (_lastWeapon != weapon)
+            {
+                _lastWeapon = weapon;
+                _currentSpread = weapon.baseSpread;
+                _currentMag = weapon.magazineSize;
+                _isReloading = false;
+                _fireTimer = 0f;
+                Debug.Log($"[WeaponShooting] 武器切换: {weapon.name}, mag={_currentMag}, spread={_currentSpread}, ammo={weapon.ammoItemName}, soundType={weapon.gunshotSoundType}, fireRate={weapon.fireRate}");
+            }
 
             if (_fireTimer > 0f)
                 _fireTimer -= UnityEngine.Time.deltaTime;
@@ -136,8 +165,16 @@ namespace _Game.Systems.Weapon
             // 弹药检查：有弹药需求且弹匣为空 → 自动换弹
             if (!string.IsNullOrEmpty(weapon.ammoItemName) && _currentMag <= 0)
             {
+                int inInv = CountAmmoInInventory(weapon.ammoItemName);
+                Debug.Log($"[WeaponShooting] 弹匣空! ammoItem={weapon.ammoItemName}, 背包子弹={inInv}, 尝试换弹...");
                 StartReload(weapon);
                 return;
+            }
+
+            if (!_shootDebugOnce)
+            {
+                _shootDebugOnce = true;
+                Debug.Log($"[WeaponShooting] TryFire! weapon={weapon.name}, mag={_currentMag}, ammo={weapon.ammoItemName}, soundType={weapon.gunshotSoundType}, spread={_currentSpread:F2}");
             }
 
             // 扣动扳机：散射扩大

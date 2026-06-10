@@ -50,6 +50,7 @@ namespace _Game.Systems.Audio
                 "Heavy" => 120f,
                 _ => 50f
             };
+            Debug.Log($"[SoundEmitter] 枪声发出: type={evt.SoundType}, radius={radius}m, pos={evt.MuzzlePos}, DecibelSystem={DecibelSystem.Instance != null}");
             DecibelSystem.Instance?.Emit(evt.MuzzlePos, radius, SoundSource.Player, SoundTag.Gunshot);
             // TODO Phase4: AudioManager.PlayGunshot(evt.SoundType, evt.MuzzlePos);
         }
@@ -85,9 +86,15 @@ namespace _Game.Systems.Audio
         // 移动（持续声音，由 PlayerController 管理 Start/Update/Stop）
         // ============================================================
 
+        static bool _footstepDebugOnce;
         public static void SetFootstep(string key, Vector3 pos, bool running)
         {
-            float radius = running ? 8f : 3f;
+            if (!_footstepDebugOnce)
+            {
+                _footstepDebugOnce = true;
+                Debug.Log($"[SoundEmitter] 首次脚步声: key={key}, pos={pos}, running={running}, DecibelSystem={DecibelSystem.Instance != null}");
+            }
+            float radius = running ? 10f : 6f;
             DecibelSystem.Instance?.StartContinuous(key, pos, radius, SoundSource.Player, SoundTag.Footstep);
         }
 

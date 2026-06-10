@@ -1,5 +1,6 @@
 using UnityEngine;
 using _Game.Config;
+using _Game.Core;
 using InventorySystem = _Game.Systems.Inventory.Inventory;
 using _Game.UI;
 
@@ -163,14 +164,14 @@ namespace _Game.Systems.Power
 
         bool ConsumeCable()
         {
-            var inv = FindObjectOfType<InventorySystem>();
+            var inv = ServiceLocator.Get<InventorySystem>();
             if (inv == null) return false;
             return inv.RemoveItemByName(CABLE_ITEM_NAME, 1);
         }
 
         public static int CountCables()
         {
-            var inv = Object.FindObjectOfType<InventorySystem>();
+            var inv = ServiceLocator.Get<InventorySystem>();
             if (inv == null) return 0;
             return inv.CountItemByName(CABLE_ITEM_NAME);
         }

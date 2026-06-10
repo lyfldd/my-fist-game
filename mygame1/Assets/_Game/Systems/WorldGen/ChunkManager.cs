@@ -50,7 +50,9 @@ namespace _Game.Systems.WorldGen
 
         void Start()
         {
-            _timeManager = FindObjectOfType<_Game.Systems.Time.TimeManager>();
+            if (playerTransform == null)
+                playerTransform = PlayerRegistry.Transform;
+            _timeManager = ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
 
             // 注册容器刷新处理器
             if (RefreshHub.Instance != null)
@@ -356,7 +358,7 @@ namespace _Game.Systems.WorldGen
             var registry = _Game.Systems.WorldContainer.ContainerRegistry.Instance;
             if (registry == null) return;
 
-            var allContainers = FindObjectsOfType<_Game.Systems.WorldContainer.WorldContainer>();
+            var allContainers = ServiceLocator.GetAll<_Game.Systems.WorldContainer.WorldContainer>();
             foreach (var wc in allContainers)
             {
                 int chunkId = GetChunkId(wc.transform.position);

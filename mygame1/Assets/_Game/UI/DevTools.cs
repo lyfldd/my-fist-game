@@ -211,12 +211,11 @@ namespace _Game.UI
         {
             if (_zTypes.Count == 0) { ShowZMsg("无可用僵尸类型"); return; }
 
-            var player = GameObject.FindWithTag("Player") ?? GameObject.Find("Player");
-            if (player == null) { ShowZMsg("找不到玩家"); return; }
+            if (!PlayerRegistry.Exists) { ShowZMsg("找不到玩家"); return; }
 
             ZombieData data = _zTypes[_zTypeIndex];
-            Vector3 pPos = player.transform.position;
-            Vector3 fwd = player.transform.forward;
+            Vector3 pPos = PlayerRegistry.Position;
+            Vector3 fwd = PlayerRegistry.Transform.forward;
             int spawned = 0;
 
             for (int i = 0; i < _zCount; i++)
@@ -259,16 +258,16 @@ namespace _Game.UI
             bool prevFree = freeBuildMode;
             freeBuildMode = GUILayout.Toggle(freeBuildMode, "自由建造（免材料检查，免扣材料）");
             if (freeBuildMode != prevFree && _buildCtrl == null)
-                _buildCtrl = FindObjectOfType<BuildModeController>();
+                _buildCtrl = ServiceLocator.Get<BuildModeController>();
 
             bool prevInstant = instantBuild;
             instantBuild = GUILayout.Toggle(instantBuild, "即时建造（跳过读条，0秒完成）");
             if (instantBuild != prevInstant && _buildCtrl == null)
-                _buildCtrl = FindObjectOfType<BuildModeController>();
+                _buildCtrl = ServiceLocator.Get<BuildModeController>();
 
             if (freeBuildMode || instantBuild)
             {
-                if (_buildCtrl == null) _buildCtrl = FindObjectOfType<BuildModeController>();
+                if (_buildCtrl == null) _buildCtrl = ServiceLocator.Get<BuildModeController>();
             }
 
             GUILayout.Space(8);
@@ -425,7 +424,7 @@ namespace _Game.UI
         void GiveItem(string assetName, int count)
         {
 #if UNITY_EDITOR
-            var inv = FindObjectOfType<Inv>();
+            var inv = ServiceLocator.Get<Inv>();
             if (inv == null) { Debug.LogWarning("Inventory 未找到"); return; }
             var guids = UnityEditor.AssetDatabase.FindAssets($"t:ItemData {assetName}");
             foreach (var g in guids)
@@ -443,7 +442,7 @@ namespace _Game.UI
 
         void GiveItem(ItemData item, int count)
         {
-            var inv = FindObjectOfType<Inv>();
+            var inv = ServiceLocator.Get<Inv>();
             inv?.AddItem(item, count);
         }
 
@@ -612,7 +611,7 @@ namespace _Game.UI
             GUILayout.EndHorizontal();
 
             // 体力（顶部固定）
-            var stamina = FindObjectOfType<StaminaSystem>();
+            var stamina = ServiceLocator.Get<StaminaSystem>();
             if (stamina != null)
             {
                 GUILayout.BeginHorizontal();

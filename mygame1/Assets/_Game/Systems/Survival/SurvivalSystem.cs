@@ -69,7 +69,7 @@ namespace _Game.Systems.Survival
         private void AutoInitComponents()
         {
             playerCharacter ??= GetComponent<PlayerCharacter>();
-            timeManager ??= FindObjectOfType<_Game.Systems.Time.TimeManager>();
+            timeManager ??= ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
 
             if (survivalData == null)
             {

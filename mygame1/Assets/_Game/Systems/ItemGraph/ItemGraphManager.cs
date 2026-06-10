@@ -27,6 +27,9 @@ namespace _Game.Systems.ItemGraph
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
+            if (graphAsset == null) graphAsset = Resources.Load<ItemGraphAsset>("ItemGraph");
+            if (recipeCatalog == null) recipeCatalog = Resources.Load<RecipeCatalog>("RecipeCatalog");
+
             if (graphAsset != null)
                 BuildLookup();
         }

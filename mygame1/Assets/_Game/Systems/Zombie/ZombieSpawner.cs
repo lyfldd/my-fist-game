@@ -49,9 +49,7 @@ namespace _Game.Systems.Zombie
         {
             _gridSize = GameConstants.CHUNK_GRID_SIZE;
 
-            var playerObj = GameObject.FindWithTag("Player")
-                ?? GameObject.Find("Player");
-            if (playerObj != null) _player = playerObj.transform;
+            _player = PlayerRegistry.Transform;
 
             EventBus.Subscribe<ZombieDied>(OnZombieDied);
         }
@@ -297,7 +295,7 @@ namespace _Game.Systems.Zombie
 
         bool IsNight()
         {
-            var tm = FindObjectOfType<_Game.Systems.Time.TimeManager>();
+            var tm = ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
             if (tm == null) return false;
             float h = tm.CurrentHour;
             return h >= 18f || h < 6f;

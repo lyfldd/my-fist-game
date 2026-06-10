@@ -55,7 +55,7 @@ namespace _Game.UI
         private void Awake()
         {
             Instance = this;
-            _inventory = FindObjectOfType<Inv>();
+            _inventory = ServiceLocator.Get<Inv>();
         }
 
         void OnEnable() { InputRouter.BindKey(KeyCode.T, InputPriority.UI, HandleRotate, this); }
@@ -407,7 +407,7 @@ namespace _Game.UI
             var itemData = _dragItem.Value.itemData;
             if (itemData == null || itemData.equipSlot == EquipSlot.None) return;
 
-            var ui = FindObjectOfType<InventoryUI>();
+            var ui = ServiceLocator.Get<InventoryUI>();
             if (ui == null) return;
             var canvas = ui.GetComponentInParent<Canvas>();
             if (canvas == null) return;
@@ -597,7 +597,7 @@ namespace _Game.UI
 
         private void ShowToast(string msg)
         {
-            var ui = FindObjectOfType<InventoryUI>();
+            var ui = ServiceLocator.Get<InventoryUI>();
             if (ui != null) ui.ShowToast(msg);
         }
     }

@@ -163,7 +163,7 @@ namespace _Game.Core
         public const float WEAPON_ROTATION_SMOOTH_SPEED = 20f;
 
         /// <summary> Debug ray visible duration in seconds. </summary>
-        public const float DEBUG_RAY_DURATION = 0.1f;
+        public const float DEBUG_RAY_DURATION = 1.0f;
 
         /// <summary>
         /// Hand model offset for Capsule mode — X=right, Y=height, Z=forward.
@@ -328,7 +328,7 @@ namespace _Game.Core
         // ============================================================
 
         /// <summary> Zombie player detection range (m). </summary>
-        public const float ZOMBIE_DETECT_RANGE = 10f;
+        public const float ZOMBIE_DETECT_RANGE = 18f;
 
         /// <summary> Zombie movement speed (m/s). </summary>
         public const float ZOMBIE_MOVE_SPEED = 3f;

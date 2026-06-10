@@ -58,12 +58,17 @@ namespace _Game.UI
         private float _overviewContentHeight;
         private RectTransform _overviewScrollContent;
 
+        void Awake()
+        {
+            ServiceLocator.Register(this);
+        }
+
         void Start()
         {
-            _inventory = FindObjectOfType<Inv>();
+            _inventory = ServiceLocator.Get<Inv>();
 
             // 确保 EventSystem 存在（拖拽必需）
-            if (Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
+            if (ServiceLocator.Get<UnityEngine.EventSystems.EventSystem>() == null)
             {
                 var esGo = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem));
                 esGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
@@ -166,7 +171,7 @@ namespace _Game.UI
 
         void ExitBuildModeIfActive()
         {
-            var bmc = Object.FindObjectOfType<_Game.Systems.Building.BuildModeController>();
+            var bmc = ServiceLocator.Get<_Game.Systems.Building.BuildModeController>();
             if (bmc != null && bmc.IsBuildMode)
                 bmc.ForceExit();
         }
@@ -633,7 +638,7 @@ namespace _Game.UI
         void SpawnEquipDrop(ItemData item, EquipSlot slot)
         {
             if (item == null) return;
-            var player = GameObject.FindWithTag("Player");
+            var player = PlayerRegistry.GameObject;
             if (player == null) return;
 
             var go = new GameObject($"World_{item.itemName}");
@@ -1396,7 +1401,7 @@ namespace _Game.UI
             float ly = -m;
 
             // -- 职业 --
-            var pc = FindObjectOfType<PlayerCharacter>();
+            var pc = ServiceLocator.Get<PlayerCharacter>();
             string profName = "无职业";
             if (pc != null && pc.characterData != null && pc.characterData.profession != null)
                 profName = pc.characterData.profession.templateName;

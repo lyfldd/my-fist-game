@@ -58,6 +58,7 @@ namespace _Game.Systems.Audio
                 return;
             }
             Instance = this;
+            ServiceLocator.Register(this);
         }
 
         void Update()

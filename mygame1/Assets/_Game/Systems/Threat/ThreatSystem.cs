@@ -47,6 +47,7 @@ namespace _Game.Systems.Threat
                 return;
             }
             Instance = this;
+            ServiceLocator.Register(this);
             SubscribeEvents();
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using _Game.Core;
 using _Game.Systems.Power;
 
 namespace _Game.UI
@@ -183,7 +184,7 @@ namespace _Game.UI
         int CountFuelInInventory()
         {
             if (_currentSource.fuelItemData == null) return 0;
-            var inv = FindObjectOfType<Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<Systems.Inventory.Inventory>();
             if (inv == null) return 0;
             return inv.GetItemCount(_currentSource.fuelItemData);
         }
@@ -191,7 +192,7 @@ namespace _Game.UI
         void ConsumeFuelFromInventory()
         {
             if (_currentSource.fuelItemData == null) return;
-            var inv = FindObjectOfType<Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             int consumed = 0;
@@ -211,7 +212,7 @@ namespace _Game.UI
         List<PowerTerminal> FindLinkedTerminals()
         {
             var result = new List<PowerTerminal>();
-            var all = FindObjectsOfType<PowerTerminal>();
+            var all = ServiceLocator.GetAll<PowerTerminal>();
             foreach (var t in all)
             {
                 if (t.connectedSources.Contains(_currentSource))

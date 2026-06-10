@@ -62,6 +62,8 @@ namespace _Game.Systems.Building
 
         private void Awake()
         {
+            if (catalog == null) catalog = Resources.Load<BuildableCatalog>("BuildableCatalog");
+
             if (GetComponent<GhostPreview>() == null)
                 gameObject.AddComponent<GhostPreview>();
             if (GetComponent<BuildModeInputLock>() == null)
@@ -102,7 +104,7 @@ namespace _Game.Systems.Building
 
         private void CloseOtherUIs()
         {
-            var invUI = Object.FindObjectOfType<_Game.UI.InventoryUI>();
+            var invUI = ServiceLocator.Get<_Game.UI.InventoryUI>();
             if (invUI != null)
             {
                 if (invUI.overviewPanel != null) invUI.overviewPanel.SetActive(false);
@@ -111,14 +113,14 @@ namespace _Game.Systems.Building
             }
 
             var craftSys = _Game.Systems.Crafting.CraftingSystem.Instance;
-            var craftUI = Object.FindObjectOfType<_Game.Systems.Crafting.CraftingUI>();
+            var craftUI = ServiceLocator.Get<_Game.Systems.Crafting.CraftingUI>();
             if (craftUI != null)
             {
                 EventBus.Publish(new WorkstationClosedEvent(
                     craftSys != null ? craftSys.ActiveStation : Config.WorkstationTier.Hands));
             }
 
-            var containerWin = Object.FindObjectOfType<_Game.Systems.WorldContainer.ContainerWindowUI>();
+            var containerWin = ServiceLocator.Get<_Game.Systems.WorldContainer.ContainerWindowUI>();
             if (containerWin != null)
                 containerWin.CloseWindow();
         }
@@ -443,7 +445,7 @@ namespace _Game.Systems.Building
                 return;
 
             var buildable = _controller.activeBuildable;
-            var inventory = GetComponent<_Game.Systems.Inventory.Inventory>();
+            var inventory = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
 
             // 计算内容高度
             int matCount = buildable.materials != null ? buildable.materials.Length : 0;
@@ -539,7 +541,7 @@ namespace _Game.Systems.Building
             if (buildable.materials == null || buildable.materials.Length == 0)
                 return true;
 
-            var inventory = GetComponent<_Game.Systems.Inventory.Inventory>();
+            var inventory = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inventory == null) return true;
 
             foreach (var req in buildable.materials)

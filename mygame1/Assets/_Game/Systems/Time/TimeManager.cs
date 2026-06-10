@@ -41,6 +41,11 @@ namespace _Game.Systems.Time
         private float _previousHour24;
         private int _lastHourlyXP; // 已发放 XP 对应的游戏小时数（整数）
 
+        void Awake()
+        {
+            ServiceLocator.Register(this);
+        }
+
         void Start()
         {
             _previousHour24 = startHour;
@@ -50,6 +55,11 @@ namespace _Game.Systems.Time
 
             if (sunLight == null)
                 sunLight = FindObjectOfType<Light>();
+        }
+
+        void OnDestroy()
+        {
+            ServiceLocator.Unregister<TimeManager>();
         }
 
         void Update()

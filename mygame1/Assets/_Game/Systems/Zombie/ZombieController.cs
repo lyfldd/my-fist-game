@@ -67,8 +67,8 @@ namespace _Game.Systems.Zombie
             defaultData.maxHealth = GameConstants.ZOMBIE_MAX_HEALTH;
             defaultData.moveSpeed = GameConstants.ZOMBIE_MOVE_SPEED;
             defaultData.detectRange = GameConstants.ZOMBIE_DETECT_RANGE;
-            defaultData.loseRange = 30f;
-            defaultData.visionAngle = 90f;
+            defaultData.loseRange = 35f;
+            defaultData.visionAngle = 120f;
             defaultData.attackRange = GameConstants.ZOMBIE_ATTACK_RANGE;
             defaultData.attackDamage = GameConstants.ZOMBIE_ATTACK_DAMAGE;
             defaultData.attackCooldown = GameConstants.ZOMBIE_ATTACK_COOLDOWN;

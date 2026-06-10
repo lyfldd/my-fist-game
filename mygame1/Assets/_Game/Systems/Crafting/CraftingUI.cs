@@ -72,7 +72,7 @@ namespace _Game.Systems.Crafting
 
             _craftingSystem = CraftingSystem.Instance;
             if (_craftingSystem == null)
-                _craftingSystem = Object.FindObjectOfType<CraftingSystem>();
+                _craftingSystem = ServiceLocator.Get<CraftingSystem>();
         }
 
         void OnDestroy()
@@ -111,7 +111,7 @@ namespace _Game.Systems.Crafting
         void CloseOtherUIs()
         {
             // 关闭背包面板
-            var invUI = Object.FindObjectOfType<_Game.UI.InventoryUI>();
+            var invUI = ServiceLocator.Get<_Game.UI.InventoryUI>();
             if (invUI != null)
             {
                 if (invUI.overviewPanel != null) invUI.overviewPanel.SetActive(false);
@@ -120,12 +120,12 @@ namespace _Game.Systems.Crafting
             }
 
             // 退出建造模式
-            var bmc = Object.FindObjectOfType<_Game.Systems.Building.BuildModeController>();
+            var bmc = ServiceLocator.Get<_Game.Systems.Building.BuildModeController>();
             if (bmc != null && bmc.IsBuildMode)
                 bmc.ForceExit();
 
             // 关闭容器窗口
-            var containerWin = Object.FindObjectOfType<_Game.Systems.WorldContainer.ContainerWindowUI>();
+            var containerWin = ServiceLocator.Get<_Game.Systems.WorldContainer.ContainerWindowUI>();
             if (containerWin != null)
                 containerWin.CloseWindow();
         }
@@ -600,8 +600,7 @@ namespace _Game.Systems.Crafting
 
             if (_selectedRecipe.materials != null)
             {
-                var inv = _craftingSystem.GetComponent<_Game.Systems.Inventory.Inventory>();
-                if (inv == null) inv = Object.FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
 
                 foreach (var req in _selectedRecipe.materials)
                 {

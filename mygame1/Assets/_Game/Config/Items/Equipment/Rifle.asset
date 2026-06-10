@@ -47,14 +47,14 @@ MonoBehaviour:
   isFirearm: 1
   weaponDamage: 35
   weaponRange: 70
-  fireRate: 0.8
+  fireRate: 0.25
   baseSpread: 2
   maxSpread: 15
   spreadRecovery: 8
   spreadPerShot: 1.5
-  magazineSize: 0
+  magazineSize: 30
   range: 70
-  ammoItemName: 
-  gunshotSoundType: 
-  muzzleFlashType: 
-  reloadTime: 1.5
+  ammoItemName: "步枪子弹"
+  gunshotSoundType: Rifle
+  muzzleFlashType: Medium
+  reloadTime: 2.0

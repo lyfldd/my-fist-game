@@ -18,12 +18,18 @@ public class CameraFollow : MonoBehaviour
     private float _currentDistance;
     private bool _isFollowingVehicle;
 
-    void Awake()
+    void Start()
     {
+        // Start 里拿 target（GameBootstrap 在 Awake 之后才设 target）
+        if (target == null)
+            target = PlayerRegistry.Transform;
         _defaultTarget = target;
         _defaultDistance = distance;
         _currentDistance = distance;
+    }
 
+    void OnEnable()
+    {
         EventBus.Subscribe<VehicleEnteredEvent>(OnVehicleEntered);
         EventBus.Subscribe<VehicleExitedEvent>(OnVehicleExited);
         EventBus.Subscribe<AIBotPilotEnteredEvent>(OnPilotEntered);
@@ -79,12 +85,9 @@ public class CameraFollow : MonoBehaviour
 
     private void OnVehicleExited(VehicleExitedEvent evt)
     {
-        if (_defaultTarget != null)
-        {
-            target = _defaultTarget;
-            _currentDistance = _defaultDistance;
-            _isFollowingVehicle = false;
-        }
+        target = _defaultTarget ?? PlayerRegistry.Transform;
+        _currentDistance = _defaultDistance;
+        _isFollowingVehicle = false;
     }
 
     private void OnPilotEntered(AIBotPilotEnteredEvent evt)
@@ -98,10 +101,7 @@ public class CameraFollow : MonoBehaviour
 
     private void OnPilotExited(AIBotPilotExitedEvent evt)
     {
-        if (_defaultTarget != null)
-        {
-            target = _defaultTarget;
-            _currentDistance = _defaultDistance;
-        }
+        target = _defaultTarget ?? PlayerRegistry.Transform;
+        _currentDistance = _defaultDistance;
     }
 }

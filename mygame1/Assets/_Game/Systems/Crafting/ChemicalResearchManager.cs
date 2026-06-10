@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using _Game.Config;
+using _Game.Core;
 using _Game.UI;
 
 namespace _Game.Systems.Crafting
@@ -83,13 +84,9 @@ namespace _Game.Systems.Crafting
 
             if (proj.Value.requiredIntellectLevel > 0)
             {
-                var player = GameObject.FindWithTag("Player");
-                if (player != null)
-                {
-                    var skills = player.GetComponent<Character.SurvivalXPSystem>();
-                    if (skills != null && skills.GetSkillLevel(SkillType.智力) < proj.Value.requiredIntellectLevel)
-                        return false;
-                }
+                var skills = PlayerRegistry.Get<Character.SurvivalXPSystem>();
+                if (skills != null && skills.GetSkillLevel(SkillType.智力) < proj.Value.requiredIntellectLevel)
+                    return false;
             }
 
             foreach (var req in proj.Value.cost)

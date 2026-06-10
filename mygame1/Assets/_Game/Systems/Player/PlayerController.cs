@@ -31,14 +31,29 @@ public class PlayerController : MonoBehaviour
         _playerCharacter = GetComponent<PlayerCharacter>();
         _stamina = GetComponent<StaminaSystem>();
         _projector = GetComponent<MouseGroundProjector>();
-        _animator = GetComponent<Animator>();
+        _animator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        // 角色始终面朝鼠标
-        if (_projector != null && _projector.HasValidTarget)
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveZ = Input.GetAxisRaw("Vertical");
+        Vector3 moveInput = new Vector3(moveX, 0, moveZ).normalized;
+        bool isMoving = moveInput.sqrMagnitude > 0.01f;
+
+        bool wantsRun = Input.GetKey(KeyCode.LeftShift) && isMoving;
+
+        // 转向：移动时朝移动方向，静止时朝鼠标
+        if (isMoving)
         {
+            // 朝移动方向转
+            Quaternion targetRotation = Quaternion.LookRotation(moveInput, Vector3.up);
+            transform.rotation = Quaternion.RotateTowards(
+                transform.rotation, targetRotation, rotationSpeed * 2f * UnityEngine.Time.deltaTime);
+        }
+        else if (_projector != null && _projector.HasValidTarget)
+        {
+            // 静止时朝鼠标（瞄准用）
             Vector3 toTarget = _projector.GroundPoint - transform.position;
             toTarget.y = 0f;
             if (toTarget.sqrMagnitude > 0.001f)
@@ -48,14 +63,6 @@ public class PlayerController : MonoBehaviour
                     transform.rotation, targetRotation, rotationSpeed * UnityEngine.Time.deltaTime);
             }
         }
-
-        float moveX = Input.GetAxisRaw("Horizontal");
-        float moveZ = Input.GetAxisRaw("Vertical");
-        Vector3 moveInput = new Vector3(moveX, 0, moveZ).normalized;
-
-        bool wantsRun = Input.GetKey(KeyCode.LeftShift) && moveInput.sqrMagnitude > 0.01f;
-        bool isMoving = moveInput.sqrMagnitude > 0.01f;
-
         // 体力状态: 跑/走/静止
         if (_stamina != null)
         {

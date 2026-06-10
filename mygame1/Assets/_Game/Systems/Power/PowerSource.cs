@@ -1,5 +1,6 @@
 using UnityEngine;
 using _Game.Config;
+using _Game.Core;
 using _Game.Systems.Interaction;
 using _Game.UI;
 
@@ -57,7 +58,7 @@ namespace _Game.Systems.Power
         void Start()
         {
             _fuelRemaining = requiresFuel ? 1f : 999f;
-            _inventory = FindObjectOfType<Inventory.Inventory>();
+            _inventory = ServiceLocator.Get<Inventory.Inventory>();
         }
 
         void Update()

@@ -28,7 +28,7 @@ namespace _Game.UI
 
         private void Start()
         {
-            survival = FindObjectOfType<SurvivalSystem>();
+            survival = ServiceLocator.Get<SurvivalSystem>();
             CreateCanvas();
             CreateBars();
             UpdateAllBars();
@@ -201,7 +201,7 @@ namespace _Game.UI
             // 如果一开始没有 SurvivalSystem，持续尝试查找
             if (survival == null)
             {
-                survival = FindObjectOfType<SurvivalSystem>();
+                survival = ServiceLocator.Get<SurvivalSystem>();
                 if (survival != null)
                 {
                     EventBus.Subscribe<SurvivalStatChanged>(OnStatChanged);

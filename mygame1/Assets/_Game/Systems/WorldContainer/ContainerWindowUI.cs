@@ -288,10 +288,7 @@ namespace _Game.Systems.WorldContainer
             if (!placed.HasValue || placed.Value.itemData == null) return;
 
             var pItem = placed.Value;
-            var player = GameObject.FindWithTag("Player");
-            if (player == null) return;
-
-            var inventory = player.GetComponent<_Game.Systems.Inventory.Inventory>();
+            var inventory = PlayerRegistry.Get<_Game.Systems.Inventory.Inventory>();
             if (inventory == null) return;
 
             int count = pItem.count;

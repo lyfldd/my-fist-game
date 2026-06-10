@@ -79,7 +79,7 @@ namespace _Game.Systems.Weather
         {
             LerpSunLight();
 
-            var tm = FindObjectOfType<TimeManager>();
+            var tm = ServiceLocator.Get<TimeManager>();
             if (tm == null) return;
 
             int currentHour = Mathf.FloorToInt(tm.CurrentHour);
@@ -199,7 +199,7 @@ namespace _Game.Systems.Weather
             float tempMod = (int)type < GameConstants.WEATHER_TEMP_MODS.Length
                 ? GameConstants.WEATHER_TEMP_MODS[(int)type] : 0f;
             AmbientTemperature = GameConstants.WEATHER_BASE_TEMP + tempMod;
-            var survival = FindObjectOfType<SurvivalSystem>();
+            var survival = ServiceLocator.Get<SurvivalSystem>();
             survival?.SetEnvironmentTemperature(AmbientTemperature);
 
             // 事件

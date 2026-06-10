@@ -67,9 +67,10 @@ namespace _Game.Systems.Zombie
             _data.targetReassessInterval = 2f;
             _data.targetSwitchThreshold = 1.5f;
             _data.angularSpeed = 360f;
-            _data.obstacleMask = LayerMask.GetMask("Default", "Building");
+            // 障碍物仅 Building 层（Default 层是玩家/AI 实体所在的层，不能包含！否则 Linecast 会击中目标自身）
+            _data.obstacleMask = LayerMask.GetMask("Building");
             _data.reactsToSoundTags = new List<SoundTag>
-                { SoundTag.Footstep, SoundTag.Combat, SoundTag.Gunshot, SoundTag.Building, SoundTag.Impact };
+                { SoundTag.Footstep, SoundTag.Combat, SoundTag.Gunshot, SoundTag.Building, SoundTag.Impact, SoundTag.Mechanical };
 
             if (_agent != null)
             {
@@ -116,7 +117,12 @@ namespace _Game.Systems.Zombie
                 Physics.Linecast(eyes, targetEyes, _data.obstacleMask))
                 return false;
 
-            // 视觉锥
+            // 近距离感知：5米内无视视野锥（听觉/嗅觉）
+            const float meleeAwarenessRange = 3f;
+            if (dist <= meleeAwarenessRange)
+                return true;
+
+            // 视觉锥（中远距离需要视野）
             if (_data.visionConeAngle > 0f && _data.visionConeAngle < 360f)
             {
                 Vector3 toTarget = (targetEyes - eyes).normalized;

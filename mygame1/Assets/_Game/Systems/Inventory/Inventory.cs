@@ -63,8 +63,14 @@ namespace _Game.Systems.Inventory
 
         void Awake()
         {
+            ServiceLocator.Register(this);
             _playerCharacter = GetComponent<PlayerCharacter>();
             InitializeContainers();
+        }
+
+        void OnDestroy()
+        {
+            ServiceLocator.Unregister<Inventory>();
         }
 
         void InitializeContainers()

@@ -236,7 +236,7 @@ namespace _Game.Systems.AIBot
 
         void Start()
         {
-            var pc = FindObjectOfType<PlayerCharacter>();
+            var pc = ServiceLocator.Get<PlayerCharacter>();
             if (pc != null) _player = pc.transform;
 
             _lastPosition = transform.position;
@@ -467,7 +467,7 @@ namespace _Game.Systems.AIBot
 
             // 白天检查
             if (_cachedTimeManager == null)
-                _cachedTimeManager = FindObjectOfType<_Game.Systems.Time.TimeManager>();
+                _cachedTimeManager = ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
             if (_cachedTimeManager == null)
             {
                 if (UnityEngine.Time.frameCount % 300 == 0) Debug.LogWarning("[AIBot] TimeManager未找到");
@@ -478,7 +478,7 @@ namespace _Game.Systems.AIBot
 
             // 天气检查
             if (_cachedWeatherManager == null)
-                _cachedWeatherManager = FindObjectOfType<_Game.Systems.Weather.WeatherManager>();
+                _cachedWeatherManager = ServiceLocator.Get<_Game.Systems.Weather.WeatherManager>();
             if (_cachedWeatherManager == null)
             {
                 if (UnityEngine.Time.frameCount % 300 == 0) Debug.LogWarning("[AIBot] WeatherManager未找到");

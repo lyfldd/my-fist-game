@@ -1,5 +1,6 @@
 using UnityEngine;
 using _Game.Config;
+using _Game.Core;
 using _Game.Systems.Building;
 using Inv = _Game.Systems.Inventory.Inventory;
 
@@ -58,7 +59,7 @@ namespace _Game.Systems.AIBot
         public void CustomDeconstruct()
         {
             // AI机器人拆除：AI核心(50%) + 小型反应堆(50%) + 部分材料
-            var inventory = FindObjectOfType<Inv>();
+            var inventory = ServiceLocator.Get<Inv>();
             if (inventory != null && buildableData != null && buildableData.materials != null)
             {
                 foreach (var req in buildableData.materials)

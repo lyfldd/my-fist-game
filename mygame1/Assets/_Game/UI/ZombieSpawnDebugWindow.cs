@@ -140,16 +140,15 @@ namespace _Game.UI
                 return;
             }
 
-            var playerObj = GameObject.FindWithTag("Player") ?? GameObject.Find("Player");
-            if (playerObj == null)
+            if (!PlayerRegistry.Exists)
             {
                 ShowMessage("错误: 找不到玩家");
                 return;
             }
 
             ZombieData data = _availableTypes[_selectedTypeIndex];
-            Vector3 playerPos = playerObj.transform.position;
-            Vector3 playerForward = playerObj.transform.forward;
+            Vector3 playerPos = PlayerRegistry.Position;
+            Vector3 playerForward = PlayerRegistry.Transform.forward;
             int spawned = 0;
 
             for (int i = 0; i < _count; i++)

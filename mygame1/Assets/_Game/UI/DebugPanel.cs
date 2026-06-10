@@ -94,7 +94,7 @@ namespace _Game.UI
             }
 
             // ── Stamina ──
-            var stamina = FindObjectOfType<StaminaSystem>();
+            var stamina = ServiceLocator.Get<StaminaSystem>();
             if (stamina != null)
             {
                 GUILayout.Label("━━ Stamina ━━");
@@ -104,13 +104,13 @@ namespace _Game.UI
             }
 
             // ── Weapons ──
-            var switcher = FindObjectOfType<_Game.Systems.Weapon.WeaponSwitcher>();
+            var switcher = ServiceLocator.Get<_Game.Systems.Weapon.WeaponSwitcher>();
             if (switcher != null)
             {
                 GUILayout.Label("━━ Weapons [Q/滚轮] ━━");
                 var slots = new[] { EquipSlot.RightHand, EquipSlot.LeftHand, EquipSlot.KnifeBelt, EquipSlot.SidearmBelt };
                 var labels = new[] { "1主武器", "2副武器", "3小刀", "4手枪" };
-                var inv = switcher.GetComponent<_Game.Systems.Inventory.Inventory>();
+                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
                 for (int i = 0; i < slots.Length; i++)
                 {
                     bool isActive = switcher.ActiveSlot == slots[i];

@@ -554,7 +554,7 @@ namespace _Game.Systems.AIBot
                     if (isPiloting)
                         pilot.ExitPilot();
                     else
-                        pilot.EnterPilot(FindObjectOfType<_Game.Systems.Character.PlayerCharacter>()?.gameObject);
+                        pilot.EnterPilot(ServiceLocator.Get<_Game.Systems.Character.PlayerCharacter>()?.gameObject);
                 }
                 GUI.backgroundColor = Color.white;
             }
@@ -588,7 +588,7 @@ namespace _Game.Systems.AIBot
 
         void AddFuelFromPlayerInventory()
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) { Debug.LogWarning("[AIBotUI] 未找到玩家背包"); return; }
 
             foreach (var placed in inv.placedItems)
@@ -622,7 +622,7 @@ namespace _Game.Systems.AIBot
 
         void RepairFromPlayerInventory()
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) { Debug.LogWarning("[AIBotUI] 未找到玩家背包"); return; }
 
             foreach (var placed in inv.placedItems)
@@ -667,7 +667,7 @@ namespace _Game.Systems.AIBot
         {
             var currentWeapon = _combat.CurrentRightArm;
             string ammoName = AIBotCombat.GetAmmoNameForWeapon(currentWeapon);
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
 
             _rightArmConfigScroll = GUILayout.BeginScrollView(_rightArmConfigScroll, GUILayout.Height(240f));
 
@@ -762,7 +762,7 @@ namespace _Game.Systems.AIBot
         void LeftArmWindowFunc(int id)
         {
             var currentWeapon = _combat.CurrentLeftArm;
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
 
             _leftArmConfigScroll = GUILayout.BeginScrollView(_leftArmConfigScroll, GUILayout.Height(200f));
 
@@ -825,7 +825,7 @@ namespace _Game.Systems.AIBot
 
         void TryEquipRightArm(RightArmWeapon weapon, ItemData itemData)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             if (_combat.CurrentRightArm != RightArmWeapon.None)
@@ -847,7 +847,7 @@ namespace _Game.Systems.AIBot
             var weapon = _combat.CurrentRightArm;
             if (weapon == RightArmWeapon.None) return;
 
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             if (_equippedRightArmItem != null)
@@ -866,7 +866,7 @@ namespace _Game.Systems.AIBot
 
         void TryEquipLeftArm(LeftArmWeapon weapon, ItemData itemData)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             if (_combat.CurrentLeftArm != LeftArmWeapon.None)
@@ -884,7 +884,7 @@ namespace _Game.Systems.AIBot
             var weapon = _combat.CurrentLeftArm;
             if (weapon == LeftArmWeapon.None) return;
 
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             if (_equippedLeftArmItem != null)
@@ -899,7 +899,7 @@ namespace _Game.Systems.AIBot
 
         void LoadAmmoToBot(string ammoName)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             var itemData = FindPlayerItem(inv, ammoName);
@@ -918,7 +918,7 @@ namespace _Game.Systems.AIBot
 
         void UnloadAmmoFromBot(string ammoName)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             int botCount = _combat.GetAmmoCount(ammoName);
@@ -1219,7 +1219,7 @@ namespace _Game.Systems.AIBot
 
         void LoadFusionCore(int slotIdx)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) { Debug.LogWarning("[ReactorUI] 未找到玩家背包"); return; }
 
             foreach (var placed in inv.placedItems)
@@ -1249,7 +1249,7 @@ namespace _Game.Systems.AIBot
 
         void ReturnFusionCore(int slotIdx)
         {
-            var inv = FindObjectOfType<_Game.Systems.Inventory.Inventory>();
+            var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
             if (inv == null) return;
 
             var slot = _bot.reactorSlots[slotIdx];
