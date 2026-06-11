@@ -1,0 +1,15 @@
+string的他变我不变
+string str1 = "123";
+string str2 = str1;
+str2 = "321";
+Console.WriteLine(str2);    
+Console.WriteLine(str1);
+结果是
+123
+321
+
+对string进行了特殊处理具备了值类型的特征
+其实就是对str2重新赋值的时候会在堆里面重新分配空间
+要是频繁的重新赋值的话会产生内存垃圾
+尽量不要大量的重新赋值
+

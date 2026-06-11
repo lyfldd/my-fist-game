@@ -1,0 +1,31 @@
+所有引用基类的地方必须能透明地使用其子类的对象。也就是说，子类对象可以替换父类对象，而程序的行为不会发生变化。
+示例：如果有一个 Animal 类和它的子类 Dog，在使用 Animal 的地方，应该可以无缝地使用 Dog 而不影响程序的正确性。
+class Animal
+{
+    public virtual void Eat()
+    {
+        Console.WriteLine("Animal is eating");
+    }
+}
+
+class Dog : Animal
+{
+    public override void Eat()
+    {
+        Console.WriteLine("Dog is eating");
+    }
+}
+
+class Program
+{
+    static void Feed(Animal animal)
+    {
+        animal.Eat();
+    }
+
+    static void Main()
+    {
+        Animal animal = new Dog();
+        Feed(animal); 
+    }
+}

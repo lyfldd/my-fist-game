@@ -1,0 +1,54 @@
+在之前的时候，我想用一个容器把函数装起来
+现在就是委托
+委托就是一个容器，可以装方法
+用来存储，传递函数
+委托本质是一个类
+
+基本语法就是
+关键字delegate
+访问修饰符 delegate 返回值 委托名字（参数列表）
+一般写在namespace中
+
+然后呢我们对这个参数列表来讨论一下
+其实这个委托可以类似于c++里面的函数指针
+访问修饰符 delegate 返回值 委托名字（参数列表）
+delegate void MyDelegate(int a, string b);
+我们来看，只有是参数是int 和string的，无返回值的才能被这指向这个委托
+
+然后呢csharp帮我们弄好了委托泛型
+1.Action
+无返回值，用泛型传参数
+Action                → 无参无返回
+Action<int>           → 一个int参数
+Action<int, string>   → int + string
+Action<int,bool,float>→ 三个参数
+
+2.Func
+最后的是我们的函数的返回值，前面的是函数的参数
+Func<int>                → 无参，返回int
+Func<string, int>        → 参string，返回int
+Func<int,bool,string>    → 参int+bool，返回string
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

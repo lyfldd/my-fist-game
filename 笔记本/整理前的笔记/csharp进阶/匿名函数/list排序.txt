@@ -1,0 +1,269 @@
+我们在想，我们之前的时候我们用这个数组可以用来排序
+那要是我们用list呢list本质就是一个数组
+那可不可以排序呢
+是可以的
+但是list传入的是一个泛型
+怎么办
+我们就举一个例子，
+就相当于我们想做一个根据物品id来整理背包
+然后我们传入物品类的泛型
+我们可以调用sort方法自己编写规则，就比如说我们可以传入id
+然后就会自动的更具我们这个规则“物品id来整理背包”来排序
+
+具体的例子如图
+
+1.要是我们传入的是那种传统的int float，double
+
+那就会实现自动的从小到大的排序
+要是想要实现从大到小排序的话就加一个
+list.Reverse();
+List<int> list = new List<int>();
+Random random = new Random();
+
+for (int i = 0; i < 10; i++)
+
+{
+
+    list.Add(random.Next(100));
+
+}
+foreach (int i in list)
+{
+    Console.Write(i + " ");
+}
+Console.WriteLine();
+list.Sort();
+foreach (var item in list)
+{
+    Console.Write(item + " ");
+}
+
+2. 用 Lambda 自定义排序
+就是我们先建立一个怪物类
+class Monster
+{
+    public string Name { get; set; }
+    public int Level {  get; set; }
+    public int Hp {  get; set; }
+    public Monster(string name,int level,int hp)
+    {
+        Name = name;
+        Level = level;
+        Hp = hp;
+    }
+}
+然后我们添加对象
+Monster monster1 = new Monster("lyf1",1,100);
+Monster monster2 = new Monster("lyf2",2,200);
+
+Monster monster3 = new Monster("lyf3",3,300);
+
+List<Monster> monsters = new List<Monster>();
+
+monsters.Add(monster1);
+
+monsters.Add(monster2);
+
+monsters.Add(monster3);
+然后我们在sort里面实现逻辑
+monsters.Sort((a, b) =>
+{
+    int result = a.Level.CompareTo(b.Level);
+
+    if (result == 0)
+
+    {
+
+        return a.Hp.CompareTo(b.Hp);
+
+    }
+
+    return result;
+});
+先比较等级，要是等级一样那就比较血量
+
+最后遍历一下
+foreach(Monster monster in monsters)
+{
+    Console.WriteLine($"{monster.Name} {monster.Level} {monster.Hp}");
+}
+(a, b) => a.字段.CompareTo(b.字段)   → 升序（小→大）
+(a, b) => b.字段.CompareTo(a.字段)   → 降序（大→小）
+
+CompareTo 就是一个 “比较工具”，它只返回 3 种数字：-1、0、1
+变量A.CompareTo(变量B)
+返回 -1 → A 比 B 小
+返回 0 → A 等于 B
+返回 1 → A 比 B 大
+返回负数 → a 在前（小在前）
+返回正数 → b 在前（大在后）
+
+然后sort得到这个
+返回 负数   →   a 排在 b 前面
+返回 0     →   不动，谁也不用排谁前面
+返回 正数   →   b 排在 a 前面
+
+sort里面有内置的排序算法
+元素 ≤ 16 个 → 插入排序
+元素多，但递归不深 → 快速排序
+递归太深，怕栈溢出 → 堆排序
+
+
+我不仅可以用一个匿名函数来使用compareto
+我还可以在一个类里面实现一个Icompareable接口
+我们先定义一个物品类
+class Item:IComparable<Item>
+{
+    public string Name;
+    public int Price;
+
+    public Item(string name,int price)
+
+    {
+
+        Name = name;
+
+        Price = price;
+
+    }
+
+    public int CompareTo(Item? other)
+    {
+        return this.Price.CompareTo(other.Price);
+    }
+然后我们在
+Item item1 = new Item("apple", 10);
+
+Item item2 = new Item("banana", 5);
+
+Item item3 = new Item("orange", 15);
+
+List<Item> items = new List<Item>();
+
+items.Add(item1);
+
+items.Add(item2);
+
+items.Add(item3);
+
+items.Sort();
+
+foreach (Item item in items)
+{
+    Console.WriteLine(item.Name);
+}
+也是异曲同工
+
+
+但是还是有区别
+特性	匿名函数 (方案一)	IComparable (方案二)
+规则写在哪	调用 Sort 的地方（外部）	类内部（自身）
+灵活性	极高（可随时换规则）	低（类定义了就很难改）
+调用方式	list.Sort( (a,b)=>... )	list.Sort() (无参数)
+适用场景	游戏中临时排序（如按距离、按血量）	类的固有属性（如默认按 ID、按价格）
+设计思想	策略模式（用什么策略传什么）	模板模式（自身自带模板）
+
+如果你想让 Item 类天生就知道怎么排序自己（比如默认按 ID），那就实现 IComparable<Item>。
+如果你只是想在某个具体场景下排序（比如按价格、按名字），那就用匿名函数
+
+sort有四个重载
+方法	核心机制	谁写比较逻辑	适用场景
+Sort()	IComparable<T>	写在类内部	类的默认排序规则
+Sort(IComparer<T>)	IComparer<T> 接口	写在独立的类里	复杂、可复用的排序规则
+Sort(Comparison<T>)	Comparison<T> 委托 / Lambda	写在调用处，匿名	临时、一次性的排序规则
+Sort(index, count, ...)	接口 / 委托 + 范围	同上	只对列表的一部分排序
+
+1️⃣ public void Sort();
+用法list.Sort();
+它会自动使用你 T 类型的默认比较规则
+要求 T 必须实现 IComparable<T> 接口
+否则运行时会报错
+就是：在类里实现 IComparable<T>
+public class Item : IComparable<Item>
+{
+    public int Price;
+    public int CompareTo(Item other)
+    {
+        return this.Price.CompareTo(other.Price);
+    }
+}
+
+// 直接调用，不用传任何东西
+list.Sort();
+
+2️⃣ public void Sort(IComparer<T>? comparer);
+这是用比较器接口的版本
+// 1. 先写一个实现了 IComparer<T> 的类
+public class ItemPriceComparer : IComparer<Item>
+{
+    public int Compare(Item a, Item b)
+    {
+        return a.Price.CompareTo(b.Price);
+    }
+}
+
+// 2. 把它传进去
+list.Sort(new ItemPriceComparer());
+
+IComparer<T> 是一个接口，定义了 Compare(T x, T y) 方法
+你写一个类实现它，就可以把它的实例传给 Sort
+适合排序规则复杂、需要复用的场景
+和 IComparable<T> 的区别
+IComparable<T>：是 **“自己和自己比”**，写在类里，定义默认规则
+IComparer<T>：是 **“第三方比较器”**，写在外面，可以定义多种规则
+
+3️⃣ public void Sort(Comparison<T> comparison);
+// 直接传 Lambda 委托
+list.Sort((a, b) => a.Price.CompareTo(b.Price));
+
+4️⃣ public void Sort(int index, int count, IComparer<T>? comparer);
+这是局部范围排序的版本
+index：从哪个索引开始排
+count：排多少个元素
+comparer：用哪个比较器（和上面的 IComparer<T> 一样）
+
+
+
+我们来说一下第三方比较器
+就是第二个方法
+它是一个实现了 IComparer<T> 接口的类，专门用来比较两个 T 类型的对象
+核心只有一个方法：Compare(T x, T y)
+作用就是：给 List.Sort() 提供一个独立的、可复用的排序规则
+
+定义数据类
+public class Enemy
+{
+    public string Name;
+    public int Hp;       // 血量
+    public float Distance; // 离玩家距离
+    public int Level;    // 等级
+}
+写一个第三方比较器类
+实现 IComparer<Enemy>，写死排序规则
+// 第三方比较器：按血量从低到高排序
+public class EnemyHpComparer : IComparer<Enemy>
+{
+    // 核心方法：比较两个 Enemy
+    public int Compare(Enemy a, Enemy b)
+    {
+        // 规则：a.Hp 和 b.Hp 比较
+        // 返回值：-1/0/1，和 CompareTo 完全一样
+        return a.Hp.CompareTo(b.Hp);
+    }
+}
+传给 Sort() 使用
+List<Enemy> enemies = new List<Enemy>
+{
+    new Enemy{ Name = "哥布林", Hp = 80 },
+    new Enemy{ Name = "骷髅", Hp = 30 },
+    new Enemy{ Name = "巨龙", Hp = 500 }
+};
+
+// 把比较器实例传进去
+enemies.Sort(new EnemyHpComparer());
+
+
+
+
+
+

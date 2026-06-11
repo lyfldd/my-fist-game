@@ -1,0 +1,74 @@
+// 方法加上 async，返回值一般是 Task
+async Task 方法名()
+{
+    // 同步代码
+
+    // 等待一个异步操作，不阻塞线程
+    await 某个Task();
+
+    // Task 完成后，继续执行这里
+}
+
+
+最简单可运行例子
+using System;
+using System.Threading.Tasks;
+class Program
+{
+    // 入口 Main 也可以写成 async Task
+    static async Task Main(string[] args)
+    {
+        Console.WriteLine("开始");
+
+        // 等待任务完成，不卡死主线程
+        await DoSomethingAsync();
+
+        Console.WriteLine("结束");
+    }
+
+    // 异步方法：名字规范以 Async 结尾
+    static async Task DoSomethingAsync()
+    {
+        // 模拟耗时操作（比如加载、网络）
+        await Task.Delay(1000);
+
+        Console.WriteLine("异步操作完成");
+    }
+}
+
+带返回值的异步方法：Task<T>
+async Task<int> CalculateDamageAsync()
+{
+    await Task.Delay(500);
+    return 500;
+}
+使用：
+int damage = await CalculateDamageAsync();
+Console.WriteLine(damage);
+不用 .Result
+不阻塞
+类型安全
+.Result 和 .Wait() 一模一样 ——都会阻塞当前线程，一直卡到任务完成
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

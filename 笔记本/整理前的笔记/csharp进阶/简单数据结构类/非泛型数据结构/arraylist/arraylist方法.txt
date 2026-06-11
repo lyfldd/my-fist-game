@@ -1,0 +1,167 @@
+arraylist提供了增删查改的方法
+一，增加元素
+Add增加单个元素
+向ArrayList集合的末尾添加一个对象
+语法实现
+ArrayList list = new ArrayList();
+int index = list.Add("item1");
+Console.WriteLine($"Added item at index {index}");
+由于ArrayList存储的是object类型，任何类型的对象都可以添加，但对于值类型会发生装箱操作
+
+AddRange方法，增加一个数据集合里面的全部元素
+将实现了IEnumerable接口的集合中的所有元素添加到ArrayList的末尾
+语法实现
+ArrayList list = new ArrayList();
+string[] strArray = { "str1", "str2" };
+list.AddRange(strArray);
+
+ArrayList subList = new ArrayList();
+subList.Add("subItem1");
+list.AddRange(subList);
+添加过程中，如果传入的集合为空，会抛出ArgumentNullException。对于值类型集合，添加时每个值类型元素会发生装箱操作
+
+
+
+二，删除元素
+Remove方法，从ArrayList中移除指定的对象。如果集合中有多个相同的对象，只会移除第一个匹配的对象，如果成功移除对象则返回true，否则返回false
+语法实现
+ArrayList list = new ArrayList();
+list.Add("item1");
+list.Add("item2");
+bool removed = list.Remove("item2");
+if (removed)
+{
+    Console.WriteLine("Item removed successfully.");
+}
+else
+{
+    Console.WriteLine("Item not found.");
+}
+
+RemoveAt方法，移除指定索引位置的元素
+语法实现
+ArrayList list = new ArrayList();
+list.Add("item1");
+list.Add("item2");
+list.RemoveAt(1);
+
+RemoveRange方法，移除从指定索引开始的指定数量的元素
+函数重载public virtual void RemoveRange(int index, int count);
+ArrayList list = new ArrayList();
+list.Add(1);
+list.Add(2);
+list.Add(3);
+list.Add(4);
+list.RemoveRange(1, 2);
+
+
+三，查找元素
+IndexOf方法，查找指定对象在ArrayList中第一次出现的索引位置
+函数重载
+public virtual int IndexOf(object value);：在整个ArrayList中查找指定的value对象，返回其第一次出现的索引，如果未找到则返回 -1
+public virtual int IndexOf(object value, int startIndex);：从指定的startIndex位置开始在ArrayList中查找value对象，返回其第一次出现的索引，如果未找到则返回 -1。如果startIndex小于 0 或者大于等于集合的大小，会抛出ArgumentOutOfRangeException异常
+public virtual int IndexOf(object value, int startIndex, int count);：从指定的startIndex位置开始，最多查找count个元素，返回value对象第一次出现的索引，如果未找到则返回 -1。如果startIndex小于 0，或者count小于 0，或者startIndex + count大于集合的大小，会抛出ArgumentOutOfRangeException异常。
+语法实现
+ArrayList list = new ArrayList();
+list.Add("item1");
+list.Add("item2");
+int index1 = list.IndexOf("item2");
+int index2 = list.IndexOf("item2", 1);
+int index3 = list.IndexOf("item2", 0, 1);
+
+LastIndexOf方法，查找指定对象在ArrayList中最后一次出现的索引位置
+函数重载
+public virtual int LastIndexOf(object value);：在整个ArrayList中查找指定的value对象，返回其最后一次出现的索引，如果未找到则返回 -1。
+public virtual int LastIndexOf(object value, int startIndex);：从指定的startIndex位置开始从后往前查找value对象，返回其最后一次出现的索引，如果未找到则返回 -1。如果startIndex小于 0 或者大于等于集合的大小，会抛出ArgumentOutOfRangeException异常。
+public virtual int LastIndexOf(object value, int startIndex, int count);：从指定的startIndex位置开始，最多向前查找count个元素，返回value对象最后一次出现的索引，如果未找到则返回 -1。如果startIndex小于 0，或者count小于 0，或者startIndex - count + 1小于 0，会抛出ArgumentOutOfRangeException异常。
+语法实现
+ArrayList list = new ArrayList();
+list.Add("item1");
+list.Add("item2");
+list.Add("item1");
+int lastIndex1 = list.LastIndexOf("item1");
+int lastIndex2 = list.LastIndexOf("item1", 2);
+int lastIndex3 = list.LastIndexOf("item1", 2, 2);
+
+Contains方法，判断ArrayList是否包含指定的对象
+如果集合包含指定对象则返回true，否则返回false
+语法实现
+ArrayList list = new ArrayList();
+list.Add("item1");
+bool contains = list.Contains("item1");
+
+
+四，修改和访问元素
+通过索引访问和修改
+语法实现
+ArrayList list = new ArrayList();
+list.Add(10);
+int value = (int)list[0];
+list[0] = 20;
+
+
+五，排序与反序
+Sort方法，对ArrayList中的元素进行排序
+函数重载
+public virtual void Sort();：要求集合中的元素类型必须实现IComparable接口，按照元素类型自身的比较逻辑进行排序
+public virtual void Sort(IComparer comparer);：使用指定的IComparer对象进行排序，IComparer接口提供了自定义的比较逻辑。如果comparer为null，则使用元素类型的默认比较器（如果元素类型实现了IComparable接口）
+public virtual void Sort(int index, int count, IComparer comparer);：对从指定index开始的count个元素，使用指定的IComparer对象进行排序。如果index小于 0，或者count小于 0，或者index + count大于集合的大小，会抛出ArgumentOutOfRangeException异常。如果comparer为null，则使用元素类型的默认比较器（如果元素类型实现了IComparable接口）
+语法实现
+ArrayList numbers = new ArrayList();
+numbers.Add(3);
+numbers.Add(1);
+numbers.Add(2);
+numbers.Sort();
+
+class CustomComparer : IComparer
+{
+    public int Compare(object x, object y)
+    {
+        return ((int)y).CompareTo((int)x);
+    }
+}
+ArrayList customSortedList = new ArrayList();
+customSortedList.Add(1);
+customSortedList.Add(3);
+customSortedList.Add(2);
+customSortedList.Sort(new CustomComparer());
+
+Reverse方法，反转ArrayList中元素的顺序
+函数重载
+public virtual void Reverse();：反转整个ArrayList中元素的顺序
+public virtual void Reverse(int index, int count);：反转从指定index开始的count个元素的顺序。如果index小于 0，或者count小于 0，或者index + count大于集合的大小，会抛出ArgumentOutOfRangeException异常。
+
+
+六，容量管理
+Capacity属性，获取或设置ArrayList可以容纳的元素数量
+语法实现
+ArrayList list = new ArrayList();
+list.Add(1);
+list.Add(2);
+list.TrimToSize();
+当添加元素超过当前容量时，ArrayList会自动增加容量，通常是当前容量的两倍。设置容量时，如果设置的值小于集合当前的元素数量
+
+七，其他分方法
+Clear方法，从ArrayList中移除所有元素，将其大小设置为 0
+语法实现
+ArrayList list = new ArrayList();
+list.Add(1);
+list.Clear();
+
+clone方法，创建ArrayList的浅表副本
+返回一个新的ArrayList对象，其元素引用与原集合中的元素引用相同（对于引用类型），值类型则进行值复制
+语法实现
+ArrayList original = new ArrayList();
+original.Add("item1");
+ArrayList clone = (ArrayList)original.Clone();
+
+ToArray方法，将ArrayList中的元素复制到一个新的数组中
+函数重载
+public virtual Array ToArray();：返回一个object类型的数组，其中包含ArrayList中的所有元素
+public virtual Array ToArray(Type type);：返回一个指定类型type的数组，其中包含ArrayList中的所有元素。如果ArrayList中的元素类型与指定类型不兼容，会抛出InvalidCastException异常
+语法实现
+ArrayList list = new ArrayList();
+list.Add(1);
+list.Add(2);
+object[] objArray = list.ToArray();
+int[] intArray = (int[])list.ToArray(typeof(int));

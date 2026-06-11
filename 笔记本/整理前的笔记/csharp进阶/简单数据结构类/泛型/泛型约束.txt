@@ -1,0 +1,51 @@
+我们在给泛型传参数的时候其实系统不知道泛型是哪个类型
+我们可以通过where关键字来让系统知道我们的泛型必须实现的功能
+目的就是避免运行时类型错误，提前在编译期做类型检查，让泛型代码更安全、更灵活
+
+语法就是// 类/方法 + 泛型参数 + where T : 约束1, 约束2...
+public class 类名<T> where T : 约束条件
+{ }
+
+泛型约束有六种
+where T : 基类 → 必须是某个类或者是派生类
+where T : 接口 → 实现接口或者是接口的派生类型
+where T : class → 引用类型
+where T : struct → 值类型
+where T : new() → 有公共无参构造函数非抽象类型
+组合约束：基类→接口→引用 / 值→new ()
+也可以是另外的一个泛型字母 T 必须和 U 类型相同，或者 T 必须继承 / 实现 U。
+更常用：强制两个泛型参数类型必须相同
+where T : U
+where U : T
+多泛型参数 + 多层约束
+public class Service<TEntity, TDto>
+    where TEntity : class, new()    // 实体约束
+    where TDto : IMapFrom<TEntity>  // DTO 必须映射自实体
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

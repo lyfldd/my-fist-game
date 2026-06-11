@@ -1,0 +1,72 @@
+继承的基本规则就是
+一个类a，继承一个类b
+A类回有b类的所有特征
+
+被继承的类就是父类，基类
+
+继承的就是子类，派生类
+
+子类可以有自己的特征
+
+单根性
+子类只有一个父类
+传递性
+子类可以间接继承父类的父类
+
+基本语法就是
+class 类名：被继承的类名
+    class Teacher
+    {
+        public string name;
+        public int number;
+
+        public void speaknamne()
+        {
+            Console.WriteLine(name);
+        }
+    }
+    class Teachingteather : Teacher
+    {
+        public string subject;
+        public void spealsubject()
+        {
+            Console.WriteLine(subject);
+        }
+    }
+
+            Teachingteather t = new Teachingteather();
+            t.name = "lyf";
+            t.number = 1;
+            t.speaknamne();
+            t.spealsubject();
+
+那访问修饰符对于他们有什么影响呢
+我们有3p类型
+尤其是我们的protected类型的
+
+一个类的一个成员变成了私有的
+那他的子类以及外部都不可以用了
+
+protected就是可以使得我们的成员在外部不可以使用，但是子类可以使用
+
+那要是子类和父类里面出现了同名成员
+可以是可以，但是不建议，这会使得父类的同名的被隐藏了，只能使用子类的
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

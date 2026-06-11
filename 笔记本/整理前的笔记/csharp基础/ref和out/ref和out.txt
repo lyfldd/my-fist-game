@@ -1,0 +1,75 @@
+就是我们在给函数传入内容的时候我们也希望
+函数可以改变外部变量的值我们就要用到ref和out
+例如
+static void change(int a)
+{
+    a = 3;
+}
+static void Main(string[] args)
+{
+    int a = 1;
+    change(a);
+    Console.WriteLine(a);
+}
+这个时候输出结果是1，那为什么不是3呢
+
+这个时候就需要ref和out
+ref就是可以把值类型转换为引用类型
+
+还有就是数组
+static void change(int[] a)
+{
+    a[0] = 5;
+}
+static void Main(string[] args)
+{
+    int[] a = { 1, 2, 3 };
+    change(a);
+    Console.WriteLine(a[0]);
+}
+结果被改变了变成5
+但是要是改为
+static void change(int[] a)
+{
+    a = new int[]{ 10, 20, 30 };
+}
+static void Main(string[] args)
+{
+    int[] a = { 1, 2, 3 };
+    change(a);
+    Console.WriteLine(a[0]);
+}
+那结果便是1，不会改变，因为函数里面的a = new int[]{ 10, 20, 30 };
+说明是在堆里面new了一个新的东西然后和原来传进去的数组的联系就断了
+
+接下来我希望我在里面声明了一个数组，在里面给变量赋值想要外面的也变
+当传入的值类型参数在内部修改是，当传入的引用类型在函数内部重新声明是
+我们可以用ref
+
+static void change(ref int[] a)
+{
+    a = new int[]{ 10, 20, 30 };
+}
+static void Main(string[] args)
+{
+    int[] a = { 1, 2, 3 };
+    change(ref a);
+    Console.WriteLine(a[0]);
+
+不仅要在函数的参数声明哪里加ref，还要在调用函数的时候加ref
+out的使用也和ref一样，都是一样的，但是有些的区别
+ref传入的变量必须要初始化，out不需要
+out传入的变量必须在内部赋值，ref不需要
+
+
+
+
+
+
+
+
+
+
+
+
+

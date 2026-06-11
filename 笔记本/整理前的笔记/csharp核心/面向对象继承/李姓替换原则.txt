@@ -1,0 +1,66 @@
+李氏替换原则就是任何父类出现的地方，子类都可以替代
+
+如果有一个 Shape 基类和 Circle、Rectangle 子类，在任何使用 Shape 的地方，都应该能够使用 Circle 或 Rectangle 替代，而不会影响程序的正确性。例如，有一个计算图形面积的方法 CalculateArea(Shape shape)，那么传入 Circle 或 Rectangle 对象都应该能正确计算面积
+
+作用就是方便进行对象的存储和管理
+具体来说就是我们用父类容器来装载子类对象
+class GameObject
+{
+
+}
+class Player:GameObject
+{
+    public void Playeratk()
+    {
+        Console.WriteLine("玩家攻击");
+    }
+}
+class Monster:GameObject
+{
+    public void Playeratk()
+    {
+        Console.WriteLine("怪物攻击");
+    }
+}
+class Boss:GameObject
+{
+    public void Playeratk()
+    {
+        Console.WriteLine("boss攻击");
+    }
+}
+
+GameObject player = new Player();就是我们用父类容器来装载子类对象
+
+但是我们注意到，我们用父类实例化的对象的时候我们不可以直接点出子类的方法来使用
+我们可以用is和as
+is就是我们可以用来判断对象是不是可以指定的类对象
+返回值是bool，是的话就是真的，不是就是假的
+ if (player is Player)
+ {
+     Console.WriteLine("是play的对象")
+ }
+
+as是将一个对象转换为指定类的对象
+返回值就是指定的类型对象
+成功就返回指定类型对象，失败就返回null
+
+            GameObject player = new Player();
+            if (player is Player)
+            {
+                Console.WriteLine("是play的对象");
+                Player p = player as Player;
+                p.Playeratk;
+            }
+这样子我们就可以用父类装载子类的对象，然后可以调用子类的方法
+
+
+
+
+
+
+
+
+
+
+

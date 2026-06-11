@@ -1,0 +1,99 @@
+协变（out）和逆变（in）是 C# 为泛型接口 / 委托提供的 “父子类兼容性” 机制，解决了「普通泛型不识别继承关系」的问题，让代码更通用、更灵活，减少重复编写。
+
+协变（Covariant）：out 关键字
+允许子类泛型 → 父类泛型转换，支持 “只读” 场景（返回值 / 输出），让子类集合 / 生成器可以被当作父类的通用接口使用
+using System;
+using System.Collections.Generic;
+
+// 父类：所有敌人
+class Enemy
+{
+    public string Name;
+    public int Hp;
+    public Enemy(string name, int hp) { Name = name; Hp = hp; }
+    public virtual void Show() => Console.WriteLine($"{Name} 出现，血量：{Hp}");
+}
+
+// 子类：Boss
+class Boss : Enemy
+{
+    public Boss(string name, int hp) : base(name, hp) { }
+    public override void Show() => Console.WriteLine($"🔥 Boss {Name} 登场，血量：{Hp}");
+}
+
+// 协变委托：生成怪物（out T 表示返回值支持协变）
+public delegate T SpawnHandler<out T>();
+
+class Program
+{
+    // 通用刷怪方法：接收生成 Enemy 的委托
+    static void DoSpawn(SpawnHandler<Enemy> spawner)
+    {
+        Enemy enemy = spawner();
+        enemy.Show();
+    }
+
+    static void Main()
+    {
+        // 1. 定义生成 Boss 的委托（SpawnHandler<Boss>）
+        SpawnHandler<Boss> spawnBoss = () => new Boss("远古巨龙", 5000);
+
+        // 2. 协变生效：SpawnHandler<Boss> 直接传给 SpawnHandler<Enemy>
+        DoSpawn(spawnBoss); // ✅ 无需转换，直接使用
+    }
+}
+
+逆变（Contravariant）：in 关键字
+允许父类泛型 → 子类泛型转换，支持 “只写” 场景（方法参数 / 输入），让父类的通用处理器可以直接处理子类对象
+using System;
+
+class Enemy
+{
+    public string Name;
+    public int Hp;
+    public Enemy(string name, int hp) { Name = name; Hp = hp; }
+    public virtual void TakeDamage(int damage) => Hp -= damage;
+}
+
+class Boss : Enemy
+{
+    public Boss(string name, int hp) : base(name, hp) { }
+}
+
+// 逆变委托：处理受伤（in T 表示参数支持逆变）
+public delegate void DamageHandler<in T>(T enemy, int damage);
+
+class Program
+{
+    static void Main()
+    {
+        // 1. 定义处理所有 Enemy 受伤的委托（父类泛型）
+        DamageHandler<Enemy> hurtEnemy = (enemy, damage) =>
+        {
+            enemy.TakeDamage(damage);
+            Console.WriteLine($"{enemy.Name} 受到 {damage} 伤害，剩余血量：{enemy.Hp}");
+        };
+
+        // 2. 逆变生效：父类委托直接赋值给子类委托
+        DamageHandler<Boss> hurtBoss = hurtEnemy;
+
+        // 3. 直接用通用委托处理 Boss 受伤
+        Boss dragon = new Boss("远古巨龙", 5000);
+        hurtBoss(dragon, 1000); // ✅ 无需为 Boss 单独写受伤逻辑
+    }
+}
+
+
+特性	关键字	适用场景	转换方向	游戏开发中的作用
+协变	out	返回值 / 只读接口（如 IEnumerable）	子类泛型 → 父类泛型	通用刷怪、遍历、AOE 技能
+逆变	in	方法参数 / 处理器（如 Action）	父类泛型 → 子类泛型	通用受伤、事件回调、AI 行为
+
+
+
+
+
+
+
+
+
+

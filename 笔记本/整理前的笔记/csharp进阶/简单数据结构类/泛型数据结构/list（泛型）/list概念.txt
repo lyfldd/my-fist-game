@@ -1,0 +1,23 @@
+List<T> 是 C# 最常用、最灵活的动态集合，属于 System.Collections.Generic 命名空间，T 代表泛型（可以存任意类型：int、string、自定义类等）
+
+命名空间是using System.Collections.Generic;
+
+就是Arrylist的升级版
+性能更好，不用装箱拆箱
+其实就相当于我可以往里面去装一些集合
+操作	代码	说明
+添加元素		list.Add(10);						末尾添加单个元素
+批量添加		list.AddRange(数组/另一个List);		批量添加一组元素
+插入元素		list.Insert(1, "西瓜");				在索引 1 位置插入元素
+删除元素		list.Remove("苹果");				删除指定元素
+按索引删除	list.RemoveAt(0);					删除第 0 个元素
+清空列表		list.Clear();						删除所有元素
+获取长度		list.Count						元素个数（不是 Length！）
+访问元素		list[0]							通过索引访问（从 0 开始）
+判断存在		list.Contains(10)					返回 true/false
+查找索引		list.IndexOf("香蕉")				返回元素索引，找不到返回 - 1
+
+
+Count	现在有多少元素	❌ 只读
+Capacity	内部最多能放多少	✅ 可读写
+TrimExcess()	压缩容量 = 数量	✅ 方法

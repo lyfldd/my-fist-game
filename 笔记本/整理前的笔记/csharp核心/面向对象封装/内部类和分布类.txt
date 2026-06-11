@@ -1,0 +1,78 @@
+内部类就是我们在类里面再声明一个类（有点鸡肋）
+
+在使用得时候要用在外部的类点出自己
+
+将相关的类组织在一起，使代码结构更加清晰。内部类可以访问外部类的私有成员，同时外部类也可以控制内部类的访问级别，提供了更细粒度的封装
+
+访问修饰符的作用很大
+
+注意要是我们在内部类里面没有加访问修饰符的话默认是私有的
+我们要在外部用他的话我们需要加public
+
+class Person
+{
+    public int age;
+    public string name;
+    public Body body;
+    public class Body
+    {
+        Arm leftarm;
+        Arm rightarm;
+        public class Arm
+        {
+
+        }
+    }
+}
+Person p=new Person();
+Person.Body b=new Person.Body();
+
+分布类，我们就是把一个类分为好几个类
+关键字就是partial
+
+作用就是分布描述一个类 增加程序的拓展性
+
+分布类可以写在不同的脚本文件，然后分布类的访问修饰符要一致
+分布类不能有相同的成员
+    partial class Student
+    {
+        public bool sex;
+        public string name;
+    }
+    partial class Student
+    {
+        public int age;
+    }
+    partial class Student
+    {
+        int number;
+    }
+
+可以分开来写
+
+分布方法就是将方法的声明和实现分离
+
+不能加访问修饰符，默认是私有的
+只可以在分布类里面声明
+返回值只能是void
+可以有参数，但是不能用out关键字
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

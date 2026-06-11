@@ -1,0 +1,36 @@
+当类定义了索引器时，this关键字可用于在索引器实现中引用当前对象，以便操作对象内部的数据结构
+
+public class MyList<T>
+{
+    private T[] items;
+
+    public MyList(int capacity)
+    {
+        items = new T[capacity];
+    }
+
+    public T this[int index]
+    {
+        get
+        {
+            if (index >= 0 && index < items.Length)
+            {
+                return items[index];
+            }
+            throw new IndexOutOfRangeException();
+        }
+        set
+        {
+            if (index >= 0 && index < items.Length)
+            {
+                items[index] = value;
+            }
+            else
+            {
+                throw new IndexOutOfRangeException();
+            }
+        }
+    }
+}
+
+在上述索引器的get和set访问器中，this隐含地引用了包含索引器的MyList<T>对象实例，通过它可以访问对象的items数组

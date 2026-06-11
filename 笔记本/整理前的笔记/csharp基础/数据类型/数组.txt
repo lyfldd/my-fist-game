@@ -1,0 +1,235 @@
+数组的声明
+变量类型[] 数组名=new 变量类型[数组的长度]{内容1，内容2，内容3}
+
+ int[] a = new int[5] { 1, 2, 3, 4, 5 };
+ Console.WriteLine(a.Length);
+数组变量名.length可以输出数组的长度
+
+int[] a = new int[5] { 1, 2, 3, 4, 5 };
+Console.WriteLine(a[数组的下标]);
+数组名[下标]可以输出数组中的元素
+
+int[] a = new int[5] { 1, 2, 3, 4, 5 };
+修改数组中的元素
+a[1]=90
+
+如何遍历数组
+ int[] a = new int[5] { 1, 2, 3, 4, 5 };
+for (int i = 0; i < a.Length; i++)
+{
+    Console.WriteLine(a[i]);
+}
+
+增加数组的元素
+数组初始化之后不能增加或减少
+但是我们可以通过搬家
+int[] a = new int[5] { 1, 2, 3, 4, 5 };
+int[] b = new int[6];
+for (int i = 0; i < a.Length; i++) 
+{
+    b[i] = a[i];
+}
+   a = b;（这里就相当于a这个指针指向b）
+然后就多出来了第六个
+
+删除数组的元素
+int[] a = new int[5] { 1, 2, 3, 4, 5 };
+int[] b = new int[4];
+for (int i = 0; i < a.Length-1; i++) 
+{
+    b[i] = a[i];
+}
+a = b;
+
+那要是剔除数组中间的呢
+int[] a = new int[5] { 1, 2, 3, 4, 5 };
+int[] b = new int[4];
+int j = 0;
+for (int i = 0; i < 5; i++) 
+{
+    if (i == 1)
+        continue;
+    b[j] = a[i];
+    j++;    
+}
+a = b;
+for (int i = 0;i < a.Length; i++)
+    Console.WriteLine(a[i]);
+
+查找数组的下标
+Console.WriteLine("请输入你要查找的数字");
+int c = int.Parse(Console.ReadLine());
+for (int i = 0;i<a.Length; i++)
+{
+    if (a[i] == c)
+    {
+        Console.WriteLine("你要的数组下标为{0}", i);
+    }
+}
+
+二维数组
+类似于矩阵
+声明方式
+int[,] 数组名
+
+int[,] b = new int[3, 3];
+
+int[,] c = new int[3, 3]
+{{0行内容一，0行内容二，0行内容三}
+，{一行内容一，一行内容二，一行内容三}
+,{二行内容一，二·行内容二，二行内容三}}
+
+            数组名.GetLength(0);得到数组的行的长度
+            数组名.GetLength(1);得到数组的列的长度
+
+Console.WriteLine(c[0, 1]);获得数组的元素
+
+遍历二维数组
+for (int i = 0; i < c.GetLength(0); i++)
+{
+    for (int j = 0; j < c.GetLength(1); j++)
+    {
+        Console.WriteLine(c[i, j]);
+    }
+}
+
+增加二维数组的元素
+int[,] b = new int[4, 4];
+int[,] c = new int[3, 3] 
+{ { 1,2,3 },{4,5,6} ,{7,8,9 }};
+for (int i = 0; i < c.GetLength(0); i++)
+{
+    for (int j = 0; j < c.GetLength(1); j++)
+    {
+        b[i, j] = c[i, j];
+    }
+          
+}
+c = b;
+
+减少二维数组的元素
+int[,] b = new int[2, 2];
+int[,] c = new int[3, 3] 
+{ { 1,2,3 },{4,5,6} ,{7,8,9 }};
+for (int i = 0; i < c.GetLength(0)-1; i++)
+{
+    for (int j = 0; j < c.GetLength(1)-1; j++)
+    {
+        b[i, j] = c[i, j];
+    }
+          
+}
+c = b;
+
+那要是想要减少其中的元素呢
+和一维数组类似想要删除其中的一行或者一列的话用if就可以了
+
+生成随机数的方法
+Random random = new Random();
+ int randomNum = random.Next();
+生成指定范围的随机数
+左闭右开区间 → 包含最小值，不包含最大值
+int num1 = random.Next(1, 11)
+
+生成「随机浮点数」
+double doubleNum1 = random.NextDouble();
+
+交错数组
+就是数组的数组，每一个元素可以不同
+是元素为一维数组的数组
+交错数组的每行的列数不同
+
+普通二维数组 int[,]（规则）	交错数组 int[][]（不规则）
+行 0：[1,2,3]（3 列）	行 0：[1,2]（2 列）
+行 1：[4,5,6]（3 列）	行 1：[7,8,9]（3 列）
+行 2：[7,8,9]（3 列）	行 2：[0]（1 列）
+
+数组的声明
+变量类型[][]交错数组名；
+int[][] a = new int[3][];每行是一个一维数组
+a[0] = new int[2] { 1, 2 };
+a[1] = new int[3] { 7, 8, 9 }; 
+a[2] = new int[1] { 0 }; 
+
+不仅可以存储一维数组还可以存储二维数组
+	/ 步骤1：定义多个独立的二维数组
+        int[,] arr1 = new int[2, 2] { { 1, 2 }, { 3, 4 } };    // 2×2
+        int[,] arr2 = new int[3, 3] { { 5, 6, 7 }, { 8, 9, 10 }, { 11, 12, 13 } }; // 3×3
+        int[,] arr3 = new int[2, 3] { { 14, 15, 16 }, { 17, 18, 19 } }; // 2×3
+        // 步骤2：声明交错数组，存储这些二维数组（int[][,] 表示“元素是int[,]的数组”）
+        int[][,] twoDArrayCollection = new int[3][,] 
+	{
+            arr1,  // 第0个元素：2×2二维数组
+            arr2,  // 第1个元素：3×3二维数组
+            arr3   // 第2个元素：2×3二维数组
+        };
+
+交错数组的使用
+获取交错数组的长度
+数组名.GetLength(0);获取行
+int b= a[0].Length;获取每一个列的长度
+
+获取其中的元素就是
+数组名[][]
+ Console.WriteLine(a[0][0]);
+
+遍历数组
+for (int i = 0; i < a.GetLength(0); i++)
+{
+    for (int j = 0; j < a[i].Length; j++)
+    {
+        Console.WriteLine(a[i][j]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

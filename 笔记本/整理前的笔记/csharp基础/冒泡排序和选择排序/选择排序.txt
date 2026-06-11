@@ -1,0 +1,47 @@
+核心就是先遍历数组从第0出发，找到最小的一个数据的下标，把它放到第一个位置
+然后从第一出发
+namespace 选择排序
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Random random = new Random();
+            int[] a = new int[10];
+            int i = 0;
+            while (i < 10)
+            {
+                int num = random.Next(0, 11);
+                a[i] = num;
+                i++;
+            }
+            for (int j = 0; j < 10; j++)
+            {
+                Console.Write(" {0} ", a[j]);
+            }
+            Console.WriteLine("  ");
+            //我们先建立一个中间商索引值
+            //从前往后以第一个是为基准
+            //看看有没有比他大的，要是有的话
+            for(int m=0; m < a.Length; m++)
+            {
+                int index = m;
+                for (int n=m+1; n < a.Length; n++)
+                {
+                    if (a[index]>a[n])
+                    {
+                        index = n;
+                    }
+                }
+                int temp = a[m];
+                a[m] = a[index];
+                a[index] = temp;
+
+            }
+            for (int j = 0; j < 10; j++)
+            {
+                Console.Write(" {0} ", a[j]);
+            }
+        }
+    }
+}

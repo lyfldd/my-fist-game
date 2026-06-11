@@ -1,0 +1,213 @@
+{
+  "main": {
+    "id": "f8e822a8cb3c0f29",
+    "type": "split",
+    "children": [
+      {
+        "id": "619586a3c94f8a86",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4ccddd3dcd15f741",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "unity笔记一/Pasted image 20260506204232.png"
+              },
+              "icon": "lucide-image",
+              "title": "Pasted image 20260506204232"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "5d4ad07b5ee368d3",
+    "type": "split",
+    "children": [
+      {
+        "id": "65ab81027b12bbcb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "bd32ad1c98f3d0a0",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "549459b50cebb653",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "07c9228859b00003",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "9e569c9c2cb6b7ea",
+    "type": "split",
+    "children": [
+      {
+        "id": "4cdfc69a1d3cfdde",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5668e71bd0ac58a9",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "反向链接"
+            }
+          },
+          {
+            "id": "c99176d11bdfc82d",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "出链"
+            }
+          },
+          {
+            "id": "137cfb7bea273e6b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "b84617f711474cb9",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "4b044a3ead8306e9",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "4ccddd3dcd15f741",
+  "lastOpenFiles": [
+    "unity笔记一/Pasted image 20260506202451.png",
+    "unity笔记一/Pasted image 20260505165640.png",
+    "unity笔记一/Pasted image 20260505164115.png",
+    "unity笔记一/Pasted image 20260505162807.png",
+    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/物理材质.md",
+    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/碰撞器.md",
+    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/碰撞检测函数.md",
+    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/刚体加力.md",
+    "unity笔记一/unity入门/transform/位置和位移/vector3.md",
+    "unity笔记一/unity入门/核心系统/光源组件/光源系统基础.md",
+    "unity笔记一/unity入门/核心系统/光源组件/光面板相关.md",
+    "整理之后的笔记/csharp进阶整理/协变和逆变整理/02_对比汇总表.md",
+    "整理之后的笔记/csharp进阶整理/协变和逆变整理/01_协变与逆变概念.md",
+    "整理之后的笔记/csharp进阶整理/委托和事件整理/03_事件.md",
+    "整理之后的笔记/csharp进阶整理/委托和事件整理/02_委托方法.md",
+    "整理之后的笔记/csharp进阶整理/委托和事件整理/01_委托概念.md",
+    "整理之后的笔记/csharp进阶整理/委托和事件整理/01_事件.md",
+    "整理之后的笔记/csharp进阶整理/匿名函数整理/01_匿名函数概念.md",
+    "数据结构与算法笔记/学习清单.md",
+    "数据结构与算法笔记/2026.5.20.md",
+    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/04-反射注意事项与坑点.md",
+    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/03-反射底层原理.md",
+    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/02-反射怎么用.md",
+    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/01-反射是什么.md",
+    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/04_查找.md",
+    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/02_安全取值.md",
+    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/00_Dictionary概念和创建.md",
+    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/LinkedList整理/04_查找.md",
+    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/LinkedList整理/05_遍历.md"
+  ]
+}

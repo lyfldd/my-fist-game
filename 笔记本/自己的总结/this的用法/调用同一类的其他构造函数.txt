@@ -1,0 +1,25 @@
+在构造函数定义中，使用this关键字可以调用同一类的其他构造函数，从而避免重复代码。构造函数链有助于集中初始化逻辑
+
+public class Circle
+{
+    public double Radius { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+
+    public Circle() : this(0, 0, 0)
+    {
+    }
+
+    public Circle(double radius) : this(radius, 0, 0)
+    {
+    }
+
+    public Circle(double radius, double x, double y)
+    {
+        Radius = radius;
+        X = x;
+        Y = y;
+    }
+}
+
+要是在构造函数后面加上的话，会先调用this指定的函数

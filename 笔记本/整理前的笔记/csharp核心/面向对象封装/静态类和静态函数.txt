@@ -1,0 +1,31 @@
+静态类就是用static来修饰一个类
+是能包含静态成员
+不能被实例化
+
+我们一般把所有的静态成员，静态函数来装到这里
+
+静态构造函数 就是我们在类的构造函数前面加上static
+1.静态类和普通类都可以有
+2.不能用访问修饰符
+3.不能有参数
+4.只会自动调用一次
+static class Teststatic
+{
+    public static int testIndex1 = 0;
+    public static int testIndex2 = 0;
+    static Teststatic()
+    {
+        Console.WriteLine("123");
+    }
+    public static void TestFun()
+    {
+
+    }
+            Console.WriteLine("Hello, World!");
+            Console.WriteLine(Teststatic.testIndex1);
+            Console.WriteLine(Teststatic.testIndex2);
+
+我们会发现顺序是Hello, World，123,0,0
+所以说我们的静态构造函数 会在我们 第一次 使用静态类里面的东西的时候
+自动执行一次
+就算是我们在普通的类里面去声明一个静态构造函数的话也是一样，会自动执行一次

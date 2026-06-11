@@ -1,0 +1,105 @@
+协变是用来解决泛型不支持父类和子类自动装换的问题
+先记住一句话
+协变 out → 返回值用 → 子类泛型 → 父类泛型
+逆变 in → 参数用 → 父类泛型 → 子类泛型
+
+关键字是out加在泛型的前面
+就是我们有一堆的怪物，他们都继承enemy
+class Enemy
+{
+    public int Hp;
+    public string Name;
+    public Enemy(int hp, string name)
+    {
+        Hp = hp;
+        Name = name;
+    }
+    public virtual void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+}
+
+class Boss : Enemy
+{
+    public Boss(int bossHp, string name) : base(bossHp, name)
+    {
+    }
+    public override void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+}
+class Slime : Enemy
+{
+    public Slime(int slimeHp, string name) : base(slimeHp, name)
+    {
+    }
+    public override void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+}
+然后呢我们要用一个方法直接攻击全部的敌人
+static void DamageAll(IEnumerable<Enemy> enemies)
+{
+    foreach (var enemy in enemies)
+    {
+        enemy.TakeDamage(10);
+    }
+}
+
+然后呢我就是有一个boss的
+我想调用Damage，然后我要往里面传对象
+List<Boss> enemies = new List<Boss>();
+enemies.Add(new Boss(100, "boss1"));
+enemies.Add(new Boss(200, "boss2"));
+
+要是我们的IEnumerable<Enemy> enemies
+这里不是协变的话，我们是不能直接用这个方法去作用在boss上
+这里就体现了类似于继承的感觉
+我们的父类的遍历接口加了一个关键字out
+然后就会自动的识别我们传进来的对象是不是这个大家庭里面的子类
+要是是的话就可以直接用这个接口
+我们就不用单独的写一个全体boss的受伤遍历接口了
+
+我们还可以用实现一下委托的协变
+我们就是用一个通用的刷怪机制，然后可以用协变来刷怪
+我们先定义一个怪物登场的东西
+public virtual void SayHello()
+{
+    Console.WriteLine($"敌人 {Name} 出现了！血量：{Hp}");
+}
+然后boss和slime实现一下
+public override void SayHello()
+{
+    Console.WriteLine($" Boss {Name} 登场！血量：{Hp}");
+}
+public override void SayHello()
+{
+    Console.WriteLine($" Slime {Name} 登场！血量：{Hp}");
+}
+然后我们定义一个委托
+public delegate T SpawnHandler<out T>();
+这个我们在需要刷怪的时候我们用来订阅的
+然后我们有一个通用的刷怪机制
+static void DoSpawn(SpawnHandler<Enemy> spawnHandler)
+{
+    Enemy enemy = spawnHandler();
+    enemy.SayHello();
+}
+我们通过我们的这个public delegate T SpawnHandler<out T>();委托
+来传入我们具体的刷怪方法
+正常我们要是没有协变的话
+我们这个委托是只能传入enemy的我们的boss是他的子类
+现在我们有了out关键字修饰
+现在就可以虽然说这个委托的泛型是enemy，但是我们可以传他的子类
+
+
+
+
+
+
+
+
+

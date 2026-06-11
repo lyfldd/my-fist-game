@@ -1,0 +1,45 @@
+运算符的重载就是可以让自定义的类和结构体可以使用运算符
+关键词是operator
+
+一定要是一个公共的静态方法
+返回值写在operator前面
+逻辑处理自定义
+
+作用就是让自定义的类和结构体对象可以进行运算
+
+要注意的是条件运算符需要成对实现
+一个运算符可以有多个重载
+不能使用ref 和 out
+
+基本语法是在类里面声明
+public static 返回类型 operator 运算符（参数列表）
+
+比如说我要计算两个向量的相加
+我可以为他们写一个相加的函数，也可以重载运算符
+class Point
+{
+    public int x { get; set; }
+    public int y {  get; set; }
+    public Point(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static Point operator +(Point a, Point b)
+    {
+        Point p=new Point(a.x+b.x, a.y+b.y);
+        return p;
+    }
+}
+            Point a = new Point(1,2);
+            Point b = new Point(3,4);
+            Point p3 = new Point(0,0);
+            p3 = a + b;
+
+public static 返回类型 operator 运算符（参数列表）
+重点是这个参数列表我们一定要至少有一个类或者是别的东西
+并非所有运算符都可以重载。例如，成员访问运算符（.）、条件运算符（? :）、赋值运算符（=）等不能重载
+可重载的运算符包括算术运算符（如 +, -, *, /）、比较运算符（如 ==, !=, <, >）、逻辑运算符（如 &, |, ^）等
+重载运算符时，应尽量保持与运算符在其他类型上的语义一致性。例如，重载的加法运算符应该符合加法的一般概念
+对称重载：对于一些运算符，如比较运算符（== 和 !=，< 和 > 等），建议成对重载，以确保行为的一致性。例如，如果重载了 == 运算符，也应该重载 != 运算符

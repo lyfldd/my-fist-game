@@ -1,0 +1,25 @@
+成员变量（字段和属性）是类的状态数据，this关键字让实例方法能够精准访问和修改这些数据
+
+public class Employee
+{
+    private string name;
+    private int salary;
+
+    public Employee(string name, int salary)
+    {
+        this.name = name;
+        this.salary = salary;
+    }
+
+    public void RaiseSalary(int amount)
+    {
+        this.salary += amount;
+    }
+
+    public string GetDetails()
+    {
+        return $"Employee {this.name} has a salary of {this.salary}";
+    }
+}
+
+在Increment方法中，this.count++ 增加了对象的count成员变量的值。在GetCount方法中，return this.count 返回了count的值

@@ -1,0 +1,77 @@
+索引器
+就是让对象像数组一样通过访问来访问其中的元素
+访问修饰符 返回值 this[参数类型 参数名，参数类型 参数名，............]
+{
+get
+{
+
+}
+set
+{
+
+}
+
+例如
+}
+ class Person
+ {
+     private string name;
+     private int age;
+     public Person[] friends;
+
+     public Person this[int index]
+     {
+         get
+         {
+             return friends[index];
+         }
+         set
+         {
+
+         }
+     }
+ }
+然后我们就可以用
+            Person p= new Person();
+            p[0]=new Person();
+来访问这个
+
+也可以在get和set里面写逻辑
+
+索引器可以重载
+        public string this[string str]
+        {
+            get
+            {
+                switch (str)
+                {
+                    case "name":
+                        return name;
+                        break;
+                    case "age":
+                        return age.ToString();
+                        break;
+                }
+                return "";
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

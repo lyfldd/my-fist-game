@@ -1,0 +1,10 @@
+在定义扩展方法时，this关键字用于指定要扩展的类型。扩展方法允许向现有类型添加新方法，而无需修改该类型的源代码
+
+public static class StringExtensions
+{
+    public static bool IsNullOrEmptyOrWhitespace(this string input)
+    {
+        return string.IsNullOrWhiteSpace(input);
+    }
+}
+这里this string表明IsNullOrEmptyOrWhitespace方法是为string类型扩展的。之后，就可以在string对象上像调用实例方法一样调用该扩展方法，例如：string text = " "; bool result = text.IsNullOrEmptyOrWhitespace();

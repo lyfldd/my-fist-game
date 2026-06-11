@@ -1,0 +1,25 @@
+定义：客户端不应该被迫依赖它不需要的接口。即一个接口应该只包含客户端真正需要的方法，而不是将所有可能的方法都放在一个大接口中。
+示例：假设有一个 Worker 接口，其中包含 Work、Eat 和 Sleep 方法。但如果有些类只需要 Work 方法，而不需要 Eat 和 Sleep 方法，就会导致这些类被迫依赖不需要的接口方法。应该将其拆分为多个接口，如 IWorkable、IEatable 和 ISleepable。
+// 不好的设计
+interface Worker
+{
+    void Work();
+    void Eat();
+    void Sleep();
+}
+
+// 好的设计
+interface IWorkable
+{
+    void Work();
+}
+
+interface IEatable
+{
+    void Eat();
+}
+
+interface ISleepable
+{
+    void Sleep();
+}

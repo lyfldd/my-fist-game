@@ -1,0 +1,183 @@
+using System.Collections.Generic;
+List<int> list= new List<int>();
+声明其实一样
+
+增加
+1.add添加单个	Add(T item)
+list.Add(6); 
+// 结果：1,2,3,4,5,3,6
+
+2.addrange批量增加	AddRange(IEnumerable<T> collection)
+list.AddRange(new[] { 7, 8 }); 
+// 结果：1,2,3,4,5,3,7,8
+
+3.在某个索引后面插入单个	Insert(int index, T item)
+list.Insert(2, 99); 
+// 索引2插入99 → 1,2,99,3,4,5,3
+
+4.在某个索引后面批量增加	InsertRange(int index, IEnumerable<T> collection)
+list.InsertRange(1, new[] { 10, 20 }); 
+// 索引1插入 → 1,10,20,2,3,4,5,3
+
+删除
+1.删除单个元素	Remove(T item)
+bool b = list.Remove(3); 
+// 删除第一个3 → 1,2,4,5,3
+
+2.删除某个索引的元素	RemoveAt(int index)
+list.RemoveAt(1); 
+// 删除索引1 → 1,3,4,5,3
+
+3.删除某个索引后面的几个元素
+RemoveRange(int index, int count)
+list.RemoveRange(1, 2); 
+// 从索引1删2个 → 1,4,5,3
+
+4.删除特定条件的元素	RemoveAll(Predicate<T> match)
+int cnt = list.RemoveAll(x => x > 3); 
+// 删除所有>3的 → 1,2,3,3
+
+5.清空
+list.Clear(); 
+// 清空 → 空列表
+
+
+查找和判断元素
+1.根据内容来判断元素是否存在	Contains(T item)
+bool has = list.Contains(3); // true
+
+
+2.判断是否存在满足条件的元素	 Exists(Predicate<T> match)
+bool exist = list.Exists(x => x > 4);
+Console.WriteLine(exist);  // True（因为有 5）
+bool exist2 = list.Exists(x => x < 0);
+Console.WriteLine(exist2); // False
+
+
+3.判断是否所有的元素都满足条件		TrueForAll(Predicate<T> match)
+bool allPositive = list.TrueForAll(x => x > 0);
+Console.WriteLine(allPositive);  // True
+
+bool allGreaterThan2 = list.TrueForAll(x => x > 2);
+Console.WriteLine(allGreaterThan2); // False（1、2 不满足）
+
+
+4.找第一个匹配项的索引，然后返回有三个重载
+
+ IndexOf(T item)		从头找第一个 3
+int index = list.IndexOf(3);
+Console.WriteLine(index);  // 2
+
+IndexOf(T item, int startIndex)		从索引 3 开始往后找第一个 3：
+int index = list.IndexOf(3, 3);
+Console.WriteLine(index);  // 5
+
+IndexOf(T item, int startIndex, int count)	从索引 2 开始，只找 3 个元素
+// list: [1,2,3,4,5,3]
+int index = list.IndexOf(3, 2, 3);
+Console.WriteLine(index);  // 2
+
+
+5.找最后一个匹配项的索引，同样 3 个重载
+用法和 IndexOf 完全对称，只是从后往前找。
+LastIndexOf(3)
+LastIndexOf(3, 4)
+LastIndexOf(3, 5, 3)
+
+
+6.按条件找索引	FindIndex
+第一个满足条件的元素索引
+
+// 找第一个 >2 的数的索引
+int idx = list.FindIndex(x => x > 2);
+Console.WriteLine(idx);  // 2（对应元素 3）
+
+他的重载是
+FindIndex(int startIndex, Predicate<T> match)
+从指定位置的开始，往后查找满足条件的索引
+
+FindIndex(int startIndex, int count, Predicate<T> match)
+从指定位置的开始，往后查找（只找count个）满足条件的索引
+
+
+7.按条件找元素本身（返回 T）		Find(Predicate<T> match)
+int num = list.Find(x => x > 3);
+Console.WriteLine(num);  // 4
+找不到会返回：
+值类型：default(T) → int 就是 0
+引用类型：null
+
+
+8.找最后一个满足条件的元素		FindLast(Predicate<T> match)
+int lastNum = list.FindLast(x => x > 2);
+Console.WriteLine(lastNum); // 3
+
+
+9.找所有满足条件的元素，返回一个新 List		FindAll(Predicate<T> match)
+List<int> result = list.FindAll(x => x > 2);
+// result 内容：3,4,5,3
+
+
+
+获取和修改
+
+1.索引访问修改
+int val = list[0]; // 1
+list[0] = 100;     // 100,2,3,4,5,3
+
+
+2.通过索引器获取
+int first = list[0];    // 10
+int second = list[1];   // 20
+int last = list[4];     // 50
+
+遍历获取（foreach /for）
+
+foreach (int item in list)
+{
+    Console.WriteLine(item);
+}
+
+for (int i = 0; i < list.Count; i++)
+{
+    Console.WriteLine(list[i]);
+}
+
+3.GetRange 获取一段元素（返回新 List）	List<T> GetRange(int index, int count);
+// 从索引 1 开始，取 3 个元素
+List<int> range = list.GetRange(1, 3);
+
+4.CopyTo 复制到数组（三个重载）
+重载 1：全部复制到数组
+int[] arr = new int[5];
+list.CopyTo(arr);
+
+重载 2：从数组的某个位置开始放
+int[] arr = new int[10];
+list.CopyTo(arr, 2);
+
+重载 3：从 List 某位置取一段，复制到数组
+int[] arr = new int[10];
+
+// list 从索引 1 开始，取 3 个元素，放到数组从索引 0 开始
+list.CopyTo(1, arr, 0, 3);
+
+5.ToArray 转成数组
+int[] arr = list.ToArray();
+
+6.遍历列表里的每一个元素，并对它执行一段代码
+参数是一个委托：Action<T>，简单理解就是你要对每个元素做什么
+list.ForEach(item => 
+{
+    // 对 item 做操作
+});
+值类型（int、struct）不能直接改
+
+
+
+
+
+
+
+
+

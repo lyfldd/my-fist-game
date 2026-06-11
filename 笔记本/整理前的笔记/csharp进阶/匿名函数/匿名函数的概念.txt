@@ -1,0 +1,159 @@
+匿名函数就是我们不想要定义一个函数，然后想用完就丢
+就相当于我们的塑料袋子，我们只是用来临时的装东西
+没有名字、临时写一段代码、用完就丢的函数
+脱离了委托和事件，不可以使用
+
+一般的函数
+void AddGold()
+{
+    Gold += 100;
+}
+匿名函数
+() => { Gold += 100; }
+我们可以在括号里面传参数
+// 无参
+() => { Console.WriteLine("怪物死了"); }
+
+// 带 int 参数
+(int a) => { Console.WriteLine(a); }
+
+// 带 string 参数
+(string s) => { Console.WriteLine(s); }
+
+delegate 老式匿名方法（了解即可）
+delegate()
+{
+    Console.WriteLine("老式写法");
+};
+
+主要的用处就是给委托赋值
+事件订阅
+
+原来的写法（要单独写函数）
+GameEvent.OnMonsterDead += AddGold;
+
+void AddGold()
+{
+    player.Gold += 100;
+}
+
+匿名函数写法（不用单独写函数）
+GameEvent.OnMonsterDead += () =>
+{
+    player.Gold += 100;
+    Console.WriteLine("金币+100");
+};
+
+匿名函数的特点
+没有名字
+临时使用
+可以直接赋值给委托
+可以访问外部变量（比如 player、gold）
+用完就丢，不占类的成员方法
+
+为什么要用它？（好处）
+不用在类里写一堆零散的小方法
+代码写在使用的地方，更直观
+不同参数的方法可以包成统一格式
+事件、回调、延迟执行必备
+
+匿名函数的寿命 = 引用它的委托 / 事件的寿命
+匿名函数会抓住外部变量，让它们一起长寿（闭包）
+匿名函数订阅事件容易常驻内存，且难以取消
+
+匿名函数很难退订
+退订要先用一个变量存起来
+然后在退订
+// 先把匿名函数交给一个变量
+Action myAction = () => {
+    player.Gold += 100;
+};
+
+// 订阅
+GameEvent.OnMonsterDead += myAction;
+
+// 退订
+GameEvent.OnMonsterDead -= myAction;
+临时执行一次：随便用匿名
+长期事件（怪物死亡、玩家受伤、成就）：一定用普通方法！
+否则内存泄漏、对象无法释放、怪卡死、包体越来越大
+
+闭包
+它的核心能力是：即使外部函数已经执行完毕，被捕获的变量依然会被保留，供内部函数后续使用。
+简单说：函数把外部变量 “抓” 进自己的作用域，让变量跟着函数一起 “活” 下去
+
+正常的变量生命周期
+在 C# 中，方法内的局部变量，方法执行完就会被销毁，内存被 GC 回收
+void Test()
+{
+    int a = 5; // 局部变量，只在Test方法内有效
+}
+// Test执行完，a就被销毁了，外面再也访问不到
+
+闭包的变量生命周期
+当一个匿名函数捕获了这个局部变量 a，并且把这个匿名函数返回出去时：
+匿名函数被外部持有，不会被销毁
+被捕获的变量 a，会被强制延长生命周期，跟着匿名函数一起存活
+即使 Test 方法执行完，a 依然存在，匿名函数随时可以访问它
+这就是闭包的本质：打破了局部变量的生命周期限制，实现了状态的持久化
+闭包的捕获的值是那个父类函数的最后的值
+
+基础结构就是
+// 外层函数：接收参数，创建闭包
+返回委托类型 外层函数(参数)
+{
+    // 返回一个匿名函数，捕获外层的参数/局部变量
+    return (内部参数) => {
+        // 内部逻辑：使用捕获的外部变量 + 内部参数
+    };
+}
+
+例子
+// 外层函数：传入a，返回一个"乘以a"的函数
+static Func<int, int> CreateMultiplier(int a)
+{
+    // 匿名函数：捕获了a，接收b，返回a*b
+    return (b) => a * b;
+}
+
+// 使用
+static void Main()
+{
+    // 1. 调用外层函数，传入a=5，得到闭包实例multiplyBy5
+    // 此时a=5被multiplyBy5捕获，即使CreateMultiplier执行完，a依然存活
+    Func<int, int> multiplyBy5 = CreateMultiplier(5);
+    
+    // 2. 执行闭包，传入b=3，计算5*3=15
+    Console.WriteLine(multiplyBy5(3)); // 输出15
+    Console.WriteLine(multiplyBy5(10)); // 输出50
+
+    // 3. 再创建一个新的闭包，a=10，和之前的a=5完全独立
+    Func<int, int> multiplyBy10 = CreateMultiplier(10);
+    Console.WriteLine(multiplyBy10(3)); // 输出30
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,130 @@
+先来讲解一下有没有重载
+下面这些 全都没有重载：
+Enqueue
+Dequeue
+Peek
+TryDequeue
+TryPeek
+Clear
+Contains
+ToArray
+TrimExcess
+GetEnumerator
+只有两个方法有重载：
+构造函数（3 个）
+CopyTo（2 个）
+
+1.构造方法
+无参数
+Queue<T> queue = new Queue<T>();
+
+指定初始容量
+Queue<T> queue = new Queue<T>(int capacity);//capacity：初始容量
+
+通过集合创建，就是把 List / 数组 直接转成队列
+Queue<T> queue = new Queue<T>(IEnumerable<T> collection);
+//collection：实现了 IEnumerable<T> 的集合（数组、List 等）
+
+
+2，入队
+作用：把元素加到队尾
+无返回值
+不会抛异常
+自动扩容
+
+queue.Enqueue("A");
+queue.Enqueue(100);
+
+
+3. Dequeue（出队 → 取出并删除队头
+作用：删除并返回队头元素
+队列为空会抛异常：InvalidOperationException
+
+if (queue.Count > 0)
+    var item = queue.Dequeue();
+
+
+4. Peek（查看队头 → 不删除）
+作用：返回队头，但不删除
+队列为空抛异常
+
+queue.Enqueue(1);
+queue.Enqueue("123");
+int i=(int)queue.Peek();
+Console.WriteLine(i);
+
+
+5. TryDequeue（安全出队 → 不抛异常）
+最推荐的安全出队方法
+成功返回 true，失败返回 false
+永远不抛异常
+if (queue.TryDequeue(out var item))
+{
+    // 成功拿到元素
+}
+queue.TryDequeue(out var value);
+ i = queue.Peek();
+Console.WriteLine(i);
+结果是2
+
+解释一下·对于我们的这个参数
+queue.TryDequeue(out var value);
+第一个out类似于指针的取值，可以直接把我们的标头元素取出来
+第二个参数是我们这个队列的类型，int类型就写int，类就写类名
+第三个参数就是我们的变量，来接住我们的取出来的东西
+
+
+6.TryPeek安全输出队头元素
+参数out T result：输出队头元素
+queue.TryPeek(out int j);
+Console.WriteLine(j);
+
+
+7. Clear（清空队列）
+Count 变成 0
+容量不变（想缩容用 TrimExcess）
+queue.Clear();
+
+
+8.Contains（判断是否包含某个元素）
+queue.Enqueue(1);
+queue.Enqueue(2);
+queue.Enqueue(3);
+bool has = queue.Contains(2);
+Console.WriteLine(has);
+
+
+9.转数组
+int[] arr = new int[queue.Count];
+arr=queue.ToArray();
+for (int k = 0; k < arr.Length; k++)
+{
+    Console.Write(arr[k]);
+}
+
+
+10. CopyTo（复制到现有数组）
+void CopyTo(T[] array, int arrayIndex);
+第一个参数是目标数组，第二个参数是从数组的哪一个位置开始复制
+
+11. TrimExcess（释放多余空间 → 优化内存）
+queue.TrimExcess();
+
+
+12.遍历的话支持foreach遍历
+也可以用GetEnumerator（遍历）
+其实我们的foreach就是调用的GetEnumerator
+
+
+
+
+
+
+
+
+
+
+
+
+
+

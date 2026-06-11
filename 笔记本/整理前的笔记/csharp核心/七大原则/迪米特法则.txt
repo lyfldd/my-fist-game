@@ -1,0 +1,37 @@
+定义：一个对象应该对其他对象有最少的了解，即尽量减少对象之间的耦合度。也被称为 “最少知识原则”。
+示例：假设有一个 Order 类，它需要获取客户地址信息。如果 Order 类直接与 Customer 类的内部地址对象交互来获取地址，就违反了迪米特法则。更好的做法是 Customer 类提供一个方法来返回地址，Order 类只与 Customer 类交互，而不涉及 Customer 类内部地址对象的细节。
+class Address
+{
+    public string Street;
+}
+
+class Customer
+{
+    private Address _address;
+
+    public Customer()
+    {
+        _address = new Address { Street = "123 Main St" };
+    }
+
+    public string GetAddress()
+    {
+        return _address.Street;
+    }
+}
+
+class Order
+{
+    private Customer _customer;
+
+    public Order(Customer customer)
+    {
+        _customer = customer;
+    }
+
+    public void PrintShippingAddress()
+    {
+        string address = _customer.GetAddress();
+        Console.WriteLine($"Shipping address: {address}");
+    }
+}

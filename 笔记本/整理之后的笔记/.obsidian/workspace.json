@@ -1,0 +1,209 @@
+{
+  "main": {
+    "id": "a870b798ef314d48",
+    "type": "split",
+    "children": [
+      {
+        "id": "eaa2f4dd31020a24",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "16637a450989faf6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "📒_使用说明.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "📒_使用说明"
+            }
+          }
+        ],
+        "stacked": true
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "c7bcfc482aee5461",
+    "type": "split",
+    "children": [
+      {
+        "id": "24c56dbeb61b8212",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "d17407fafb0fa73e",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "96da2aa796f21397",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "d99eb8c05f767c91",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "d5290c1bb09da1e0",
+    "type": "split",
+    "children": [
+      {
+        "id": "6aeb7fea947c529e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "155073568bd7c654",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "csharp核心整理/面向对象多态整理/04_接口.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "04_接口 的反向链接列表"
+            }
+          },
+          {
+            "id": "269f376d3b7c4035",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "csharp核心整理/面向对象多态整理/04_接口.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "04_接口 的出链列表"
+            }
+          },
+          {
+            "id": "3ad32f9f164b8caa",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "0146e755d491f563",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "3d9661d757a3a885",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "csharp核心整理/面向对象多态整理/04_接口.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "04_接口 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "16637a450989faf6",
+  "lastOpenFiles": [
+    "🗺️_知识图谱总览.md",
+    "csharp进阶整理/多线程和异步编程整理/03_线程安全与lock.md",
+    "csharp进阶整理/数据结构整理/非泛型数据结构整理/01_ArrayList.md",
+    "csharp核心整理/面向对象多态整理/04_接口.md",
+    "csharp核心整理/面向对象多态整理/03_抽象类和抽象函数.md",
+    "csharp核心整理/面向对象多态整理/01_虚方法与重写.md",
+    "csharp核心整理/面向对象多态整理/02_密封函数.md",
+    "csharp进阶整理/委托和事件整理/01_事件.md",
+    "csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/03_删除.md",
+    "csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/01_增加和修改.md",
+    "csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/00_Dictionary概念和创建.md",
+    "csharp进阶整理/协变和逆变整理/01_协变与逆变概念.md",
+    "📒_使用说明.md",
+    "未命名",
+    "csharp基础整理/01_数组与枚举.md",
+    "csharp进阶整理/匿名函数整理/01_匿名函数概念.md",
+    "csharp入门整理/01_控制台输入输出与变量类型.md",
+    "csharp入门整理/00_修订说明.md",
+    "csharp核心整理/面向对象封装整理/02_成员变量和访问修饰符.md"
+  ]
+}

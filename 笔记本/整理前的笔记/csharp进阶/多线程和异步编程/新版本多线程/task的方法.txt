@@ -1,0 +1,263 @@
+超简核心总结
+Wait() → 等一个任务
+Result → 等 + 拿返回值
+WaitAll() → 等全部
+WaitAny() → 等一个完成
+CancellationToken → 中途取消
+ContinueWith() → 任务接力
+IsCompleted / IsFaulted → 看状态
+lock → 多线程改共享变量必须用
+
+一、静态方法（直接 Task.xxx）
+Run：开启异步任务
+RunAsync：异步运行委托
+Delay：异步等待一段时间
+WhenAll：等待所有任务完成
+WhenAny：等待任意一个任务完成
+FromResult：用结果创建已完成任务
+FromException：创建带异常的已失败任务
+FromCanceled：创建已取消任务
+Factory：获取任务工厂
+CompletedTask：获取一个已完成的任务
+
+二、实例方法（task.xxx）
+Start：启动任务
+Wait：同步等待任务完成
+WaitAll：等待多个任务
+WaitAny：等待任一任务
+ContinueWith：任务完成后继续执行
+GetAwaiter：获取等待器
+ConfigureAwait：配置等待上下文
+
+三、实例属性
+IsCompleted：是否完成
+IsFaulted：是否出错
+IsCanceled：是否取消
+Status：任务状态
+Exception：任务异常
+Result：获取返回值（会阻塞）
+
+四、泛型 Task<T>
+Result
+同样支持上面大部分方法
+
+1. 等待单个任务：Wait ()
+主线程阻塞，直到这个 Task 执行完毕。
+对应 Thread 的 Join()。
+
+static void Main(string[] args)
+{
+    Task task = Task.Run(() =>
+    {
+        Thread.Sleep(1000);
+        Console.WriteLine("怪物攻击完成");
+    });
+
+    Console.WriteLine("等待攻击结束...");
+
+    // 主线程会卡在这里，等子线程跑完
+    task.Wait();
+
+    Console.WriteLine("攻击结束，主线程继续");
+}
+
+2. 获取返回值：Task<T> + Result
+让任务返回一个结果，主线程用 .Result 获取。
+
+static void Main(string[] args)
+{
+    Task<int> calculateTask = Task.Run(() =>
+    {
+        // 模拟计算伤害
+        Thread.Sleep(500);
+        return 325; // 返回最终伤害
+    });
+
+    Console.WriteLine("正在计算伤害...");
+
+    // Result 会自动等待，并拿到返回值
+    int damage = calculateTask.Result;
+
+    Console.WriteLine($"最终伤害：{damage}");
+}
+
+3. 等待多个任务全部完成：Task.WaitAll ()
+等所有任务都执行完，主线程再继续。
+常用于：多个角色同时攻击，等所有人打完再结算
+
+static void Main(string[] args)
+{
+    Task t1 = Task.Run(() => {
+        Thread.Sleep(1000);
+        Console.WriteLine("战士攻击完成");
+    });
+
+    Task t2 = Task.Run(() => {
+        Thread.Sleep(800);
+        Console.WriteLine("射手攻击完成");
+    });
+
+    Task t3 = Task.Run(() => {
+        Thread.Sleep(1200);
+        Console.WriteLine("法师攻击完成");
+    });
+
+    // 等 t1、t2、t3 全部结束
+    Task.WaitAll(t1, t2, t3);
+
+    Console.WriteLine("所有角色攻击完毕");
+}
+
+4. 等待任意一个任务完成：Task.WaitAny ()
+只要有一个任务完成，就立刻继续往下走。
+场景：谁先击杀 BOSS，谁拿奖励。
+
+static void Main(string[] args)
+{
+    Task t1 = Task.Run(() => { Thread.Sleep(1000); Console.WriteLine("战士击杀BOSS"); });
+    Task t2 = Task.Run(() => { Thread.Sleep(800); Console.WriteLine("射手击杀BOSS"); });
+    Task t3 = Task.Run(() => { Thread.Sleep(1200); Console.WriteLine("法师击杀BOSS"); });
+
+    // 只要任意一个完成，就继续
+    int index = Task.WaitAny(t1, t2, t3);
+
+    Console.WriteLine($"第 {index+1} 个角色完成击杀");
+}
+
+5. 取消任务：CancellationTokenSource / Token
+中途停止任务，比如玩家取消加载、停止 AI、中断技能。
+
+static void Main(string[] args)
+{
+    // 1. 创建取消源
+    CancellationTokenSource cts = new CancellationTokenSource();
+    CancellationToken token = cts.Token;
+
+    // 2. 开启任务，传入 token
+    Task task = Task.Run(() =>
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            // 判断是否收到取消信号
+            if (token.IsCancellationRequested)
+            {
+                Console.WriteLine("任务被取消，停止执行");
+                return;
+            }
+
+            Console.WriteLine($"技能施放进度：{i+1}%");
+            Thread.Sleep(100);
+        }
+    }, token);
+
+    // 按任意键取消
+    Console.ReadKey();
+    cts.Cancel();
+
+    task.Wait();
+}
+
+6. 任务连续执行：ContinueWith ()
+上一个任务执行完，自动执行下一个，不用手动 Wait。
+
+static void Main(string[] args)
+{
+    Task.Run(() =>
+    {
+        Console.WriteLine("第一步：加载角色模型");
+        Thread.Sleep(1000);
+    })
+    .ContinueWith((prevTask) => // 前一个任务完成后执行
+    {
+        Console.WriteLine("第二步：加载装备");
+        Thread.Sleep(800);
+    })
+    .ContinueWith((prevTask) =>
+    {
+        Console.WriteLine("第三步：进入游戏");
+    });
+
+    Console.ReadLine();
+}
+
+7. 查看任务状态：IsCompleted / IsFaulted / IsCanceled
+判断任务现在是什么状态：运行中？完成？报错？被取消？
+
+static void Main(string[] args)
+{
+    Task task = Task.Run(() =>
+    {
+        Thread.Sleep(1000);
+        // throw new Exception("出错了");
+    });
+
+    while (!task.IsCompleted)
+    {
+        Console.WriteLine("任务运行中...");
+        Thread.Sleep(200);
+    }
+
+    if (task.IsCompletedSuccessfully)
+        Console.WriteLine("任务成功完成");
+
+    if (task.IsFaulted)
+        Console.WriteLine($"任务出错：{task.Exception}");
+
+    if (task.IsCanceled)
+        Console.WriteLine("任务被取消");
+}
+
+9. 长任务：TaskCreationOptions.LongRunning
+告诉线程池：这是个长期运行的任务，别用普通线程池，单独开线程。
+
+Task.Factory.StartNew(() =>
+{
+    while (true)
+    {
+        Console.WriteLine("后台日志监控运行中...");
+        Thread.Sleep(1000);
+    }
+}, TaskCreationOptions.LongRunning);
+
+Console.ReadLine();
+
+10. 线程安全（Task 和 Thread 完全一样）
+多线程同时修改同一个变量，必须 lock。
+
+static int hp = 1000;
+static readonly object _lockObj = new object();
+
+static void Main(string[] args)
+{
+    Task t1 = Task.Run(() => {
+        for (int i = 0; i < 500; i++) {
+            lock (_lockObj) hp--;
+        }
+    });
+
+    Task t2 = Task.Run(() => {
+        for (int i = 0; i < 500; i++) {
+            lock (_lockObj) hp--;
+        }
+    });
+
+    Task.WaitAll(t1, t2);
+    Console.WriteLine($"最终血量：{hp}"); // 一定是 0
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

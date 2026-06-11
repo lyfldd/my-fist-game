@@ -1,0 +1,35 @@
+	 enum SexType
+    {
+        Man,
+        women,
+    }
+	struct Pet
+    {
+
+    }
+	class Person
+    {
+        string name;
+        int age;
+        SexType sex;(可以调用任何数据类型)
+        Person grilfriend;（不像结构体一样，class里面可以自己调用自己就相当于函数）
+	person[] friend（这种调用自己的时候不能初始化）
+	Pet pet;(也可以调用结构体)
+    }
+
+
+
+访问修饰符
+public——公共的，内部外部都可以用
+private——私有的，只有内部可以用
+protected——保护的，自己内部和自己的子类才可以访问
+
+成员变量的使用的初始值（值类型的默认值是0，bool是false，引用类型是null）
+我们先 Person p=new Person();
+然后就可以使用了
+
+
+
+
+
+

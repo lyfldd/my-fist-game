@@ -1,0 +1,77 @@
+结构体的基本概念
+是一种自定义变量类型
+是数据和函数的集合
+可以声明变量和函数
+
+基本语法
+一般写在namespace中
+关键字是struct
+using System.Security.Cryptography;
+
+namespace 结构体
+{
+    struct student  //结构体名字
+    {
+        //访问修饰符
+        //修饰结构体中的变量是否能被外部是用
+        //public 公共的，可以被外部访问
+        //private 私有的 只能在内部使用
+        //默认不写就是 private
+
+        //第一部分是变量
+        //第二部分是构造函数（可选）
+        //第三部分是函数
+
+        //接下来我们来展现学生数据的结构体
+
+        //变量(结构体中声明的变量不能初始化）还可以包括别的结构体
+        public int age;
+        public bool sex;
+        public int number;
+        public string name;
+
+        //结构体的构造函数
+        //(就是当我们要对很多个学生输入数据的时候我们还要在外面一个个的声明，但是我们可以用一个函数来输入学生的数据）
+        //没有返回值，函数名和结构体名字相同
+        //必须有参数
+        //如果声明了构造函数 那么必须对其中的变量数据初始化
+        //其实就是方便初始化
+        public student(int age, bool sex, int number,string name)
+        {
+            //新的关键字 this
+            //我们用this代表自己用来区分我们结构体自己的变量和传进来的变量
+            this.age = age;
+            this.sex = sex;
+            this.number = number;
+            this.name = name;
+        }
+        //构造函数也可以重载
+
+
+        //函数（表现这个数据结构的行为）
+        //注意结构体里面的函数不要static
+       public void speak()
+        {
+            Console.WriteLine("我的名字是{0},我今年{1}岁", name, age);
+        }
+
+    }
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            //结构体的使用
+            // 变量类型 变量名；
+            student s1;
+            s1.age = 10;
+            s1.sex = true;
+            s1.number = 1;
+            s1.name = "lyf";
+            s1.speak();
+            //就相当于用构造函数来初始化
+            student s2 = new student(18, true, 2, "lyf");
+            s2.speak();
+
+        }
+    }
+}

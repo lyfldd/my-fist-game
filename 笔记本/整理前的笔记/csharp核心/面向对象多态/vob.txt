@@ -1,0 +1,121 @@
+多态的概念
+就是多种状态
+就是让继承同一父类的子类们，在执行相同的方法的时候，可以有不同的表象
+
+同一父类的对象 执行相同的方法的时候，有不同的表现，可以让同一个对象有唯一的行为特征
+    class Father
+    {
+        public void SprakName()
+        {
+            Console.WriteLine("father");
+        }
+    }
+    class Son:Father
+    {
+        public  new void SprakName()
+        {
+            Console.WriteLine("son");
+        }
+    }
+Father f = new Son();
+f.SprakName();
+
+为什么执行的结果是father呢
+
+但是要是我们
+(f as Son).SprakName();
+结果就是son
+
+我们其实之前的时候就已经学过了多态
+就是函数的重载（静态多态）
+
+vob就是
+v virtual虚函数
+o override重写
+b base父类
+
+    class GameObject
+    {
+        public string name;
+        public GameObject(string  name)
+        {
+            this.name = name;
+        }
+        public virtual void atk()
+        {
+            Console.WriteLine("攻击");
+        }
+    }
+    class Player:GameObject
+    {
+        public Player(string name):base(name)
+        {
+
+        }
+        public override void atk()
+        {
+            base.atk();
+        }
+    }
+就相当于我们在父类函数中，我们用virtual来让子类可以来重写这个函数
+然后在子类里面可以来用override来重写
+    class GameObject
+    {
+        public string name;
+        public GameObject(string name)
+        {
+            this.name = name;
+        }
+        public virtual void atk()
+        {
+            Console.WriteLine("攻击");
+        }
+    }
+    class Player:GameObject
+    {
+        public Player(string name):base(name)
+        {
+
+        }
+        public override void atk()
+        {
+            base.atk();
+            Console.WriteLine("玩家攻击");
+        }
+    }
+
+要是我们加base.atk();那就会执行父类的atk
+要是没有的话我们就执行子类的atk
+就是base可以保留父类的行为
+
+总结就是
+
+virtual 关键字
+定义与作用：virtual 关键字用于在基类中声明一个虚方法。虚方法提供了一个可以在派生类中被重写的默认实现。它表明该方法的行为在派生类中可能需要根据具体情况进行调整或扩展。
+特点：
+基类中的虚方法有自己的方法体，即有默认的实现逻辑。
+派生类可以选择是否重写虚方法。如果不重写，派生类将继承基类中虚方法的默认实现。
+
+override 关键字
+定义与作用：override 关键字用于在派生类中重写基类的虚方法。通过重写，派生类可以提供与基类不同的方法实现，从而实现多态行为。
+使用规则：
+只有基类中用 virtual、abstract 或 override 修饰的方法才能在派生类中被重写。
+重写方法的签名（方法名、参数列表和返回类型）必须与基类中被重写的虚方法完全相同。
+
+base关键字
+1. 调用基类构造函数
+当创建派生类的实例时，首先会调用基类的构造函数来初始化基类部分的成员。如果基类没有默认构造函数（无参数构造函数），派生类构造函数必须显式调用基类的构造函数，此时就需要使用base关键字
+2. 调用基类被重写的方法
+当在派生类中重写了基类的虚方法时，如果需要在派生类的重写方法中调用基类的原始方法实现，可以使用base关键字。这在希望在保留基类方法部分功能的基础上，添加派生类特定功能时非常有用
+. 访问基类的属性和字段
+在派生类中，如果需要访问基类的属性或字段，且派生类中存在同名的属性或字段可能导致混淆时，可以使用base关键字来明确访问基类的成员
+
+
+
+
+
+
+
+
+
+

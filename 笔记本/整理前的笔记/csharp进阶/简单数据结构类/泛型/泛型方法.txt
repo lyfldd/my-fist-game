@@ -1,0 +1,124 @@
+举一个实例就是
+我们要创建一个people的类我们要给他写很多的东西
+年龄，名字，身高
+然后我们要不停的创建这些变量
+public People(string name, int age,double high)
+{
+    this.name = name;
+    this.age = age;
+    this.high = high;
+}
+People people = new People("lyf", 19, 168);
+
+但是我们可以用泛型来解决问题
+class Monster<T>
+{
+    public T Value { get; set; }
+}
+Monster<int> monster = new Monster<int>();
+monster.Value = 1；
+就是我们直接传了一个int类型的id为1
+Monster<string> monster2= new Monster<string>();
+monster2.Value = "lyf";
+就是我们传了一个string的lyf
+
+泛型的方法和泛型的接口有什么作用呢
+泛型方法
+就相当于我们要平繁的打印玩家信息，怪物信息，道具信息
+我们要三个方法
+void PrintPlayer(Player p) { ... }
+void PrintEnemy(Enemy e) { ... }
+void PrintItem(Item i) { ... }
+
+但是我们发现这个高度相似都是打印一个信息
+我们可以用泛型方法
+void Print<T>(T obj)
+{
+    Console.WriteLine(obj.ToString());
+}
+然后随便传什么对象都可以
+Print(player);
+Print(enemy);
+Print(item);
+
+泛型接口
+比如我们玩游戏，我们需要有扣血机制
+怪物要扣，玩家也要扣
+那我们就可以定义一个泛型接口
+public interface IDamageable<T>
+{
+    void TakeDamage(T damage);
+}
+然后
+// 玩家用 int 伤害
+public class Player : IDamageable<int>
+{
+    public void TakeDamage(int damage) { ... }
+}
+
+// 怪物用 float 伤害
+public class Enemy : IDamageable<float>
+{
+    public void TakeDamage(float damage) { ... }
+}
+
+
+我们还可以把泛型叠加使用
+比如说我们的泛型类里面的泛型方法
+最经典、最常用的例子
+游戏里的 **“角色背包”**
+角色是固定类型（类的 T）
+物品可以是任意类型（方法的 U）
+// 泛型类：T = 角色类型
+public class Backpack<T>
+{
+    public T Owner; // 背包主人
+
+    // 泛型方法：U = 任意物品类型
+    public void PutItem<U>(U item)
+    {
+        Console.WriteLine($"[{Owner}] 放入了物品：{item}");
+    }
+}
+// 人类
+public class Person
+{
+    public string Name;
+}
+
+// 物品类
+public class Sword
+{
+    public string Name;
+}
+var bag = new Backpack<Person>();
+bag.Owner = new Person { Name = "小明" };
+
+// 方法自己指定 U
+bag.PutItem<Sword>(new Sword { Name = "屠龙刀" });
+bag.PutItem<int>(100);
+bag.PutItem<string>("药水");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

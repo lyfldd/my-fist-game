@@ -1,0 +1,136 @@
+我们可以用委托和事件当参数去传给函数
+
+① 延迟执行 / 计时器
+void Delay(float time, Action onComplete)
+{
+    // 等待时间到
+    onComplete(); // 执行你传进来的逻辑
+}
+用法
+Delay(1, () => 怪物消失());
+Delay(2, () => 播放音效());
+Delay(3, () => 打开宝箱());
+
+
+② 技能系统：同一个技能，不同效果
+void UseSkill(Action onHit)
+{
+    播放动画();
+    判定范围();
+    onHit(); // 执行传进来的效果
+}
+用法
+UseSkill( () => 造成燃烧() );
+UseSkill( () => 造成眩晕() );
+UseSkill( () => 召唤小怪() );
+
+
+③ 怪物 / 角色死亡回调
+void TakeDamage(int dmg, Action onDead)
+{
+    hp -= dmg;
+    if(hp <=0) onDead();
+}
+用法
+monster.TakeDamage(50, ()=>{
+    掉落金币();
+    玩家加经验();
+    解锁成就();
+});
+
+
+④ UI 按钮点击事件
+button.onClick.AddListener( () => {
+    打开商店();
+});
+作用：
+按钮不知道点击后干嘛，你传什么逻辑，它就做什么
+
+
+⑤ 任务 / 事件系统
+void CompleteQuest(Action onReward)
+{
+    任务完成();
+    onReward();
+}
+用法：
+CompleteQuest( () => 获得装备() );
+
+
+⑥ 攻击判定：不同武器不同效果
+void Attack(Action<Enemy> effect)
+{
+    effect(敌人);
+}
+用法
+Attack( (e) => e.燃烧() );
+Attack( (e) => e.中毒() );
+
+
+⑦ 对话系统：不同选项不同逻辑
+void ShowDialog(string text, Action onYes, Action onNo)
+{
+    if(点击YES) onYes();
+    if(点击NO) onNo();
+}
+用法
+ShowDialog("要接受任务吗？",
+    () => { 接受任务(); },
+    () => { 拒绝任务(); }
+);
+
+
+⑧ 动画结束回调
+void PlayAnim(string name, Action onFinish)
+{
+    播放动画();
+    动画结束时 → onFinish();
+}
+用法
+PlayAnim("攻击", () => {
+    造成伤害();
+});
+
+为什么游戏开发必须用 “函数当参数”？
+① 解耦！
+怪物不知道玩家是谁
+技能不知道效果是什么
+按钮不知道点击后干嘛
+只传逻辑，不互相引用。
+② 代码复用！
+一个 Delay 函数
+能延迟消失、延迟音效、延迟打开宝箱
+不用写 N 遍重复代码。
+③ 灵活扩展！
+加新技能、新装备、新效果
+不用改老代码，只需要传新函数。
+④ 逻辑清晰！
+代码写在它该出现的地方。
+
+
+回调 = 我现在先不做，等一会儿做完某件事，再回头调用你给我的函数。
+“回头调用” → 所以叫 回调。
+超简单生活例子
+你点单（调用函数）
+店员去做（执行耗时操作）
+你不留下来等，去打游戏（不阻塞）
+奶茶做好了，店员喊你：“你的好了！”（回调）
+店员喊你 = 回调
+你给店员的 “你的号码 / 名字” = 回调函数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

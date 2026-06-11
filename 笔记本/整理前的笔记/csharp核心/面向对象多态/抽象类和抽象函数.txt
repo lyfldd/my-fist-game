@@ -1,0 +1,127 @@
+抽象类就是我们在前面加一个abstract关键字
+抽象类可以用来存储我们对象的基本信息
+类似与我们要写一个玩家的职业系统，比如说我们要有战士法师
+他们的角色有一些东西是类似的，就比如说玩家的名字，血量，以及他们的掉血方法
+我们就可以用这个抽象类来装基础的信息和方法
+abstract class Character
+{
+    public string Name { get; set; }
+    public int Health { get; set; }
+
+    // 抽象类可以有已经实现的方法
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+        if (Health <= 0)
+        {
+            Console.WriteLine($"{Name} has been defeated.");
+        }
+    }
+}
+但是要注意抽象类不能实例化
+然后我们要创建一个抽象类的子类
+子类继承了抽象类的属性和方法，也可以有自己的方法
+class Warrior : Character
+{
+    public int Strength { get; set; }
+
+    public void Attack()
+    {
+        Console.WriteLine($"{Name} the warrior attacks with strength {Strength}!");
+    }
+}
+
+class Mage : Character
+{
+    public int MagicPower { get; set; }
+
+    public void CastSpell()
+    {
+        Console.WriteLine($"{Name} the mage casts a spell with magic power {MagicPower}!");
+    }
+}
+抽象方法就是我们要在父类里面创建一个方法
+比如说所有的角色都要以移动，那我们可以创建一个抽象的方法
+比如说创建一个基础的移动方法
+abstract class Character
+{
+    public string Name { get; set; }
+    public int Health { get; set; }
+
+    public void TakeDamage(int damage)
+    {
+        Health -= damage;
+        if (Health <= 0)
+        {
+            Console.WriteLine($"{Name} has been defeated.");
+        }
+    }
+
+    // 抽象方法
+    public abstract void PerformAction();
+}
+在父类的抽象方法是有声明没有实现，但是要注意的是
+创建了抽象方法之后它要强制继承的子类必须实现这个方法
+我们要在父类上面用abstract来修饰方法，而且抽象函数一定要加一个访问修饰符
+而且抽象类不能是私有的，可以是公共的和保护的
+我们可以用override来在子类里面实现方法
+而且子类在实现父类的抽象方法的时候，访问修饰符一定要一样
+class Warrior : Character
+{
+    public int Strength { get; set; }
+
+    public void Attack()
+    {
+        Console.WriteLine($"{Name} the warrior attacks with strength {Strength}!");
+    }
+
+    public override void PerformAction()
+    {
+        Attack();
+    }
+}
+
+class Mage : Character
+{
+    public int MagicPower { get; set; }
+
+    public void CastSpell()
+    {
+        Console.WriteLine($"{Name} the mage casts a spell with magic power {MagicPower}!");
+    }
+
+    public override void PerformAction()
+    {
+        CastSpell();
+    }
+}
+那这个那里实现了多态呢
+class Program
+{
+    static void Main()
+    {
+        Character[] characters = { new Warrior { Name = "Conan", Strength = 100 }, new Mage { Name = "Gandalf", MagicPower = 200 } };
+        foreach (Character character in characters)
+        {
+            character.PerformAction();
+        }
+    }
+}
+这个例子里面体现了数组character里面包含了Warror对象和mage对象，他们被视为character类型，但是我们用遍历数组调用character.PerformAction();时
+c#会根据运行时实际的引用类型执行不同的方法
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

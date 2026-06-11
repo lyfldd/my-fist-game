@@ -1,0 +1,24 @@
+软件实体（类、模块、函数等）应该对扩展开放，对修改关闭。即在不修改现有代码的基础上，能够通过扩展来添加新功能。
+
+假设有一个图形绘制程序，已经实现了绘制圆形的功能。当需要添加绘制矩形的功能时，按照开闭原则，不应该去修改现有的绘制圆形的代码，而是通过创建新的 Rectangle 类并实现绘制方法来扩展功能。
+abstract class Shape
+{
+    public abstract void Draw();
+}
+
+class Circle : Shape
+{
+    public override void Draw()
+    {
+        Console.WriteLine("Drawing a circle");
+    }
+}
+
+// 新增矩形类，符合开闭原则
+class Rectangle : Shape
+{
+    public override void Draw()
+    {
+        Console.WriteLine("Drawing a rectangle");
+    }
+}

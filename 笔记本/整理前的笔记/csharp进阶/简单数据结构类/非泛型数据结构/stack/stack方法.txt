@@ -1,0 +1,126 @@
+stack的增删查改
+里面的函数没有重载，只能一个一个的拿，不可以穿参数
+
+一，增加
+我们只可以在栈的顶部压入一个新的数据
+增加元素（Push）
+Stack<string> stack = new Stack<string>();
+        stack.Push("apple");
+        stack.Push("banana");
+        stack.Push("cherry");
+
+二，取出来
+我们只可以取出栈顶的元素
+取出元素（Pop）
+使用 Pop 方法从栈顶移除并返回元素。如果栈为空，调用 Pop 会抛出 InvalidOperationException 异常
+Stack<string> stack = new Stack<string>();
+        stack.Push("apple");
+        stack.Push("banana");
+        stack.Push("cherry");
+
+        if (stack.Count > 0)
+        {
+            string removed = stack.Pop();
+            Console.WriteLine($"Removed: {removed}");
+
+三，查找
+查找元素（Contains）
+Contains 方法用于检查栈中是否包含特定元素，返回 bool 类型值
+Stack<string> stack = new Stack<string>();
+        stack.Push("apple");
+        stack.Push("banana");
+        stack.Push("cherry");
+
+        bool containsBanana = stack.Contains("banana");
+        Console.WriteLine($"Contains banana: {containsBanana}");
+
+查找元素（peek）
+peek是能检查栈顶的内容
+Stack<string> stack = new Stack<string>();
+        stack.Push("apple");
+        stack.Push("banana");
+        stack.Push("cherry");
+	object v =stack.peek（）
+	 Console.WriteLine（v）；
+
+四，修改
+Stack<T> 本身没有直接修改特定位置元素的方法。但一种变通方法是将栈元素复制到数组或列表，修改后再重新构建栈
+Stack<int> stack = new Stack<int>();
+        stack.Push(1);
+        stack.Push(2);
+        stack.Push(3);
+
+然后我们使用ToArry来把栈里面的复制到一个数组里面
+int[] array = stack.ToArray();
+        // 修改数组中的元素（这里假设修改第二个元素）
+        if (array.Length > 1)
+        {
+            array[1] = 20;
+        }
+
+// 清空原栈
+        stack.Clear();
+        // 按相反顺序将修改后的数组元素重新压入栈
+        for (int i = array.Length - 1; i >= 0; i--)
+        {
+            stack.Push(array[i]);
+        }
+
+        // 输出修改后的栈元素
+        foreach (int num in stack)
+        {
+            Console.WriteLine(num);
+        }
+
+那要是我们要修改的是一个类呢
+如果 Stack<T> 中存放的是自定义类对象，并且类具有可访问的属性，你可以通过获取栈中的对象并直接修改其属性来实现 “修改元素”
+class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+
+    public Person(string name, int age)
+    {
+        Name = name;
+        Age = age;
+    }
+}
+Stack<Person> personStack = new Stack<Person>();
+        Person person1 = new Person("Alice", 30);
+        Person person2 = new Person("Bob", 25);
+        personStack.Push(person1);
+        personStack.Push(person2);
+
+        if (personStack.Count > 0)
+        {
+            Person topPerson = personStack.Pop();
+            topPerson.Age = 26; // 修改属性
+            personStack.Push(topPerson);
+        }
+
+        foreach (Person person in personStack)
+        {
+            Console.WriteLine($"Name: {person.Name}, Age: {person.Age}");
+        }
+
+获取长度就是
+stack.count
+
+遍历就是
+foreach（object item in stack）
+
+循环弹栈
+用 while /for 循环，一直把栈里元素取出来，直到栈为空
+这是游戏里非常常用的写法，比如：
+清空路径点
+关闭所有 UI 面板
+撤销所有操作
+回溯寻路路径
+while (stack.Count > 0)
+{
+    // 弹栈
+    var item = stack.Pop();
+
+    // 在这里处理每个弹出的元素
+    Debug.Log("弹出：" + item);
+}

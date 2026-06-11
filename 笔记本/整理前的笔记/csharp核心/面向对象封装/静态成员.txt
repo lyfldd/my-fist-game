@@ -1,0 +1,45 @@
+静态的关键字就是static
+用这个来修饰static的成员变量，方法，属性等
+
+特点是直接用类名.点出使用
+
+class Test
+{
+    public static float pi = 3.141459f;
+    public int testint = 100;
+    public static float calaccircle(float x)
+    {
+        return x * pi*x;
+    }
+    public void testfun()
+    {
+        Console.WriteLine("123");
+    }
+
+}
+我们可以在main函数里面直接这样子使用
+Test.calaccircle(3);
+要是不是静态的我们还要声明
+Test test= new Test();
+test.testfun();
+
+总结就是非静态的要new一个实例化对象才可以使用
+实例化对象就是相当于我们要先分配空间
+静态成员我们会在程序开始的时候就会自己开一个内存空间1
+注意，静态成员和程序同生死
+程序结束的时候会自己释放内存
+这导致了静态成员是唯一性，全局性
+
+注意静态函数不能使用非静态成员
+非静态函数可以使用静态成员
+
+静态成员的作用是
+常用唯一变量的声明
+方便别人获取对象
+
+
+
+
+
+
+

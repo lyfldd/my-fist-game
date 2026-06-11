@@ -1,0 +1,24 @@
+定义：尽量使用对象组合，而不是继承来达到复用的目的。因为继承会导致类之间的强耦合，而组合则可以在运行时动态地改变对象的行为，提高系统的灵活性和可维护性。
+示例：假设有一个 Car 类，它需要具备动力功能。如果通过继承一个 Engine 类来获取动力，会使 Car 类与 Engine 类紧密耦合。更好的方式是在 Car 类中组合一个 Engine 对象，通过调用 Engine 对象的方法来实现动力功能
+class Engine
+{
+    public void Start()
+    {
+        Console.WriteLine("Engine started");
+    }
+}
+
+class Car
+{
+    private Engine _engine;
+
+    public Car()
+    {
+        _engine = new Engine();
+    }
+
+    public void StartCar()
+    {
+        _engine.Start();
+    }
+}

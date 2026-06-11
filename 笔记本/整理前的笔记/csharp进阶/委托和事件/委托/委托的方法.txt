@@ -1,0 +1,288 @@
+委托是一个类
+委托对象可以指向一个或多个方法
+委托本质是一个方法链表（多播委托）
++= 是运算符重载，底层调用 Delegate.Combine
+-= 同理，底层 Delegate.Remove
+
+就相当于我们的委托既然是一个类，那就可以装进数据结构里面，最适合的就是链表
+主要是要频繁的修改
+我举个例子
+那就是说我在玩家类里面封装了一个捡东西的方法和打怪的方法，然后我在怪物类里面封装了一个掉东西的方法和掉血的方法，那我就可以用一个委托联系他们，用一个queue来存储委托，现实玩家打怪，然后怪物掉血，然后掉落物品，然后捡起物品
+using System;
+using System.Collections.Generic;
+
+// 玩家
+class Player
+{
+    public void AttackMonster()
+    {
+        Console.WriteLine("玩家攻击怪物！");
+    }
+
+    public void PickUpItem()
+    {
+        Console.WriteLine("玩家捡起掉落的物品！");
+    }
+}
+
+// 怪物
+class Monster
+{
+    public void TakeDamage()
+    {
+        Console.WriteLine("怪物受到伤害！");
+    }
+
+    public void DropItem()
+    {
+        Console.WriteLine("怪物掉落了物品！");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Player player = new Player();
+        Monster monster = new Monster();
+
+        // 创建委托队列 ✅ 正确
+        Queue<Action> eventQueue = new Queue<Action>();
+
+        // 按顺序加入行为
+        eventQueue.Enqueue(player.AttackMonster);
+        eventQueue.Enqueue(monster.TakeDamage);
+        eventQueue.Enqueue(monster.DropItem);
+        eventQueue.Enqueue(player.PickUpItem);
+
+        // 依次执行
+        while (eventQueue.Count > 0)
+        {
+            Action action = eventQueue.Dequeue();
+            action();
+        }
+    }
+}
+我们在声明对于的数据结构去装委托的时候，就是我们要把这个委托
+一般是Action和Func当做泛型穿进我们的泛型数据结构
+
+
+总共有这几个
+Method → 看方法信息
+Target → 看属于哪个对象
+GetInvocationList() → 拿到整个方法链表
+Invoke() → 执行所有方法
+Combine() → 实现 +=
+Remove() → 实现 -=
+
+一，委托的属性
+1. Method
+获取当前委托指向的方法信息
+Action a = Test;
+MethodInfo method = a.Method;
+
+Console.WriteLine(method.Name);      // 方法名
+Console.WriteLine(method.ReturnType); // 返回类型
+
+2. Target
+获取方法所属的对象实例
+静态方法 → Target = null
+实例方法 → Target = 该对象
+Player p = new Player();
+Action a = p.Attack;
+
+Player target = (Player)a.Target;
+
+3. GetInvocationList()
+获取委托链表中所有委托的数组
+最常用！用来遍历每个方法。
+Action a = A;
+a += B;
+a += C;
+
+Delegate[] list = a.GetInvocationList();
+
+foreach (Action item in list)
+{
+    item(); // 逐个执行
+}
+
+二，委托的调用
+
+如果你想精确调用 “某一个函数”，
+绝对不要用多播委托（+= 绑一堆）
+1.一个委托只绑一个函数，
+和直接调用函数的区别是是动态的，运行时可以随便换
+最直观的就是我们可以用委托来让ai随机的释放技能
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // 每个委托只绑定【一个】方法
+        Action attack = Attack;
+        Action defend = Defend;
+        Action jump   = Jump;
+
+        // 想调用谁就调用谁
+        attack();  
+        defend();
+        jump();
+    }
+
+    static void Attack() { Console.WriteLine("攻击"); }
+    static void Defend() { Console.WriteLine("防御"); }
+    static void Jump()   { Console.WriteLine("跳跃"); }
+}
+优点：
+意图明确
+不会误触发
+性能最好
+适用：
+每个技能独立使用，明确调用
+
+
+2.把委托放进数组 / List<Action>，通过下标访问
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        // 数组：把委托放进数组，按索引取
+        Action[] skills = { Attack, Defend, Jump };
+
+        skills[0]();  // 攻击
+        skills[1]();  // 防御
+        skills[2]();  // 跳跃
+
+
+        // List 版本
+        List<Action> skillList = new List<Action> { Attack, Defend, Jump };
+        skillList;
+    }
+
+    static void Attack() { Console.WriteLine("攻击"); }
+    static void Defend() { Console.WriteLine("防御"); }
+    static void Jump()   { Console.WriteLine("跳跃"); }
+}
+可遍历
+可随机选择技能
+可按序号、分页、AI 随机释放
+
+
+3.用 Dictionary（按名字调用）（正确方案 ）
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Dictionary<string, Action> skillDict = new Dictionary<string, Action>()
+        {
+            { "Attack", Attack },
+            { "Defend", Defend },
+            { "Jump",   Jump }
+        };
+
+        // 按名字调用
+        skillDict;
+        skillDict;
+    }
+
+    static void Attack() { Console.WriteLine("攻击"); }
+    static void Defend() { Console.WriteLine("防御"); }
+    static void Jump()   { Console.WriteLine("跳跃"); }
+}
+极快查找 O (1)
+适合背包、物品、技能 ID 查找
+
+
+
+1. Invoke()
+同步调用委托（执行链表所有方法）
+a.Invoke();
+// 等价于
+a();
+
+2. DynamicInvoke(object[] args)
+弱类型调用，不检查参数类型
+运行时才匹配，很少用
+Delegate d = Test;
+d.DynamicInvoke(new object[] { 10 });
+
+3. BeginInvoke(...) / EndInvoke(...)
+旧式异步调用，现在基本不用
+被 async/await 完全替代
+
+三，Delegate 静态方法
+1. Delegate.Combine(Delegate a, Delegate b)
+合并两个委托 → 形成链表
+Action a = A;
+Action b = B;
+Action c = (Action)Delegate.Combine(a, b);
+等价于
+Action c = A;
+c += B;
+
+2. Delegate.Remove(Delegate source, Delegate value)
+从链表中移除最后一个匹配的委托
+Action a = A + B + C;
+a = (Action)Delegate.Remove(a, B);
+等价于
+a -= B;
+
+3. Delegate.RemoveAll(Delegate source, Delegate value)
+移除所有匹配的委托
+
+
+总结
+1. 绑定单个方法
+Action a = Test;
+
+2. 追加方法（多播）
+a += Test2;
+a += Test3;
+
+3. 移除方法
+a -= Test2;
+
+4. 调用所有方法
+a();
+// 或
+a.Invoke();
+
+5. 遍历所有方法
+foreach (Action item in a.GetInvocationList())
+{
+    item();
+}
+
+6. 判断是否为 null
+if (a != null) a();
+// 或简化
+a?.Invoke();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

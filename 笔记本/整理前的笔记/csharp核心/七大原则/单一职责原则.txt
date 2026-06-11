@@ -1,0 +1,34 @@
+一个类应该只有一个引起它变化的原因，即一个类应该只负责一项职责
+
+假设我们有一个 User 类，它既负责用户数据的存储（比如将用户信息写入数据库），又负责用户业务逻辑的处理（如验证用户登录）。这就违反了单一职责原则。应该将其拆分为两个类，UserDataAccess 类负责数据存储相关操作，UserService 类负责业务逻辑处理
+
+// 不好的设计
+class User
+{
+    public void SaveToDatabase()
+    {
+        // 数据库存储代码
+    }
+
+    public bool ValidateLogin(string username, string password)
+    {
+        // 登录验证逻辑
+    }
+}
+
+// 好的设计
+class UserDataAccess
+{
+    public void SaveToDatabase()
+    {
+        // 数据库存储代码
+    }
+}
+
+class UserService
+{
+    public bool ValidateLogin(string username, string password)
+    {
+        // 登录验证逻辑
+    }
+}

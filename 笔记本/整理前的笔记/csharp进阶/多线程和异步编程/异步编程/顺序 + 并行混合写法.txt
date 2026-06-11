@@ -1,0 +1,91 @@
+异步里的 顺序执行 和 并行执行
+一、顺序执行
+await A();
+await B();
+await C();
+
+游戏例子：
+角色复活流程
+先播放复活动画
+再恢复血量
+最后弹出复活提示
+
+async Task RespawnAsync()
+{
+    // 顺序执行
+    await PlayRespawnAnimation();  // 1
+    await RestoreHp();             // 2
+    await ShowTip("复活成功");     // 3
+}
+
+有先后依赖
+必须一步一步来
+总时间 = 三者相加
+
+二、并行执行（重点！）
+多个任务同时跑，一起等全部结束。
+// 先把所有任务启动
+Task t1 = A();
+Task t2 = B();
+Task t3 = C();
+
+// 再一起等
+await Task.WhenAll(t1, t2, t3);
+游戏例子：
+进入关卡，同时加载：
+场景资源
+角色模型
+背景音乐
+async Task LoadLevelAsync()
+{
+    // 同时开始加载
+    Task loadScene = LoadSceneAsync();
+    Task loadModel = LoadModelAsync();
+    Task loadAudio = LoadAudioAsync();
+
+    // 等三个全部加载完
+    await Task.WhenAll(loadScene, loadModel, loadAudio);
+
+    Debug.Log("全部加载完成，进入游戏");
+}
+无先后依赖
+同时执行
+总时间 ≈ 最慢的那个
+速度大幅提升
+
+三、获取并行任务的返回值
+如果都是 Task<T>，可以一起等并一起拿结果：
+async Task Demo()
+{
+    Task<int> t1 = Calc1Async();
+    Task<int> t2 = Calc2Async();
+
+    // 等完直接获取结果数组
+    int[] results = await Task.WhenAll(t1, t2);
+
+    int r1 = results[0];
+    int r2 = results[1];
+}
+
+四、等待任意一个完成
+四、等待任意一个完成
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

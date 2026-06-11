@@ -1,0 +1,23 @@
+成员方法就相当于函数，可以用来描述对象的行为
+class Person
+{
+    public string name;
+    public int age;
+
+    public void speak(string s)
+    {
+        Console.WriteLine("{0}说{1}",name,s);
+    }
+    public bool adult()
+    {
+        return age >= 18;
+    }
+}
+
+然后我们使用这个方法
+Person p = new Person();
+p.name="lyf;
+p.age=19
+p.speak("我爱你");
+
+然后类里面的方法不要加static

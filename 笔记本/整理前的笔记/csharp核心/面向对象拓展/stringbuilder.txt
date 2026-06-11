@@ -1,0 +1,53 @@
+string是一个特殊的引用类型，每次重新赋值的时候我们会浪费空间
+StringBuilder 类用于高效地创建和操作可变字符串。与不可变的 string 类型不同，StringBuilder 允许在不创建大量临时字符串对象的情况下进行字符串的修改
+
+使用前的时候我们需要引用命名空间using System.Text;
+StringBuilder str = new StringBuilder("lyflyf",10);//第二个参数就是容量
+Console.WriteLine(str.ToString());
+
+StringBuilder存在一个容量，我们在扩容的时候我们会自动扣容，不会产生垃圾
+一开始的容量是十六，要是超过了那就会乘以2
+
+增加就是
+str.Append("jay");//写要增加的
+Console.WriteLine(str);
+
+str.AppendFormat("{0}{1}", 123, 456);
+Console.WriteLine(str);
+这样写也可以
+
+插入
+str.Insert(2, "xmm");//第一个参数就是位置，第二个就是要加的
+Console.WriteLine(str);
+
+删
+str.Remove(2,4);//第一个参数就是位置，第二个就是要删的个数
+Console.WriteLine(str);
+
+清空
+str.Clear();
+Console.WriteLine(str);
+
+查找
+    Console.WriteLine(str[2]);
+
+改
+str[1] = 'q';
+Console.WriteLine(str);
+
+替换
+str.Replace("l", "a");
+Console.WriteLine(str);
+
+完全重新赋值
+str.Clear();
+str.Append("12334");
+Console.WriteLine(str);
+
+判断相等
+if (str.Equals("12334"))
+{
+    Console.WriteLine("相等");
+}
+
+

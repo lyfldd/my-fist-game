@@ -1,0 +1,32 @@
+无符号，有符号，浮点数，特殊类型，复杂结构类型
+应用类型：string，数组，类，
+值类型：无符号，有符号，浮点数，bool
+他们的区别
+使用上的区别
+int a = 10;
+int[] arr = new int[] { 1, 2, 3, 4 };
+int b = a;
+int[] brr = arr;
+Console.WriteLine("a={0},b={1}",a,b);
+Console.WriteLine("arr={0},brr={1}", arr[0], brr[0]);
+结果是
+a=10，b=10
+arr【0】=1，brr【0】=1
+然后我们让
+b = 20;
+brr[0] = 5;
+    Console.WriteLine("修改了");
+    Console.WriteLine("a={0},b={1}", a, b);
+    Console.WriteLine("arr={0},brr={1}", arr[0], brr[0]);
+
+结果是a=10，b=20
+arr【0】=5，brr【0】=5
+
+区别就是值类型在赋值的时候是把他自己拷贝给别人，别人边自己不变
+引用类型就是让两个指向同一个值，一个变量另外一个也变
+值类型和引用类型在内存的存储方式和区域是不同的
+
+值类型存储在栈（系统分配，自动回收，小而快）
+引用类型存储在堆上（要手动申请和释放，大而慢）
+栈（int[] arr()存的是地址	int[] brr	,int a（存的是值）,int b）
+堆（12345（存的是arr和brr地址对应的值））

@@ -1,0 +1,117 @@
+1. 等待 Task 完成（最基本作用）
+await task;
+
+2. 自动拆包 Task<T> → T
+int a = await CalcAsync();   // Task<int> → int
+string s = await GetStrAsync(); // Task<string> → string
+
+3. 让代码保持顺序，像同步一样流畅
+await A();
+await B();
+await C();
+顺序执行：A→B→C
+结构清晰，没有嵌套
+
+4.异常处理
+场景我们就用：角色释放技能，可能会因为各种原因失败
+（没蓝、被沉默、目标死亡、距离太远……）
+玩家按技能键 → 调用 CastSkillAsync()
+这个方法是异步的（要播放前摇、飞行、伤害计算……）
+异步方法里随时可能抛异常：
+蓝不够
+目标已死亡
+超出距离
+被沉默不能施法
+我们希望：
+抛出什么异常，就直接捕获什么异常，然后弹出对应提示
+
+用 await 的写法
+// 异步施放技能
+async Task CastSkillAsync(Player caster, Enemy target)
+{
+    // 前摇
+    await Task.Delay(500);
+
+    // 可能出现各种异常
+    if (target.IsDead)
+        throw new InvalidOperationException("目标已死亡");
+
+    if (caster.Mana < 50)
+        throw new InvalidOperationException("法力不足");
+
+    if (Vector3.Distance(caster.Position, target.Position) > 20)
+        throw new InvalidOperationException("距离过远");
+
+    // 造成伤害
+    await ApplyDamageAsync(caster, target);
+}
+调用 + 捕获异常
+try
+{
+    await CastSkillAsync(player, enemy);
+    Debug.Log("技能施放成功");
+}
+catch (InvalidOperationException ex)
+{
+    // 直接弹提示给玩家
+    ShowTip(ex.Message);
+}
+
+如果你用 .Result/ Wait ()
+同样的代码：
+Task task = CastSkillAsync(player, enemy);
+
+try
+{
+    task.Wait();
+    // 或者 task.Result
+}
+catch (InvalidOperationException ex)
+{
+    // ❗ 根本进不来这个 catch
+}
+catch (AggregateException ex)
+{
+    // ✅ 只能抓到这个包装异常
+
+    // 你必须手动拆
+    var realError = ex.InnerException;
+
+    ShowTip(realError.Message);
+}
+代码又臭又长
+每次都要拆 InnerException
+多异常时更乱（InnerExceptions 列表）
+容易忘记拆，导致错误提示不显示、Bug 难查
+
+为什么游戏 “特别需要” await 的异常机制？
+因为游戏里：
+技能、buff、移动、加载、网络……全是异步
+每一步都可能失败
+失败了要立刻给玩家文字提示
+逻辑要清晰、好维护、少出 Bug
+
+5. 避免死锁（UI / Unity 必备）
+死锁场景：
+主线程 调用 Wait() / Result → 死等任务完成
+任务 运行完了 → 想回到主线程继续
+主线程 被卡住，不释放
+任务 等着主线程空闲
+→ 互相卡死 → 死锁！
+
+Wait() / .Result 极易死锁
+await 自带上下文调度，基本不会死锁
+
+6. 支持取消（CancellationToken）
+await Task.Delay(1000, token);
+
+7. 支持超时
+await Task.WhenAny(task, Task.Delay(2000));
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+层模块不应该依赖低层模块，二者都应该依赖其抽象；抽象不应该依赖细节，细节应该依赖抽象。简单来说，就是要面向接口编程，而不是面向实现编程。
+假设一个 EmailSender 类依赖于 SmtpClient 类来发送邮件，这是高层模块依赖低层模块的情况。按照依赖倒置原则，可以定义一个 IEmailSender 接口，EmailSender 类实现该接口，而使用邮件发送功能的高层模块依赖于 IEmailSender 接口，而不是具体的 EmailSender 类实现。
+interface IEmailSender
+{
+    void SendEmail(string to, string subject, string body);
+}
+
+class EmailSender : IEmailSender
+{
+    public void SendEmail(string to, string subject, string body)
+    {
+        // 使用 SmtpClient 发送邮件的具体实现
+    }
+}
+
+class NotificationService
+{
+    private readonly IEmailSender _emailSender;
+
+    public NotificationService(IEmailSender emailSender)
+    {
+        _emailSender = emailSender;
+    }
+
+    public void SendNotification(string to, string message)
+    {
+        _emailSender.SendEmail(to, "Notification", message);
+    }
+}

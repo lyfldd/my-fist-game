@@ -1,0 +1,82 @@
+区分成员变量和局部变量
+
+可以让一个构造方法复用另外一个构造方法
+
+把当前参数传给别的函数使用
+
+在类的索引器（this[int index]）里，this 代表当前对象的集合 / 数组。
+
+定义扩展方法时，第一个参数必须用 this 标记要扩展的类型
+
+区分成员变量和局部变量
+public class Student
+{
+    // 成员变量（类自己的变量）
+    private string name;
+
+    // 构造方法，参数 name 和成员变量重名
+    public Student(string name)
+    {
+        // this.name = 类的成员变量
+        // name = 方法的参数
+        this.name = name; 
+    }
+
+    public void ShowName()
+    {
+        Console.WriteLine("我的名字：" + this.name);
+    }
+}
+
+可以让一个构造方法复用另外一个构造方法
+public class Student
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    // 无参构造
+    public Student()
+    {
+        Id = 0;
+    }
+
+    // 有参构造：调用上面的无参构造
+    public Student(string name) : this()
+    {
+        this.Name = name;
+    }
+}
+
+把当前参数传给别的函数使用
+public class Teacher
+{
+    public void CheckHomework(Student student)
+    {
+        Console.WriteLine($"老师检查了 {student.Name} 的作业");
+    }
+}
+
+public class Student
+{
+    public string Name { get; set; }
+
+    public void SubmitHomework(Teacher teacher)
+    {
+        // 把当前学生对象传给老师
+        teacher.CheckHomework(this);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

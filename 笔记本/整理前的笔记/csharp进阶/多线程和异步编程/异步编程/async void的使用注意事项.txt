@@ -1,0 +1,62 @@
+只有一个地方允许：UI 事件 / Unity 事件
+比如按钮点击：
+async void Button_Click(object sender, RoutedEventArgs e)
+{
+    await DoSomethingAsync();
+}
+因为事件委托天生要求返回 void，没办法改
+
+当方法是一个 “事件处理程序”（Event Handler）时，才可以用 async void。
+
+事件处理程序
+它是用来响应某个事件的
+这个事件的委托类型固定是返回 void
+你不能改返回值，只能写成 void
+
+角色点击 “技能按钮” 放火球术
+这是事件处理程序，系统规定返回值必须是 void，所以只能这样写：
+// 技能按钮点击事件（Unity 绑定的事件）
+public async void OnSkillButtonClicked()
+{
+    try
+    {
+        // 调用真正的技能逻辑
+        await CastFireballAsync();
+    }
+    catch (Exception ex)
+    {
+        Debug.LogError("技能施放失败: " + ex.Message);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

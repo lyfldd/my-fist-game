@@ -1,0 +1,114 @@
+一，创建一个任务
+Task task = Task.Run(() =>
+{
+    Console.WriteLine("lyfff");
+});
+不用
+task.start（）
+就会自动的运行，但是要注意由于主线程太快了，可能会不执行就略过这个task
+我们要加一个
+task.Wait();
+
+我们来看这个的重载
+由于重载太多，然后大多数我们都可以用Lambda表达式来代替这个究极重载
+但是我们先来了解一下
+public Task(
+    Action<object?> action,
+    object? state,
+    CancellationToken cancellationToken,
+    TaskCreationOptions creationOptions
+)
+1️⃣ Action<object?> action
+要执行的方法（必须带一个 object 参数）
+
+2️⃣ object? state
+传给上面方法的参数
+
+3️⃣ CancellationToken cancellationToken
+取消令牌 → 用来取消任务
+
+4️⃣ TaskCreationOptions creationOptions
+任务创建选项 → 控制任务怎么运行
+最常用的只有一个：
+TaskCreationOptions.LongRunning
+告诉线程池：
+这是一个长时间运行的任务，别用线程池，给我开一个专用线程！
+
+接下来我们来写一段代码
+CancellationTokenSource cts = new CancellationTokenSource();
+CancellationToken token = cts.Token;
+
+void Fun(object obj)
+{
+    for (int i =0; i <(int)obj; i++)
+    {
+        if(token.IsCancellationRequested)
+        {
+            return;
+        }
+        Console.WriteLine($"线程执行第{i+1}次");
+        Thread.Sleep(100);
+    }
+}
+Task task1 = new Task(Fun, 100,token,TaskCreationOptions.LongRunning);
+task1.Start();
+Console.ReadKey();
+cts.Cancel();
+task1.Wait();
+
+我们也可以用Lambda来做
+我们把这个函数void Fun(object obj)
+直接用lambda里面的逻辑实现
+然后这个取消令牌写在这个lambda后面
+我们先在外面定一循环多少次，然后用lambda来捕获这个参数
+int count = 100; 
+Task task1 = Task.Run(() =>
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (token.IsCancellationRequested)
+            return;
+
+        Console.WriteLine($"线程执行第{i+1}次");
+        Thread.Sleep(100);
+    }
+}, token); // 传入取消令牌
+Console.ReadKey();
+cts.Cancel();
+task1.Wait();
+
+第一个参数：Action<object?> action
+重载作用：
+要执行的方法
+Lambda 对应：
+() => { ... }
+直接把方法写进去，完全替代 Action
+
+第二个参数：object? state（传递数据）
+重载作用：
+给方法传参数（你传的是 100）
+Lambda 对应：
+int count = 100;
+直接捕获变量
+不用拆箱、不用强转、类型安全
+
+第三个参数：CancellationToken
+重载作用：
+取消令牌
+Lambda 对应：
+Task.Run(..., token);
+直接传进去，功能一模一样
+
+第四个参数：TaskCreationOptions.LongRunning
+重载作用：
+告诉线程池：这是长任务，开专用线程
+Lambda 对应：
+Task.Run(...)
+.NET 自动判断长任务
+你不需要手动写 LongRunning
+Task.Run 会自动优化
+长时间运行的代码会自动分配独立线程
+
+
+
+

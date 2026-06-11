@@ -1,0 +1,178 @@
+然后呢我们之前的时候，我们提到两个 int 参数、一个 string 参数，怎么放一起
+用匿名函数包一下，全部变成无参 Action：
+// int 方法
+void AddGold(int amount) { }
+
+// string 方法
+void ShowMsg(string msg) { }
+
+Queue<Action> q = new Queue<Action>();
+
+q.Enqueue( () => AddGold(100) );
+q.Enqueue( () => ShowMsg("首次击杀") );
+
+
+
+闭包的具体使用情况
+场景 1：给怪物生成不同的伤害计算函数
+// 通用伤害生成器：传入暴击倍率，返回对应的伤害计算函数
+static Func<int, int> CreateDamageCalculator(float critRate)
+{
+    // 闭包：捕获了critRate
+    return (baseDamage) => (int)(baseDamage * critRate);
+}
+
+// 使用
+static void Main()
+{
+    // 普通怪物：1.0倍伤害
+    var normalDamage = CreateDamageCalculator(1.0f);
+    // 精英怪物：1.5倍伤害
+    var eliteDamage = CreateDamageCalculator(1.5f);
+    // BOSS：2.0倍伤害
+    var bossDamage = CreateDamageCalculator(2.0f);
+
+    // 计算伤害
+    Console.WriteLine(normalDamage(100)); // 100
+    Console.WriteLine(eliteDamage(100));  // 150
+    Console.WriteLine(bossDamage(100));   // 200
+}
+
+
+场景 2：延迟执行 + 状态保留（动画 / 计时器
+// 延迟执行方法：传入延迟时间和回调
+static void Delay(float time, Action callback)
+{
+    // 模拟等待，实际用Unity的协程/Invoke
+    callback();
+}
+
+// 怪物死亡逻辑
+static void MonsterDie(int monsterId, string monsterName)
+{
+    // 闭包：捕获了monsterId和monsterName
+    Delay(1.0f, () => {
+        Console.WriteLine($"怪物{monsterId}【{monsterName}】死亡，掉落金币");
+    });
+}
+
+
+场景 3：事件订阅 + 对象状态保留
+class Player
+{
+    public string Name { get; set; }
+    public int Gold { get; set; }
+
+    public Player(string name)
+    {
+        Name = name;
+        // 闭包：捕获了当前Player实例this
+        GameEvent.OnMonsterDead += () => {
+            Gold += 100;
+            Console.WriteLine($"{Name}获得100金币，当前金币：{Gold}");
+        };
+    }
+}
+作用：匿名函数直接访问当前 Player 的 Name 和 Gold，不用手动传参，代码更紧凑。
+
+场景 4：函数柯里化（把多参数函数拆成单参数）
+// 原函数：两个参数相乘
+int Multiply(int a, int b) => a * b;
+
+// 柯里化：用闭包拆成两个单参数函数
+Func<int, Func<int, int>> CurriedMultiply = a => b => a * b;
+
+// 使用
+var multiplyBy5 = CurriedMultiply(5); // 先传a=5，得到闭包
+Console.WriteLine(multiplyBy5(3)); // 再传b=3，得到15
+
+闭包的优点（为什么要用？）
+代码简洁：不用手动传参，直接捕获外部变量，减少冗余代码。
+状态封装：给函数绑定私有状态，实现 “带状态的函数”。
+灵活扩展：用一个通用方法生成 N 个不同逻辑的函数，复用性拉满。
+解耦：延迟执行、事件订阅时，不用传递大量参数，逻辑更清晰。
+函数式编程基础：柯里化、高阶函数的核心依赖就是闭包。
+
+
+闭包的致命坑（游戏开发必踩，必须警惕）
+循环中捕获循环变量（最经典的闭包 BUG）
+// 错误写法：循环里用闭包捕获i
+Action[] actions = new Action[3];
+for (int i = 0; i < 3; i++)
+{
+    // 闭包捕获的是循环变量i的引用，不是值
+    actions[i] = () => Console.WriteLine(i);
+}
+
+// 执行所有闭包
+foreach (var action in actions)
+{
+    action();
+}
+// 输出：3 3 3（不是0 1 2！）
+
+坑 2：内存泄漏
+// 错误写法：用闭包订阅静态事件
+static class GameEvent
+{
+    public static Action OnMonsterDead;
+}
+
+class Monster
+{
+    public int Id { get; set; }
+
+    public Monster(int id)
+    {
+        Id = id;
+        // 闭包捕获了当前Monster实例this
+        GameEvent.OnMonsterDead += () => {
+            Console.WriteLine($"怪物{Id}死亡");
+        };
+    }
+}
+
+// 问题：
+// 1. 每次创建Monster，都会给静态事件加一个闭包
+// 2. 静态事件永远不会被回收，闭包永远活着
+// 3. 闭包捕获了Monster实例this，导致Monster永远不会被GC回收
+// 4. 怪物越多，内存泄漏越严重，游戏越玩越卡
+
+
+坑 3：闭包捕获引用类型，导致意外修改
+// 闭包捕获引用类型变量
+List<int> list = new List<int> { 1, 2, 3 };
+Action action = () => {
+    foreach (var num in list)
+    {
+        Console.WriteLine(num);
+    }
+};
+
+// 修改list
+list.Add(4);
+
+// 执行闭包：输出1 2 3 4（不是1 2 3！）
+action();
+
+闭包的使用规范（游戏开发实战守则）
+✅ 适合用闭包的场景
+临时回调：延迟执行、动画结束、协程结束等一次性逻辑。
+简单状态封装：给函数绑定少量状态，比如不同倍率的伤害计算。
+参数包装：把多参数方法包装成无参 Action，放进队列 / 事件。
+UI 按钮点击：单次点击，无生命周期管理需求。
+❌ 绝对不要用闭包的场景
+订阅长期静态事件：会导致内存泄漏，必须用有名方法。
+循环中捕获循环变量：会出现经典 BUG，必须用局部变量中转。
+复杂业务逻辑：逻辑多行、需要复用、需要调试，必须用有名方法。
+高频创建的对象：比如怪物、子弹，频繁创建闭包会增加 GC 压力。
+
+
+
+
+
+
+
+
+
+

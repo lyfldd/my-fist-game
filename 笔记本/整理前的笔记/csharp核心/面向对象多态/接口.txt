@@ -1,0 +1,76 @@
+接口的关键字是interface
+接口是行为的抽象规范
+就相当于我们在声明了一个动物类，然后鸟和人类，然后我们可以直接声明一个抽象类，
+在里面实现一个抽象函数，感觉就有点麻烦，要是我们抽象出一个接口，用来装这个方法
+然后我们就可以继承这个接口，就相当于有需要用到的才去继承接口
+
+接口的声明规范
+1.不包含成员变量
+2.只包含方法。属性，索引器，事件
+3.成员不能被实现
+4.成员可以不用写访问修饰符，但是不能是私有的
+5.接口不能继承类，但是可以继承接口
+6.不能包含构造函数和析构函数
+
+接口的规范
+1.类可以继承多个接口
+2.类继承接口之后，必须实现接口的搜有成员，而且必须是public的
+3.接口也可以继承接口，但是接口继承接口的时候也不需要实现
+但是需要我们在类里面实现它继承的所有借口的方法
+
+特点就是
+1.和类的声明类似
+2.接口是用来继承的
+3.接口不可以实例化，但是可以作为容器装对象
+4.一个类里面可以继承一个类和一个接口
+5.我们可以在类实现这个接口的时候我们加一个virtual让子类再次实现一下接口的方法
+
+命名规范就是在帕斯卡命名法之前加I
+
+要注意的是我们不可以直接new一个接口，但是我们可以用一个类来装
+就相当于李氏替换原则
+
+显示实现接口，当一个类继承两个接口的时候，存在一个同名方法，但是接口存在同名方法
+public interface IMyInterface1
+{
+    void MyMethod();
+}
+
+public interface IMyInterface2
+{
+    void MyMethod();
+}
+
+public class MyClass : IMyInterface1, IMyInterface2
+{
+    // 显式实现IMyInterface1的MyMethod
+    void IMyInterface1.MyMethod()
+    {
+        Console.WriteLine("IMyInterface1's MyMethod");
+    }
+
+    // 显式实现IMyInterface2的MyMethod
+    void IMyInterface2.MyMethod()
+    {
+        Console.WriteLine("IMyInterface2's MyMethod");
+    }
+}
+我们用这个接口.点出函数来让类具体实现那个接口的
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

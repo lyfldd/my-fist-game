@@ -1,0 +1,59 @@
+ArrayList
+是一个非泛型的动态数组，位于 System.Collections 命名空间下。它允许存储不同类型的对象，并且可以根据需要自动调整大小
+基本概念就是我们用装箱拆箱来把我们的对象装到arraylist这个类里面，然后我们再使用里面存储的对象的数据的时候我们需要拆箱
+1.创建和初始化
+因为这个是一个类，我们需要实例化一个对象，使用默认构造函数，创建一个初始容量是0的arraylist
+ArrayList list1 = new ArrayList();
+
+指定初始容量：如果你大致知道要存储的元素数量，可以指定初始容量，减少自动扩容的次数，提高性能
+ArrayList list2 = new ArrayList(10); // 初始容量为10
+
+我们也可以使用我们的数据集合来初始化arraylist
+int[] numbers = { 1, 2, 3 };
+ArrayList list3 = new ArrayList(numbers);
+
+*****重点
+其实我们的这个arraylist就是可以装任何东西（类实例化过后的对象，结构体装箱之后）
+其实就是装的是对象
+但是我们要注意
+
+值类型（如 int、struct、enum 等）存储到 ArrayList 时会发生装箱操作，即将值类型转换为 object 类型
+
+对于引用类型（如类、接口、字符串、数组等），虽然不需要装箱，但在存储和使用时要注意对象的生命周期和引用传递
+
+我们需注意到这个arraylist可以装的东西更多，然后就会有点不安全，我们在访问原始的时候，我们需要注意我们要进行类型的判断，就是我们在访问的时候需要拆箱，而且要注意类型转换
+ArrayList存储的是object类型的元素。当值类型被装箱存入ArrayList后，在访问时必须将其从object类型转换回原来的值类型，这个过程就是拆箱
+
+使用is关键字进行类型检查：为避免拆箱时抛出异常，可以在拆箱前使用is关键字检查对象的实际类型
+ArrayList list = new ArrayList();
+list.Add(10);
+object item = list[0];
+if (item is int)
+{
+    int num = (int)item;
+    Console.WriteLine(num);
+}
+
+使用as关键字进行安全转换（仅适用于引用类型）：as关键字用于尝试将对象转换为指定类型，如果转换失败则返回null，但它仅适用于引用类型，不适用于值类型的拆箱
+ArrayList refList = new ArrayList();
+refList.Add("test");
+string result = refList[0] as string;
+if (result != null)
+{
+    Console.WriteLine(result);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

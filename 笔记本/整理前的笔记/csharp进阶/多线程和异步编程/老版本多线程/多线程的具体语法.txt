@@ -1,0 +1,183 @@
+先引用命名空间
+using System.Threading;
+
+一. 最基础：创建并启动一个线程
+有四个重载
+1.public Thread(ThreadStart start)
+我们传的委托函数是无参的方法
+我们先定义一个函数
+static void NewThread()
+{
+    Console.WriteLine("新线程");
+}
+ Thread thread=new Thread(NewThread);
+ thread.Start();
+然后在启动
+游戏场景：
+开启一个后台线程去加载 AssetBundle。
+开启一个线程专门监听网络消息。
+开启一个线程去计算怪物 AI 路径。
+特点：简单、稳定、不出错。
+
+2.public Thread(ParameterizedThreadStart start)
+我们传的是一个有参数而且是能是object类型的参数
+线程执行的方法只能接收一个 object 类型的参数
+我们要先定义一个函数
+static void Print(object obj)
+{
+    string msg=obj as string;
+    Console.WriteLine(msg);
+}
+然后启动
+Thread thread1 = new Thread(Print);
+thread1.Start("1234546");
+游戏场景：
+线程加载指定 ID 的资源。
+线程处理某个 UID 的玩家逻辑。
+注意：因为是 object，所以需要装箱 / 拆箱，类型强转时有风险。
+
+接下来第三个和第四个作为了解
+3.public Thread(ParameterizedThreadStart start, int maxStackSize)
+带参数 + 自定义栈大小 的线程
+这个重载极少见，但在 Unity / 大型游戏中非常关键。
+参数 start：和上面一样，是带参数的委托。
+参数 maxStackSize：线程栈的最大内存大小（单位：字节）。
+默认情况：不填，系统默认分配（通常是 1MB 或 4MB）。
+自定义场景：如果你在线程里写了极深的递归，或者局部变量特别大（比如定义了一个超大的 struct 栈变量），默认的 1MB 栈可能会溢出（StackOverflowException）。这时候就需要手动扩大栈空间
+
+// 申请 10MB 的栈空间（小心内存泄漏）
+Thread t = new Thread(HeavyWork, 10 * 1024 * 1024);
+t.Start(data);
+慎用！ 栈空间是独占的，你开 100 个线程，每个 10MB，就是 1GB 内存！
+Unity 特殊：在 Unity 中，主线程栈通常是固定的，子线程栈由 CLR 管理。只有在做极其底层的 C++ 插件调用或特殊递归算法时，才需要用到这个。
+
+4.public Thread(ThreadStart start, int maxStackSize)
+无参 + 自定义栈大小 的线程
+这个和第 3 个几乎一样，只是委托是无参的。
+参数 start：无参委托。
+参数 maxStackSize：同上，自定义栈大小。
+Thread t = new Thread(MyWork, 4 * 1024 * 1024);
+t.Start();
+
+二.线程的四个核心方法和两个属性
+1.Start ()
+Thread t = new Thread(DoWork);
+t.Start(); // 真正启动线程
+不是调用方法，是启动线程
+启动后和主线程同时跑
+
+2. Sleep () —— 让线程睡觉
+让当前线程暂停一段时间，不占 CPU。
+Thread.Sleep(毫秒);
+static void DoWork()
+{
+    Console.WriteLine("开始睡觉 1 秒");
+    
+    Thread.Sleep(1000); // 睡1秒
+    
+    Console.WriteLine("睡醒了");
+}
+游戏里的用途
+技能冷却
+怪物刷新延迟
+倒计时
+延迟加载
+重点
+Sleep 是静态方法，只能让当前线程睡觉
+睡觉期间不占 CPU
+不会释放锁（后面讲安全会用到）
+
+3. Join () —— 让线程排队
+让主线程停下来，等子线程跑完再继续
+t.Start();
+t.Join(); // 主线程卡住，等 t 结束
+要是想让多个子线程有先后顺序的话
+我们可以在每一个子线程的创建就加一个join
+
+t1.Start();
+t1.Join();
+
+t2.Start();
+t2.Join();
+
+t3.Start();
+4. Interrupt () —— 强行叫醒睡觉的线程
+如果线程正在 Sleep，你可以把它强行叫醒
+Thread t = new Thread(() =>
+{
+    try
+    {
+        Thread.Sleep(5000); // 睡5秒
+    }
+    catch (ThreadInterruptedException)
+    {
+        Console.WriteLine("我被叫醒了！");
+    }
+});
+
+t.Start();
+t.Interrupt(); // 立刻叫醒
+
+
+接下来：线程的两个关键属性
+1. IsBackground —— 后台线程
+规则
+前台线程（默认）：主线程关闭，进程会等它跑完
+后台线程：主线程关闭，它直接被杀死
+游戏理解
+前台线程 = 重要任务（必须做完）
+后台线程 = 次要任务（游戏关了就停）
+用法
+thread.IsBackground = true;
+
+2. Name —— 给线程起名字
+thread.Name = "怪物加载线程";
+
+
+接下来我们介绍线程的生命周期
+线程一生有 4 个状态：
+新建状态
+Thread t = new Thread();
+运行状态
+t.Start(); 之后
+阻塞 / 睡眠状态
+Sleep()、Join()、等待锁
+终止状态
+方法跑完 → 线程死亡
+
+一段全能示例代码
+static void DoWork()
+{
+    Console.WriteLine("子线程开始");
+
+    // 睡觉1秒
+    Thread.Sleep(1000);
+
+    Console.WriteLine("子线程结束");
+}
+
+static void Main(string[] args)
+{
+    Thread t = new Thread(DoWork);
+    t.Name = "工作线程";
+    t.IsBackground = true;
+
+    t.Start();       // 启动
+    t.Join();        // 主线程等待
+
+    Console.WriteLine("主线程最后执行");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,252 @@
+C# Dictionary 超详细全解（含增删查改 + 所有重载 + 用法）
+Dictionary<TKey, TValue> 是 C# 最常用的泛型键值对集合，属于 System.Collections.Generic 命名空间。
+核心特点：
+键必须唯一，值可以重复
+查找速度极快（O (1) 时间复杂度，基于哈希表）
+键不能为 null，值可以为 null
+无序（C# 未保证顺序，若需要有序用 SortedDictionary）
+我会分 3 部分讲：
+基础定义与初始化
+增 / 删 / 查 / 改 所有方法 + 全部重载
+常用属性、遍历、注意事项
+一、基础准备
+1. 引用命名空间
+csharp
+运行
+using System.Collections.Generic;
+2. 定义格式
+csharp
+运行
+Dictionary<TKey, TValue> 变量名 = new Dictionary<TKey, TValue>();
+TKey：键的类型（如 int、string）
+TValue：值的类型（任意类型）
+示例：
+csharp
+运行
+// 键：string  名字，值：int 年龄
+Dictionary<string, int> dict = new Dictionary<string, int>();
+3. 初始化方式（4 种）
+csharp
+运行
+// 1. 空初始化
+var dict1 = new Dictionary<int, string>();
+
+// 2. 指定初始容量（优化性能）
+var dict2 = new Dictionary<int, string>(100);
+
+// 3. 带初始值
+var dict3 = new Dictionary<int, string>()
+{
+    { 1, "张三" },
+    { 2, "李四" }
+};
+
+// 4. 从另一个 Dictionary 复制
+var dict4 = new Dictionary<int, string>(dict3);
+二、核心：增 / 删 / 查 / 改（所有方法 + 全部重载）
+这是你最需要的部分，每个方法、所有重载、用法、区别全部讲清楚。
+1. 增加元素（Add / TryAdd / 索引赋值）
+① Add () 方法
+作用：向字典添加键值对。
+注意：键已存在会直接抛异常！
+重载：
+csharp
+运行
+void Add(TKey key, TValue value);
+只有 1 个重载，必须传入 key + value。
+示例：
+csharp
+运行
+Dictionary<string, int> dict = new Dictionary<string, int>();
+dict.Add("张三", 20);  // 成功
+dict.Add("李四", 21);  // 成功
+dict.Add("张三", 22);  // 报错：键已存在！
+② TryAdd () 方法（C# 6.0+）
+作用：尝试添加，不抛异常，返回 bool 表示是否成功。
+重载：
+csharp
+运行
+bool TryAdd(TKey key, TValue value);
+只有 1 个重载。
+示例：
+csharp
+运行
+bool success = dict.TryAdd("张三", 20); 
+// true → 添加成功
+success = dict.TryAdd("张三", 22);    
+// false → 键已存在，不添加
+③ 索引赋值 dict[key] = value
+作用：
+键不存在 = 新增
+键存在 = 修改
+无重载，直接赋值。
+示例：
+csharp
+运行
+dict["王五"] = 23;  // 不存在 → 新增
+dict["张三"] = 99;  // 已存在 → 修改
+2. 删除元素（Remove / Clear）
+① Remove () 方法
+作用：根据键删除元素。
+重载 1：最常用
+csharp
+运行
+bool Remove(TKey key);
+返回 true：删除成功
+返回 false：键不存在
+示例：
+csharp
+运行
+bool removed = dict.Remove("张三"); // true
+removed = dict.Remove("不存在的键"); // false
+重载 2：带 out 参数（C# 7.0+）
+csharp
+运行
+bool Remove(TKey key, out TValue value);
+删除时把被删除的值取出来。
+示例：
+csharp
+运行
+if (dict.Remove("李四", out int age))
+{
+    Console.WriteLine($"删除成功，值为：{age}");
+}
+② Clear () 方法
+作用：清空字典所有元素。
+重载：
+csharp
+运行
+void Clear();
+无参数，无重载。
+示例：
+csharp
+运行
+dict.Clear(); // 字典变空
+3. 查询元素（ContainsKey / ContainsValue / TryGetValue / 索引）
+① ContainsKey () —— 判断键是否存在（最常用、最快）
+csharp
+运行
+bool ContainsKey(TKey key);
+无重载。
+示例：
+csharp
+运行
+if (dict.ContainsKey("张三"))
+{
+    // 键存在
+}
+② ContainsValue () —— 判断值是否存在
+csharp
+运行
+bool ContainsValue(TValue value);
+无重载。
+注意：遍历查找，速度慢（O (n)），尽量少用。
+③ TryGetValue () —— 安全获取值（推荐）
+作用：尝试根据键获取值，不抛异常。
+重载：
+csharp
+运行
+bool TryGetValue(TKey key, out TValue value);
+无其他重载。
+示例：
+csharp
+运行
+if (dict.TryGetValue("张三", out int age))
+{
+    Console.WriteLine($"找到：{age}");
+}
+else
+{
+    Console.WriteLine("未找到");
+}
+④ 索引访问 dict[key]
+csharp
+运行
+TValue value = dict[key];
+键存在 → 返回值
+键不存在 → 抛异常
+示例：
+csharp
+运行
+int age = dict["张三"]; // 存在 → 正常
+int age2 = dict["不存在"]; // 报错 KeyNotFoundException
+4. 修改元素（索引赋值 / TryAdd 不行）
+① 索引赋值（最常用）
+csharp
+运行
+dict[key] = 新值;
+键必须存在，否则会新增而不是修改。
+示例：
+csharp
+运行
+dict["张三"] = 25; // 修改成功
+② 安全修改（先判断再改）
+csharp
+运行
+if (dict.ContainsKey("张三"))
+{
+    dict["张三"] = 26;
+}
+三、Dictionary 常用属性（必须掌握）
+csharp
+运行
+// 1. 元素数量
+int count = dict.Count;
+
+// 2. 获取所有键
+ICollection<string> keys = dict.Keys;
+
+// 3. 获取所有值
+ICollection<int> values = dict.Values;
+四、遍历字典（3 种方式）
+1. 遍历键值对（最常用）
+csharp
+运行
+foreach (var item in dict)
+{
+    Console.WriteLine($"键：{item.Key}，值：{item.Value}");
+}
+2. 遍历键
+csharp
+运行
+foreach (var key in dict.Keys)
+{
+    Console.WriteLine(key);
+}
+3. 遍历值
+csharp
+运行
+foreach (var value in dict.Values)
+{
+    Console.WriteLine(value);
+}
+五、所有方法 + 重载 终极汇总表
+增加
+表格
+方法	重载	说明
+Add(key,value)	仅 1 个	添加，重复键抛异常
+TryAdd(key,value)	仅 1 个	尝试添加，返回 bool
+dict[key]=value	无	不存在 = 新增，存在 = 修改
+删除
+表格
+方法	重载	说明
+Remove(key)	1 个	删除键，返回是否成功
+Remove(key,out val)	1 个	删除并获取被删除的值
+Clear()	无	清空所有
+查询
+表格
+方法	重载	说明
+ContainsKey(key)	无	判断键存在（快）
+ContainsValue(val)	无	判断值存在（慢）
+TryGetValue(key,out val)	无	安全取值，推荐
+dict[key]	无	取值，键不存在报错
+修改
+表格
+方法	重载	说明
+dict[key]=新值	无	必须键存在才是修改
+六、重要注意事项
+键必须唯一，不能重复
+键不能为 null，值可以为 null
+ContainsKey 比 ContainsValue 快得多
+优先用 TryAdd、TryGetValue，避免抛异常
+多线程下必须加锁，或用 ConcurrentDictionary

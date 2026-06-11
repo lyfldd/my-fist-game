@@ -1,0 +1,86 @@
+while循环
+while（bool类型值）
+{
+满足条件之后就会执行代码
+当代码执行完之后然后就会回到while开头
+再次进行条件判断
+要是满足就继续执行
+要是不满足就跳出
+}
+这个死循环不太好，尽量不要用
+可以加break和contine
+while
+{
+	代码一
+	break；
+	代码二（这里就不执行）
+}
+
+int i = 0;
+while (true)
+{
+    ++i;
+    Console.WriteLine(i);
+    if (i == 10)  
+    {
+        break; 
+    }
+}
+Console.WriteLine(i);
+break 写在 if 内部，但 if 本身不是可被 break 跳出的结构
+break 会向上找最近的 “可跳出结构”，也就是外层的 while 循环。
+
+while
+{
+	Console.WriteLine(continue前);
+	continue；
+	Console.WriteLine(continue后);这里不会打印因为到了continue
+				会继续调回循环那里
+}
+
+do while循环，先至少执行一次，然后在判断
+do
+{
+
+}
+while（bool类型值）；
+
+for循环
+for（初始表达式；条件表达式；增量表达式）
+初始表达式（一般是一个变量用来计数）
+条件表达式（表明进入循环的条件，是bool类型值）
+增量表达式（一般自增剪）
+for（初始表达式；条件表达式；增量表达式）
+{
+执行这里的代码
+完成之后才执行增量表达式的代码
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

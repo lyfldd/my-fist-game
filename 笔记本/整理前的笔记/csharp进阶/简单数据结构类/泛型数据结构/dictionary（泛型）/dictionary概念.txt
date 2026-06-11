@@ -1,0 +1,35 @@
+其实和我们的hashtable差不多，就是我们可以规范一点了
+类型从object变为泛型
+也是基于键值配对的，用来查找
+
+基本上和大多数的泛型都类似需要引用命名空间
+using System.Collections.Generic;
+声明格式是：
+Dictionary<TKey, TValue> 变量名 = new Dictionary<TKey, TValue>();
+TKey：键的类型（如 int、string）
+TValue：值的类型（任意类型）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

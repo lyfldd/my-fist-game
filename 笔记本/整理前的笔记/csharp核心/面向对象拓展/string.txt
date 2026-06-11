@@ -1,0 +1,64 @@
+1.字符串的位置获取
+string本质就是一个char数组
+string str = "lyf";
+Console.WriteLine(str[0]);
+结果就是l
+
+我们也可以把str变量转为char数组
+char[] chars= str.ToCharArray();
+
+2.字符串拼接
+就是用string.format
+str = string.Format("{0}{1}", 1123, 214);
+Console.WriteLine(str);
+结果就是1123214
+
+3.正向查找字符串的位置
+int i = str.IndexOf("1");
+Console.WriteLine(i);
+要是没有的话就会返回-1
+
+4.反向查找字符串
+str = "lyfyf";
+i = str.LastIndexOf("f");
+Console.WriteLine(i);
+
+5.删除指定位置后面的字符包括那个位置
+string str2=str.Remove(4，2);第一个参数是位置，第二个是移除的个数
+Console.WriteLine(str2);
+
+6.替换指定的字符串
+str = str.Replace("lyf", "jay");第一个参数是原有的字符串，第二个是自己想要的
+Console.WriteLine(str);
+
+7.大小写转换
+str = "lyf";
+str = str.ToUpper();//tolower就是改小写
+Console.WriteLine(str);
+
+8.字符串截取
+str = "lyfyf";
+str = str.Substring(3，3);//第一个参数是开始位置，第二个参数是个数
+Console.WriteLine(str);
+就是截取指定位置以后的字符串，包括那个位置
+
+9.字符串切割
+            str = "1,2,3,4,5,6,7,8";
+            string[] strs = str.Split(',');
+            for (int j = 0; j < strs.Length; j++)
+            {
+                Console.Write(strs[j]);
+            }
+就是我们可以切割
+
+
+
+
+
+
+
+
+
+
+
+

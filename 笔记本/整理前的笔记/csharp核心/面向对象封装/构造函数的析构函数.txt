@@ -1,0 +1,92 @@
+其实构造函数就相当于我们之前的时候的结构体，方便我们把玩家一，玩家二，玩家三
+的数据写入结构体里面，然后这个析构函数和解构函数也类似
+
+构造函数可以重载
+class Person
+{
+    public string name;
+    public int age;
+
+    public Person(string name, int age)
+    {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+要是有了构造函数，就没有无参构造函数了，要是想要的话必须得自己再写一个
+要是在构造函数后面加上一个冒号然后再加上this（）
+就会导致传进来的参数先去调用无参构造函数然后再去调用构造函数
+    class Person
+    {
+        public string name;
+        public int age;
+        public Person()
+        {
+            Console.WriteLine("Hello, World!");
+        }
+            
+
+        public Person(string name, int age):this() 
+        {
+            this.name = name;
+            this.age = age;
+        }
+    }
+            Person person = new Person("lyf",18);
+            Console.WriteLine(person.name+person.age);
+结果是先输出hello world
+然后再是lyf的信息
+
+    class Person
+    {
+        public string name;
+        public int age;
+        public Person()
+        {
+            Console.WriteLine("Hello, World!");
+        }
+        public Person(string name)
+        {
+            Console.WriteLine("你好lyf");
+        }
+            
+
+        public Person(string name, int age):this(name) 
+        {
+            this.name = name;
+            this.age = age;
+        }
+    }
+要是我们在后面的this传参数，那就会去到只有那个参数的函数那里，然后在执行本函数
+
+析构函数（不怎么用）当引用类型的堆内存被回收时，会调用析构函数
+析构函数的声明
+~Person
+{
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

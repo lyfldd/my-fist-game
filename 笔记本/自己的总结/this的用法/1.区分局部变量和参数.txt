@@ -1,0 +1,12 @@
+当局部变量（如方法参数或方法内定义的变量）与类的成员变量（字段或属性）同名时，使用this关键字来明确引用类的成员变量
+public class Rectangle
+{
+    private int width;
+    private int height;
+
+    public Rectangle(int width, int height)
+    {
+        this.width = width;
+        this.height = height;
+    }
+}

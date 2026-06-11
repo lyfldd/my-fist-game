@@ -1,0 +1,157 @@
+方法	作用	示例
+Console.Write()	输出内容（不换行）	Console.Write("Hello");
+Console.WriteLine()	输出内容并换行	Console.WriteLine("World");
+Console.Write/Line(format, args)	格式化输出（类似 C 语言的 printf）	Console.WriteLine("年龄：{0}，姓名：{1}", 20, "张三");
+
+方法	作用	注意事项
+Console.ReadLine()	读取一行输入（返回字符串）	按回车键结束输入，返回 string 类型
+Console.ReadKey()	读取单个按键（返回按键信息）	按任意键即返回，常用于 “按任意键退出”
+Console.Read()	读取单个字符（返回 ASCII 码）	较少用，返回 int 类型（需转换为字符）
+
+region可折叠的文件夹
+
+声明变量
+变量类型 变量名 = 初始值;           (变量名可以是中文，但是尽量不要用)
+
+十四个变量类型
+四个大类 有符号的整形变量 无符号的整形变量 浮点数 特殊类型 
+
+ 有符号的整形变量 一定范围的正负数的类型
+sbyte int short long
+sbyte：25（范围：-128~127）
+short：25（范围：-32768~32767）
+int：123456（范围：-2147483648~2147483647）
+long：9876543210（范围：-9223372036854775808~9223372036854775807）
+在输出这个变量的时候可以用别的和这个来相加例如
+int 装备 = a；
+console.writelline（"装备加一"+a）
+结果是你的装备加一
+
+无符号的整型变量 一定范围的正数和零
+byte 0~255
+uint 0~42亿
+ushort 0~65535
+ulong 0~18百万兆
+
+浮点数 小数 会抛弃后面的数字四舍五入
+float 存储七到八位的有效数字 而且要在最后面加一个f
+double 存储十五到十七位有效数字 默认是double类型
+decimal 27~28 要在后面加m
+
+特殊类型
+bool char string
+bool true false 表示数据的真假
+char 用来存储单个字符串类型
+char c = 'a' 汉字也可以但是只能是一个
+string 用来存储字符串类型 ，没有上限 
+
+常量的声明 const
+const 变量类型 变量名 = 初始值
+必须初始化 不能被改变
+
+转义字符 单引号 双引号 空行（用来输出这些符号）
+单引号（\'）
+双引号（\"）
+换行（\n）
+斜杠（\\）
+空一个tab键（\t）
+
+隐式转换
+简单来说就是大的包住小的
+就是
+sbyte
+	~short
+byte		~int
+	  ushort
+			~long
+	  char
+		  uint		float ~double
+			  ulong
+显示转换
+括号强转 变量类型 变量名 =（变量类型）变量
+会有范围问题和精度问题
+浮点数强制转换为整数的时候直接把小数去掉
+
+parse把字符串转化为对应的类型
+变量类型.parse（"字符串"）
+例如
+int i = int.Prase（"123"）就等于string str =（"123");
+			int i2 = int. prase(str)
+字符串必须能转化为对应的类型
+游戏开发里面是存储的游戏数据是以字符串存储在txt文件
+然后我们调用的时候要用parse来把字符串转换为整形变量然后电脑才识别
+
+convert法  更准确的转换 这是游戏开发中最常用的场景（比如从配置 / 存档读取字符串格式的数值）
+容错性强  几乎所有基础类型 字符串、数值、布尔、日期等
+语法：Convert.To目标类型（变量或者是常量）
+
+例如
+int a = Convert.To.int32（"12213"）
+
+方法	作用	
+Convert.ToInt32()	转 32 位整数（int）
+且精度会更高 会四舍五入
+要是转short用int16 int用int32 loing用64	
+Convert.ToSingle()	转单精度浮点数（float）	
+Convert.ToDouble()	转双精度浮点数（double）	
+Convert.ToDecimal()	转高精度小数（财务 / 金币）	
+Convert.ToString()	转字符串（UI 显示）
+Convert.ToBoolean()	转布尔值（开关状态）
+true是1 false是0
+
+简写类型	完整类型名（CLR 类型）	Convert 转换方法	类型属性	取值范围特点
+sbyte	System.SByte	Convert.ToSByte()	有符号 8 位整数	-128 ~ 127
+short	System.Int16	Convert.ToInt16()	有符号 16 位整数	-32768 ~ 32767
+int	System.Int32	Convert.ToInt32()	有符号 32 位整数	-2147483648 ~ 2147483647
+long	System.Int64	Convert.ToInt64()	有符号 64 位整数	-9e18 ~ 9e18
+byte	System.Byte	Convert.ToByte()	无符号 8 位整数	0 ~ 255
+ushort	System.UInt16	Convert.ToUInt16()	无符号 16 位整数	0 ~ 65535
+uint	System.UInt32	Convert.ToUInt32()	无符号 32 位整数	0 ~ 4294967295
+ulong	System.UInt64	Convert.ToUInt64()	无符号 64 位整数	0 ~ 1.8e19
+
+还有一种其他变量转string就是
+变量.tostring();
+ 
+要想让用户输入的字符串传回变量readline就是
+string str = console.readline（）；
+
+异常捕获，比如说让玩家输入一个数字要转成一个整形的变量
+但是要是玩家没有输入整数，不合法的话，不能转，比如说是一个汉字
+基本语法
+try
+{
+希望把异常捕获的代码块放到try里面
+}
+catch
+{
+出错了就会执行其中的代码
+}
+finally（可以没有）
+{
+最后执行的代码不管有没有错
+}
+
+例如
+try
+{
+string str =console.readline();
+int i =convert.toint32();		这里来检查玩家有没有输入数字
+console.writeline(i)
+}
+catch
+{
+consloe.writeline("请输入数字");		这里发现错误之后提示玩家输入数字
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

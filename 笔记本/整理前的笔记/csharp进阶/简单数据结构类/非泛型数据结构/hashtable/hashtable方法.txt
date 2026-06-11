@@ -1,0 +1,126 @@
+超清晰总结：Hashtable 所有方法
+增
+Add(key, value)
+删
+Remove(key)
+Clear()
+查
+this[key]
+Contains(key)
+ContainsKey(key)
+ContainsValue(value)
+遍历
+Keys
+Values
+GetEnumerator()
+拷贝
+CopyTo(array, index)
+Clone()
+线程安全
+Synchronized(ht)
+属性
+Count
+
+一、构造方法
+1. Hashtable()
+作用：创建空哈希表
+默认容量：16
+默认负载因子：0.75
+
+2. Hashtable(int capacity)
+参数：初始容量
+作用：指定大小，减少扩容
+
+3. Hashtable(int capacity, float loadFactor)
+参数：容量 + 负载因子
+负载因子：达到多少比例开始扩容
+
+
+增加
+void Add(object key, object value)
+Key 不能重复
+Key 不能为 null
+Value 可以为 nul
+
+ht.Add("name", "张三");
+
+
+删除
+void Remove(object key)
+作用：根据 Key 删除 一条数据
+没有这个 Key → 不报错，只是不删
+
+ht.Remove("name");
+
+
+清空
+void Clear()
+作用：清空所有数据
+
+ht.Clear();
+
+
+判断是否包含
+bool Contains(object key)
+
+if (ht.Contains("name")) { }
+
+bool ContainsKey(object key)
+作用：和 Contains 完全一样
+
+bool ContainsValue(object value)
+作用：查找哈希表中有没有这个 Value
+速度慢，因为要遍历所有数据
+
+
+三、取值 / 修改（最重要）
+7. object this[object key]（索引器）
+作用：获取 或 设置 Value
+
+// 取值
+object val = ht["name"];
+
+// 赋值（不存在则添加，存在则覆盖）
+ht["age"] = 20;
+
+
+四、遍历相关
+foreach (var key in ht.Keys)
+可以把键和值一起取出来
+也可以是
+foreach (DictionaryEntry item in hashtable)
+{
+    Console.WriteLine(item);
+}
+
+
+五、拷贝、同步、扩展
+void CopyTo(Array array, int index)
+作用：把所有 Value 复制到数组
+从 index 位置开始粘贴
+
+object[] arr = new object[100];
+ht.CopyTo(arr, 0);
+
+
+ Hashtable Synchronized(Hashtable ht)
+作用：创建线程安全的哈希表
+多线程用
+
+
+object Clone()
+作用：浅拷贝哈希表
+
+
+
+
+
+
+
+
+
+
+
+
+
+

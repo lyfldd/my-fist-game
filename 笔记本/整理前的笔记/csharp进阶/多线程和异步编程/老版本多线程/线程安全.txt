@@ -1,0 +1,170 @@
+我们用一个例子来讲解线程安全
+多线程同时打怪扣血
+怪物有 1000 血
+两个线程同时对它造成伤害
+
+// 怪物血量
+static int hp = 1000;
+
+static void Attack()
+{
+    // 每次攻击 -1
+    hp--;
+}
+
+static void Main(string[] args)
+{
+    Thread t1 = new Thread(Attack);
+    Thread t2 = new Thread(Attack);
+
+    t1.Start();
+    t2.Start();
+
+    t1.Join();
+    t2.Join();
+
+    Console.WriteLine("最终血量：" + hp);
+}
+正常逻辑：1000 - 1 -1 = 998
+但真实运行时
+偶尔会变成 999！
+甚至偶尔还是 1000！
+这就是 线程不安全
+
+为什么会乱？一句话讲透
+因为：
+hp-- 不是一步完成的！
+它在 CPU 里其实是 三步：
+读：hp 现在是多少
+改：减 1
+写：把新值存回去
+两个线程同时跑，就会出现这种情况：
+线程 A 读到 hp = 1000
+线程 B 也读到 hp = 1000
+线程 A 减 1 → 999，写回去
+线程 B 减 1 → 999，也写回去
+结果只减了一次！
+这就叫：
+竞态条件（Race Condition）
+
+就比如说这个
+static int hp=100000;
+static void Attack()
+{
+    for (int i = 0; i < 10000; i++)
+    {
+        hp--; // 不加锁，必乱
+    }
+}
+Thread t1 = new Thread(Attack);
+Thread t2 = new Thread(Attack);
+
+t1.Start();
+t2.Start();
+
+t1.Join();
+t2.Join();
+
+Console.WriteLine("最终血量：" + hp);
+理想状态就是80000
+但是结果是随机的
+为什么呢就是因为我们的线程共用了一个变量，为了防止这样的事发生
+我们就给这个变量上锁
+
+接下来讲解一下lock的语法
+1.就是我们先定义一个锁对象
+// 必须是：private static readonly object
+private static readonly object _lockObj = new object();
+2. 把会冲突的代码包进 lock 里
+lock (_lockObj)
+{
+    // 这里面的代码，同一时间只会有一个线程执行
+    // 写你要安全修改的变量
+}
+// 1. 定义锁对象
+    private static readonly object _lockObj = new object();
+    private static int hp = 100000;
+
+    static void Attack()
+    {
+        for (int i = 0; i < 10000; i++)
+        {
+            // 2. 加锁
+            lock (_lockObj)
+            {
+                hp--; 
+            }
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        Thread t1 = new Thread(Attack);
+        Thread t2 = new Thread(Attack);
+
+        t1.Start();
+        t2.Start();
+        t1.Join();
+        t2.Join();
+
+        Console.WriteLine(hp); // 永远正确 80000
+    }
+}
+
+lock 语法的 3 个关键规则
+1. 锁的对象必须是 引用类型
+✅ 可以锁：object、实例对象、类实例
+❌ 不能锁：int、float、bool、enum、string
+
+2.锁对象必须是 同一个对象
+多个线程要互斥排队，必须锁同一个东西。
+下面这种是错的：
+// 错误！每次都 new 一个新锁，等于没锁
+lock (new object()) 
+{
+    hp--;
+}
+
+3. 锁对象尽量用
+private static readonly object _lock = new object();
+private：防止外面代码也乱锁
+static：全局共用一把锁
+readonly：防止中途被替换成别的对象
+
+刚刚的例子我们有两种写法
+lock (_lockObj)
+{
+    for (int i = 0; i < 10000; i++)
+    {
+        hp--; // 不加锁，必乱
+    }
+}
+
+for (int i = 0; i < 10000; i++)
+        {
+            // 2. 加锁
+            lock (_lockObj)
+            {
+                hp--; 
+            }
+        }
+这两种写法看起来没差别，但是其实他们的性能开销不一样
+就是我们尽量让锁的东西少一点，关键一点
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

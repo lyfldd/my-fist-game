@@ -1,0 +1,32 @@
+在同一一个语句快里面
+函数的方法（名字）相同参数的数量不同或者是数量想同类型不同
+就相当于简单的writeline我们点击这个函按f12可以看见有很的writeline函数
+我们在调用的时候程序会更具传入的参数来自动判断用哪一个重载
+static int sum(int a, int b)
+{
+    return a + b;
+}
+static int sum(int a, int b,int c)
+{
+    return a + b + c;
+}
+static float sum(int a, float b)
+{
+    return a + b;
+}
+static float sum(float a, int b)
+{
+    return a + b;
+}
+static float sum(ref float a, int b)
+{
+    return a + b;
+}
+要注意的是可选参数不可以重载
+
+
+
+
+
+
+

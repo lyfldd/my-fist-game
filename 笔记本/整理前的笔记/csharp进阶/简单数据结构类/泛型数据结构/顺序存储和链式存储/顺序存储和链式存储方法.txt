@@ -1,0 +1,140 @@
+具体的就是，每个节点只存两件事：自己的值 + 下一个节点的地址。
+你 → 告诉你下一个人是谁 → 下一个人 → 再告诉下一个……
+最后一个节点指向 null（表示没了）
+
+class Node
+{
+    public int Data;       // 存数据
+    public Node Next;      // 指向下一个节点
+}
+
+假设有 3 个节点：1 → 2 → 3
+节点1 → 节点2 → 节点3 → null
+节点 1.Next = 节点 2
+节点 2.Next = 节点 3
+节点 3.Next = null
+
+和数组最大区别
+数组：连续内存，下标访问快，插入删除慢
+链表：不连续，不能直接用下标访问，但插入删除很快
+
+// 创建节点
+Node n1 = new Node { Data = 1 };
+Node n2 = new Node { Data = 2 };
+Node n3 = new Node { Data = 3 };
+
+// 连起来
+n1.Next = n2;
+n2.Next = n3;
+现在链表就是：1 → 2 → 3
+
+遍历就用while
+Node current = n1;  // 从头开始
+
+while (current != null)
+{
+    Console.WriteLine(current.Data);
+    current = current.Next; // 走到下一个
+}
+
+在头部插入（超级快 O (1)）
+Node newNode = new Node { Data = 0 };
+newNode.Next = n1;  // 新节点指向原来头
+// 现在头变成 newNode
+
+ 删除节点（也很快）
+比如要删掉 2：
+n1.Next = n3;
+现在 1 直接指向 3，2 就被跳过了。
+
+
+接下来我们自己做一个简单的链表
+class linkednode<T>
+{
+    public T value;
+    public linkednode<T> nextnode;//存储的下一个元素，就是钩子
+    public linkednode(T value)
+    {
+        this.value = value;
+    }
+}
+class lindedlist<T>
+{
+    public linkednode<T> head;
+    public void Add(T value)
+    {
+        linkednode<T> newnode = new linkednode<T>(value);
+        if (head == null)
+        {
+            head = newnode;
+        }
+        else
+        {
+            linkednode<T> current = head;
+            while (current.nextnode != null)
+            {
+                current = current.nextnode;//就是一直走到下一个元素，然后走到队尾，队尾指向的是空，那就添加在队尾
+            }
+            current.nextnode = newnode;
+        }
+    }
+
+    // 重载：在指定节点后面插入
+    public void Add(int index, T value)
+    {
+        linkednode<T> newnode = new linkednode<T>(value);
+        linkednode<T> current = head;
+        if (index==0)
+        {
+            newnode.nextnode = head;
+            head = newnode;
+        }
+        for (int i = 0; i < index-1; i++)
+        {
+            if(current==null)
+            {
+                throw new IndexOutOfRangeException("索引超出范围");
+            }
+            current = current.nextnode;
+        }
+        newnode.nextnode = current.nextnode;
+        current.nextnode = newnode;
+
+    }
+    public void Remove(T value, int index)
+    {
+        linkednode<T> current = head;
+        if (index == 0)
+        {
+            head = head.nextnode;
+        }
+        for (int i = 0; i < index - 1; i++)
+        {
+            if (current == null)
+            {
+                throw new IndexOutOfRangeException("索引超出范围");
+            }
+            current = current.nextnode;
+        }
+        current.nextnode = current.nextnode.nextnode;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

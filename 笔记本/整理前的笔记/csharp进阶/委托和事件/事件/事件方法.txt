@@ -1,0 +1,86 @@
+要是不用事件
+class Player
+{
+    public int Gold { get; set; }
+
+    // 玩家必须持有所有怪物
+    public List<Monster> monsters = new List<Monster>();
+
+    public void Update()
+    {
+        // 每一帧都要遍历检查！
+        foreach (var monster in monsters)
+        {
+            if (monster.IsDead && !monster.HasGivenReward)
+            {
+                Gold += 100;
+                monster.HasGivenReward = true;
+            }
+        }
+    }
+}
+
+class Monster
+{
+    public bool IsDead { get; set; }
+    public bool HasGivenReward { get; set; }
+}
+
+
+用了事件的话
+// 全局事件
+public static class GameEvent
+{
+    public static event Action OnMonsterDead;
+
+    public static void TriggerMonsterDead()
+    {
+        OnMonsterDead?.Invoke();
+    }
+}
+
+// 怪物自己负责触发
+class Monster
+{
+    public void Die()
+    {
+        Console.WriteLine("怪物死了，掉落金币");
+        GameEvent.TriggerMonsterDead(); // 只负责喊一声：我死了！
+    }
+}
+
+// 玩家只需要监听，完全不用管怪物
+class Player
+{
+    public int Gold { get; set; }
+
+    public Player()
+    {
+        // 只订阅，不持有怪物
+        GameEvent.OnMonsterDead += AddGold;
+    }
+
+    void AddGold()
+    {
+        Gold += 100;
+        Console.WriteLine("玩家获得金币！");
+    }
+}
+
+Player player = new Player();
+Monster monster = new Monster();
+monster.Die();
+
+全程就只有一个
+monster.Die();
+没有别的
+
+
+
+
+
+
+
+
+
+

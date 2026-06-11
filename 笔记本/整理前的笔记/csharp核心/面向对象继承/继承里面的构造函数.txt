@@ -1,0 +1,64 @@
+继承的构造函数就是我们在申明子类对象的时候
+先执行父类的构造函数
+在执行子类的构造函数
+
+父类的无参构造很重要
+子类可以通过base关键字，代表父类
+
+class Game
+{
+    public Game()
+    {
+        Console.WriteLine("爷爷");
+    }
+}
+class Player:Game
+{
+    public Player()
+    {
+        Console.WriteLine("爸爸");
+    }
+}
+class MainPlayer:Player
+{
+    public MainPlayer()
+    {
+        Console.WriteLine("儿子");
+    }
+}
+MainPlayer mp = new MainPlayer();
+
+结果是爷爷，爸爸，儿子
+
+父类的无参构造函数很重要
+因为我们在外部实例化的时候
+默认调用的是父类的无参构造函数
+
+我们可以通过base调用父类的构造函数
+
+就是子类在调用子类自己的构造函数的时候会不断的去父类寻找一个构造函数
+要是没有关键字，会默认调用父类的无参构造函数
+    class Father
+    {
+
+        public Father(int i)
+        {
+            Console.WriteLine("lyf");
+        }
+    }
+    class Son:Father
+    {
+        public Son(int i):base(i)
+        {
+
+        }
+    }
+
+
+
+
+
+
+
+
+

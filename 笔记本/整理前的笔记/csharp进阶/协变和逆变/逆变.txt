@@ -1,0 +1,123 @@
+逆变也是我们用来解决接口和委托里面的泛型的不能自动转换的
+先记住一句话
+协变 out → 返回值用 → 子类泛型 → 父类泛型
+逆变 in → 参数用 → 父类泛型 → 子类泛型
+就是我们要是想处理受伤
+我们可以在enemy里面的每一个子类都写一个受伤的方法
+那要是我想要写一个太通用的方法
+我们只要传进去一个对象，受到的伤害
+我们就可以让这个对象受伤
+然后我们再加上协变，这样子我们就可以在那个通用的受伤方法只要写一个enemy的类就行
+   
+
+接下来展示修改前代码
+class Enemy
+{
+    public int Hp;
+    public string Name;
+
+    public Enemy(int hp, string name)
+    {
+        Hp = hp;
+        Name = name;
+    }
+
+    public virtual void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+    public virtual void SayHello()
+    {
+        Console.WriteLine($"敌人 {Name} 出现了！血量：{Hp}");
+    }
+}
+
+class Boss : Enemy
+{
+    public Boss(int bossHp, string name) : base(bossHp, name)
+    {
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+    public override void SayHello()
+    {
+        Console.WriteLine($" Boss {Name} 登场！血量：{Hp}");
+    }
+}
+
+class Slime : Enemy
+{
+    public Slime(int slimeHp, string name) : base(slimeHp, name)
+    {
+    }
+
+    public override void TakeDamage(int damage)
+    {
+        Hp -= damage;
+    }
+    public override void SayHello()
+    {
+        Console.WriteLine($" Slime {Name} 登场！血量：{Hp}");
+    }
+}
+public delegate T SpawnHandler<out T>();
+internal class Program
+{
+    static void DamageAll(IEnumerable<Enemy> enemies)
+    {
+        foreach (var enemy in enemies)
+        {
+            enemy.TakeDamage(10);
+        }
+    }
+    static void DoSpawn(SpawnHandler<Enemy> spawnHandler)
+    {
+        Enemy enemy = spawnHandler();
+        enemy.SayHello();
+    }
+
+    static void Main(string[] args)
+    {
+        List<Boss> enemies = new List<Boss>();
+        enemies.Add(new Boss(100, "boss1"));
+        enemies.Add(new Boss(200, "boss2"));
+
+        DamageAll(enemies);
+
+        foreach (var enemy in enemies)
+        {
+            Console.WriteLine(enemy.Name + ":" + enemy.Hp);
+        }
+里面的逻辑太臃肿了
+我们把所有的受伤逻辑删了
+然后我们加上一个受伤委托
+public delegate void GetDamage<in T>(T t, int damage);
+然后写一个全部受伤的匿名函数订阅委托
+GetDamage<Enemy> enemygetdamage=(Enemy enemy,int damage)=>
+{
+    enemy.Hp-=damage;
+   Console.WriteLine($"{enemy.Name} 受到 {damage} 点伤害！剩余血量：{enemy.Hp}");
+};
+然后
+SpawnHandler<Boss> spawnBoss = () =>
+{
+    return new Boss(5000,"lyf");
+};
+DoSpawn(spawnBoss);
+Boss boss= DoSpawn(spawnBoss) as Boss;
+enemygetdamage(boss, 1000);
+
+
+
+
+
+
+
+
+
+
+
+

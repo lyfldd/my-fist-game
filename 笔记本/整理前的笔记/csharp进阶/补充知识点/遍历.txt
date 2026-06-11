@@ -1,0 +1,27 @@
+foreach循环
+是遍历集合最常用的方式之一，它简洁明了，适用于只需要读取集合元素而不需要修改集合结构的情况
+基本语法是
+foreach (type identifier in collection)
+{
+    // 循环体，使用 identifier 访问 collection 中的每个元素
+}
+type：表示集合中元素的类型。对于 ArrayList，由于它存储的是 object 类型，这里通常为 object，除非你确定集合中所有元素都是特定类型（如 int、string 等）
+
+identifier：一个变量名，用于在每次迭代中表示集合中的当前元素。你可以在循环体中使用这个变量来访问和操作当前元素
+
+collection：要遍历的集合对象，如 ArrayList、数组、List<T> 等实现了 IEnumerable 接口的类型
+
+for循环
+for循环允许通过索引访问ArrayList中的元素，这种方式在需要同时获取元素索引和修改集合元素时很有用。但要注意在循环中修改集合大小可能会导致索引混乱
+而且需要先获取长度就是我们的arraylist（对象名字）.count
+语法实现
+ArrayList list = new ArrayList();
+list.Add("apple");
+list.Add("banana");
+list.Add("cherry");
+
+for (int i = 0; i < list.Count; i++)
+{
+    object item = list[i];
+    Console.WriteLine($"Index {i}: {item}");
+}

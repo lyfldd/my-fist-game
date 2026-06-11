@@ -1,0 +1,94 @@
+枚举
+是一种自定义值类型是常量的集合，核心作用是给一组固定的整数常量赋予 “语义化名称”
+语法：
+enum E_枚举名
+{
+	成员1,（默认第一个成员值为 0，后续依次 + 1也可手动指定值）
+	成员2,
+ 	...
+}
+在namespace语句块里面声明枚举
+也可以在class语句块和steuct语句块里面
+不能再函数语句块里面声明
+
+枚举的使用
+就是声明枚举变量
+自定义的枚举类型 变量名 = 默认值；（自定义的枚举类型.枚举项）
+namespace meiju
+
+{
+    #region 枚举
+    enum Monster
+    {
+        normal,
+        boss,
+    }
+
+    #endregion
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Monster monster = Monster.boss;
+            if (monster == Monster.boss)
+            {
+                Console.WriteLine("这个是boss");
+            }
+            else if (monster == Monster.normal)
+            {
+                Console.WriteLine("这个不是boss");
+            }
+        }
+    }
+}
+枚举就相当于可以赋予这个Monster.boss是我们数据库里面的boss
+这个枚举和switch天生一对
+例如
+switch (monster)（挡着里填入枚举变量按回车就可以自动输入）
+{
+    case Monster.normal:
+        break;
+    case Monster.boss:
+        break;
+    default:
+        break;
+}
+枚举是可以和int string之间的转换
+int i = (int)monster;
+Console.WriteLine(i);结果是1
+string str = monster.ToString();
+Console.WriteLine(str);结果是boss
+接下来是把字符串转换为枚举
+parse第一个表示的是你要转为那个枚举类型，第二个是用于转换对应枚举项的字符串
+转换完之后前面的括号是把转换完成之后变成的通用类型变成枚举类型
+ monster=(Monster)Enum.Parse(typeof(Monster),str);  
+
+枚举的作用
+在游戏开发中对象很多时候有很多的状态
+比如说玩家有很多的状态 我们需要一个变量来标识是哪一个状态
+我们用int 1是走 2是跑有点不方便
+枚举的话我们把这个1 2 放到枚举里面
+Enum 运动状态
+	走，
+	   跑，
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

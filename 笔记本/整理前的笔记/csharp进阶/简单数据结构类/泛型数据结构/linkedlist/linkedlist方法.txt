@@ -1,0 +1,240 @@
+一，创建
+空链表
+LinkedList<int> list = new LinkedList<int>();
+
+从集合 / 数组创建（重载）
+int[] arr = { 1, 2, 3 };
+LinkedList<int> list = new LinkedList<int>(arr);
+
+二、核心属性
+list.Count        // 元素数量
+list.First        // 第一个节点（LinkedListNode<T>）
+list.Last         // 最后一个节点
+list.First.Value  // 第一个节点的值
+list.Last.Value   // 最后一个节点的值
+
+三，添加元素
+1.添加到头部
+AddFirst (T value)
+直接传入值，链表自动新建节点
+LinkedList<string> list = new LinkedList<string>();
+list.AddFirst("张三");
+list.AddFirst("李四");
+结果顺序：
+李四 → 张三
+
+重载
+AddFirst (LinkedListNode<T> node)
+传入已经存在的节点，把它移到头部。
+var node = new LinkedListNode<string>("王五");
+list.AddFirst(node);
+这个 node 不能属于别的链表
+也不能是已经被删除的节点
+否则直接抛异常。
+
+2.添加到链表尾部
+AddLast (T value)
+传值，自动创建节点。
+list.AddLast("小明");
+list.AddLast("小红");
+顺序：
+小明 → 小红
+
+重载
+AddLast (LinkedListNode<T> node)
+把已有节点移到尾部。
+var node = list.Find("小明");
+list.AddLast(node);
+
+3.在某个节点前面插入
+AddBefore
+必须先找到一个参考节点，才能用
+AddBefore (LinkedListNode<T> node, T value)
+在 node 前面插入一个值，自动新建节点
+var node = list.Find("小红");
+list.AddBefore(node, "小刚");
+顺序变成：
+小明 → 小刚 → 小红
+
+重载
+AddBefore (LinkedListNode<T> node, LinkedListNode<T> newNode)
+把一个已存在节点插到 node 前面
+var newNode = new LinkedListNode<string>("小李");
+list.AddBefore(node, newNode);
+
+4.在某个节点 后面 插入
+AddAfter (LinkedListNode<T> node, T value)
+在 node 后面插入值
+var node = list.Find("小明");
+list.AddAfter(node, "小亮");
+顺序：
+小明 → 小亮 → 小红
+
+重载 
+AddAfter (LinkedListNode<T> node, LinkedListNode<T> newNode)
+把已有节点插到 node 后面。
+var newNode = new LinkedListNode<string>("小张");
+list.AddAfter(node, newNode);
+
+一句话总结所有添加重载
+AddFirst (T) → 头部加值
+AddFirst (node) → 头部移节点
+AddLast (T) → 尾部加值
+AddLast (node) → 尾部移节点
+AddBefore (节点，T) → 前面加值
+AddBefore (节点，node) → 前面移节点
+AddAfter (节点，T) → 后面加值
+AddAfter (节点，node) → 后面移节点
+
+四，删除元素
+1. Remove(T value)
+删除链表中第一个匹配到的值
+LinkedList<int> list = new LinkedList<int>();
+list.AddLast(10);
+list.AddLast(20);
+list.AddLast(10);
+
+list.Remove(10);
+返回值
+true：找到并删除成功
+false：没找到这个值
+内部会从头遍历查找
+只删第一个匹配项
+重复元素不会全删
+
+2. Remove(LinkedListNode<T> node)
+删除指定节点
+var node = list.Find(20);
+list.Remove(node);
+直接删除该节点，不需要遍历
+效率 O (1)
+节点必须属于当前链表
+节点不能为 null
+否则直接抛异常
+
+3. RemoveFirst()
+删除第一个节点
+list.RemoveFirst();
+链表为空时调用 → 抛异常
+安全写法
+if (list.Count > 0)
+    list.RemoveFirst();
+
+4. RemoveLast()
+删除最后一个节点。
+list.RemoveLast();
+空链表调用会抛异常
+双向链表，所以删尾也是 O (1)
+
+5. Clear()
+清空整个链表，删除所有节点
+list.Clear();
+结果是
+Count = 0
+First = null
+Last = null
+
+Remove (T) 只删第一个匹配项
+想删所有相同值，必须循环删。
+Remove (node) 是最高效删除
+已知节点位置时，永远优先用这个。
+LinkedList 没有 RemoveAt (int index)
+它不支持下标，想按位置删必须遍历到节点再删。
+空链表调用 RemoveFirst/RemoveLast 会崩溃
+
+删除所有相同元素（常用）
+// 删除所有 10
+var node = list.Find(10);
+while (node != null)
+{
+    var next = node.Next; // 先保存下一个
+    list.Remove(node);
+    node = next;
+}
+
+五，查找
+1. bool Contains(T value)
+作用：判断链表中是否包含某个值
+LinkedList<int> list = new LinkedList<int> { 1, 2, 3, 4 };
+
+bool has2 = list.Contains(2); // true
+bool has9 = list.Contains(9); // false
+内部从头遍历查找
+时间复杂度：O(n)
+只返回存在与否，不返回位置
+
+2. LinkedListNode<T> Find(T value)
+作用：从前向后找，返回第一个匹配值的节点
+var node = list.Find(3);
+
+if (node != null)
+{
+    Console.WriteLine(node.Value); // 3
+}
+找不到返回 null
+只返回第一个匹配
+复杂度 O (n)
+
+3. LinkedListNode<T> FindLast(T value)
+作用：从后向前找，返回最后一个匹配值的节点
+list.AddLast(2);
+// 现在链表：1,2,3,4,2
+
+var lastNode = list.FindLast(2);
+// 找到最后那个 2，不是第一个
+双向链表特性，从尾部往前找
+复杂度 O (n)
+找不到返回 null
+
+返回值是整个节点，包含了所有的信息，就是说返回的是一个对象
+
+六。遍历
+ 1：foreach 遍历值
+foreach (int item in list)
+{
+    Console.WriteLine(item);
+}
+
+ 2：用节点手动遍历
+前往后
+var node = list.First;
+while (node != null)
+{
+    Console.WriteLine(node.Value);
+
+    // 移动到下一个
+    node = node.Next;
+}
+后往前
+var node = list.Last;
+while (node != null)
+{
+    Console.WriteLine(node.Value);
+    node = node.Previous;
+}
+
+
+小拓展
+CopyTo 复制到数组
+public void CopyTo(T[] array, int index);
+
+int[] arr = new int[list.Count];
+list.CopyTo(arr, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

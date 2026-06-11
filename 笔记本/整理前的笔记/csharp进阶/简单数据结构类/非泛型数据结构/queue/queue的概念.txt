@@ -1,0 +1,27 @@
+Queue（队列）是 C# 中先进先出（FIFO, First In First Out）的集合，严格遵循先入队的数据先出队规则，常用于任务排队、消息处理、广度优先搜索（BFS）等场景
+
+C# 提供两种常用队列：
+1.非泛型 Queue（System.Collections，不推荐，存在装箱拆箱、类型不安全问题）
+2.泛型 Queue<T>（System.Collections.Generic，推荐，类型安全、性能更高）
+
+使用前要引用命名空间
+// 泛型 Queue<T>（推荐）
+using System.Collections.Generic;
+
+// 非泛型 Queue（不推荐）
+using System.Collections;
+
+queue的属性就是
+属性	用途
+Count	元素实际数量
+Capacity	队列当前总容量（内部用）
+
+不空才能 Dequeue
+想安全用 TryDequeue
+想查看用 TryPeek
+想扩容自动扩
+想缩容 TrimExcess
+
+非泛型 Queue（简单提）
+System.Collections.Queue
+方法和上面几乎一样，但存储 object，需要拆箱装箱，不推荐使用。

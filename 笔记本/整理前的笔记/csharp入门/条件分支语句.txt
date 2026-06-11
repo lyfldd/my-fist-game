@@ -1,0 +1,69 @@
+if语句
+if（bool类型值）
+{
+满足if就执行这里的代码块
+}
+
+if else语句
+if（bool类型值）
+{
+满足if就执行这里
+}
+else
+{
+不满足就执行这里
+}
+
+if else if语句
+if（bool类型值）
+{
+满足if就执行这里
+}
+else if（bool类型值）
+{
+第一个不满足，满足了这个条件就执行
+}
+中间可以有n个else if
+else
+{
+都不满足就执行这里
+}
+
+switch语句
+switch（变量）
+{
+	case 常量：
+	变量满足常执行满足条件的代码
+		break；
+	case 常量：
+	变量满足常执行满足条件的代码
+		break；
+	default：（可省略）
+	都不满足就执行这里的代码
+		break；
+}
+switch的贯穿
+int a=1
+switch（a）
+{
+	case 1：这里没有代码但是满足了一就会继续执行到case2
+	case 2：
+	虽然说没有满足这里的条件，但是满足一了，会执行这里的代码
+		break；
+	default：（可省略）
+	都不满足就执行这里的代码
+		break；
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

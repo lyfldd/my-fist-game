@@ -1,0 +1,61 @@
+冒泡的核心就是两两比较，相互交换，交换n轮，两重循环
+
+
+
+namespace 排序算法
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            Random random = new Random();
+            int[] a = new int[10];
+            int i = 0;
+            while (i<10)
+            {
+                int num = random.Next(0, 11);
+                a[i] = num;
+                i++;
+            }
+            for(int j = 0; j<10; j++)
+            {
+                Console.Write(" {0} ",a[j]);
+            }
+            Console.WriteLine("              ");
+            for (int j = 0; j < a.Length - 1; j++)
+            {
+                for (int k = 0; k < a.Length - 1 - j; k++)
+                {
+                    if (a[k] > a[k + 1])
+                    {
+                        // 交换两个元素
+                        int temp = a[k];
+                        a[k] = a[k + 1];
+                        a[k + 1] = temp;
+                    }
+                }
+            }
+            for (int k = 0; k < 10; k++)
+                {
+                    Console.Write(" {0} ", a[k]);
+                }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

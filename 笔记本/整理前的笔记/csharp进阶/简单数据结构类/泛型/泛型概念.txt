@@ -1,0 +1,89 @@
+泛型就是 “让代码适用于任意类型的模板”，不用为每种数据类型（int、string、自定义类）重复写一模一样的逻辑
+可以把它理解成：
+普通代码：只能装苹果的盒子
+泛型代码：万能盒子，你告诉它装什么，它就装什么，不用重新造盒子
+假如你想写一个 **“拿第一个元素”** 的方法：
+给 int 数组写一个方法
+给 string 数组写一个方法
+给自定义类写一个方法
+代码重复、臃肿、难维护。
+泛型就是：写一次代码，所有类型都能用
+
+泛型的声明，泛型类、泛型接口、泛型方法、泛型委托
+在我们的类名，接口名，方法名，委托名后面加<T>,这个T是占位符，可以有多个
+T的作用就是我现在这里站好了一个位置，然后要是我想要int的传进来那就在T那里写int，我们想要什么都可以，也可以装一个类，接口，就是传一个对象
+要是有多个的占位符，就是用来传多个参数，就比如说传一个people的类获取基本信息，然后再传一个物品的类
+
+你有两个类：
+Person（人：名字、年龄）
+Item（物品：名称、价格）
+你想写一个通用类，同时装一个人和一个物品，用两个泛型占位符。
+先定义两个普通类
+// 人类
+public class Person
+{
+    public string Name { get; set; }
+    public int Age { get; set; }
+}
+
+// 物品类
+public class Item
+{
+    public string ItemName { get; set; }
+    public decimal Price { get; set; }
+}
+
+写一个双泛型类，装这两个对象
+// TPerson 装人
+// TItem  装物品
+public class Bag<TPerson, TItem>
+{
+    // 这两个就是你传进来的对象
+    public TPerson Owner { get; set; }
+    public TItem Goods { get; set; }
+
+    // 演示怎么使用它们
+    public void ShowInfo()
+    {
+        // 重点来了！
+        // 直接用 Owner 和 Goods 就行，它们就是你传的对象
+        Console.WriteLine("拥有者：" + Owner);
+        Console.WriteLine("物品：" + Goods);
+    }
+}
+
+// 1. 创建一个人
+var person = new Person { Name = "小明", Age = 20 };
+
+// 2. 创建一个物品
+var item = new Item { ItemName = "长剑", Price = 999 };
+
+// 3. 把两个类一起传给泛型
+var bag = new Bag<Person, Item>();
+bag.Owner = person;  // 把人放进去
+bag.Goods = item;   // 把物品放进去
+
+// 4. 使用
+bag.ShowInfo();
+
+关键问题：怎么拿到 Name、Price？
+现在你会发现一个问题：
+直接写 Owner.Name 会报错！
+因为编译器不知道 TPerson 到底是啥，它不知道有 Name 这个属性。
+解决方法：加泛型约束
+public class Bag<TPerson, TItem>
+    where TPerson : Person   // 限制 TPerson 必须是 Person 类
+    where TItem : Item       // 限制 TItem 必须是 Item 类
+{
+    public TPerson Owner { get; set; }
+    public TItem Goods { get; set; }
+
+    public void ShowInfo()
+    {
+        // 现在就能正常用属性了！
+        Console.WriteLine("名字：" + Owner.Name);
+        Console.WriteLine("年龄：" + Owner.Age);
+        Console.WriteLine("物品：" + Goods.ItemName);
+        Console.WriteLine("价格：" + Goods.Price);
+    }
+}

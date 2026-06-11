@@ -1,0 +1,235 @@
+{
+  "main": {
+    "id": "ff878c5fb2f68a37",
+    "type": "split",
+    "children": [
+      {
+        "id": "14fd01524f3b19a4",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "05ab9cb6ab427397",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "UGUI/UGUI进阶/UI事件监听接口/UI事件监听接口.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "UI事件监听接口"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "611a62422cf6eb27",
+    "type": "split",
+    "children": [
+      {
+        "id": "588bb97b58664633",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "01f3590eab3f4b36",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "6dd6604991e8f1bf",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "9ee7eb6ab864f9e6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "5fd12ec28c3a2f7e",
+    "type": "split",
+    "children": [
+      {
+        "id": "0f696d8712737bfe",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "215a6048711758ea",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "2.Mathf_笔记.pdf",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "2.Mathf_笔记 的反向链接列表"
+            }
+          },
+          {
+            "id": "7a0589c1ab33a896",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "2.Mathf_笔记.pdf",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "2.Mathf_笔记 的出链列表"
+            }
+          },
+          {
+            "id": "facc3b592d5158bb",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "e0cdf61107433190",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "73c4dae39f95e5c2",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "2.Mathf_笔记.pdf",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "2.Mathf_笔记 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "01f3590eab3f4b36",
+  "lastOpenFiles": [
+    "unity核心/2d相关/Sprite/SpriteAtlas精灵图集/SpriteAtlas精灵图集.pdf",
+    "unity核心/2d相关/Sprite/SpriteAtlas精灵图集",
+    "UGUI/UGUI进阶/遮罩/Mask遮罩.md",
+    "UGUI/UGUI进阶/CanvasGroup/CanvasGroup.md",
+    "UGUI/UGUI进阶/CanvasGroup/images/p1_i1.png",
+    "UGUI/UGUI进阶/UI动画控制/UI动画控制.md",
+    "unity核心/2d相关/Sprite/SpriteMask精灵遮罩/SpriteMask精灵遮罩.pdf",
+    "unity基础/3d数学/四元数/四元数计算.md",
+    "unity核心/2d相关/Sprite/SortingGroup排序分组/SortingGroup排序分组.pdf",
+    "unity核心/2d相关/Sprite/SortingGroup排序分组",
+    "unity核心/2d相关/Sprite/SpriteMask精灵遮罩",
+    "unity核心/2d相关/Sprite/SpriteCreator精灵创造者/SpriteCreator精灵创造者.pdf",
+    "unity核心/2d相关/Sprite/SpriteCreator精灵创造者",
+    "unity核心/2d相关/Sprite/Sprite Renderer/SpriteRenderer精灵渲染器.pdf",
+    "unity核心/2d相关/Sprite/Sprite Renderer",
+    "unity核心/2d相关/Sprite/Sprite Editor/SpriteEditorPolygon图片编辑.pdf",
+    "unity基础/3d数学/四元数/四元数的常用方法.md",
+    "unity基础/3d数学/四元数/_extracted_images/四元数的常用方法_p1_img2.png",
+    "unity基础/Resources资源动态加载/Resources资源异步加载/Resources资源异步加载.md",
+    "unity基础/Resources资源动态加载/Resources资源卸载/Resources资源卸载.md",
+    "unity基础/mono中的重要内容/协同程序/协同程序1.md",
+    "unity基础/核心系统/射线检测/射线检测.md",
+    "unity基础/3d数学/三角函数/三角函数.md",
+    "unity基础/3d数学/四元数/四元数是什么.md",
+    "UGUI/UGUI进阶/UI事件监听接口/UI事件监听接口.md",
+    "UGUI/UGUI进阶/异性按钮/异形按钮.md",
+    "unity基础/核心系统/核心系统补充.md",
+    "unity基础/Resources资源动态加载/Resources资源管理补充.md",
+    "unity基础/mono中的重要内容/Mono重要内容补充.md",
+    "unity基础/3d数学/3D数学补充.md",
+    "unity基础/核心系统/范围检测/范围检测.md",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p9_img1.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p9_img0.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p8_img2.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p8_img1.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p8_img0.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p7_img2.png",
+    "unity基础/核心系统/范围检测/_extracted_images/范围检测_p7_img1.png",
+    "unity基础/场景异步切换/场景异步加载.md",
+    "unity基础/场景异步切换/_extracted_images/场景异步加载_p6_img0.png",
+    "unity基础/划线功能LineRenderer/LineRenderer.md",
+    "unity基础/mono中的重要内容/延时函数/延迟函数.md",
+    "unity基础/mono中的重要内容/协同程序/协同程序原理.md",
+    "unity基础/mono中的重要内容/协同程序/协同程序2.md",
+    "unity基础/Resources资源动态加载/unity里面的特殊文件夹/特殊文件夹.md",
+    "unity基础/Resources资源动态加载/Resources资源同步加载/Resources资源同步加载.md"
+  ]
+}

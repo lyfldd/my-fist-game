@@ -1,0 +1,60 @@
+单例模式（Singleton Pattern）是编程中最基础、最核心的设计模式之一
+保证一个类在整个程序中，只有且仅有一个实例，并提供一个全局访问它的入口
+
+生活中的类比
+Windows 任务管理器：你无论点击多少次图标，屏幕上永远只出现一个任务管理器窗口。
+打印机后台程序：整个电脑只能有一个程序在排队处理打印任务，不能每个人都启动一个自己的打印后台。
+游戏里的 “单例”：游戏中的GameManager（游戏总管理器）、InputManager（输入管理），玩家的 **Player（主角）** 通常也是单例
+
+using System;
+
+public class GameManager
+{
+    // 1. 私有静态变量：用于存储唯一的实例
+    private static GameManager _instance;
+
+    // 2. 公开静态属性：全局访问点
+    public static GameManager Instance
+    {
+        get
+        {
+            // 双重检查锁：提高性能，同时保证线程安全
+            if (_instance == null)
+            {
+                lock (typeof(GameManager)) // 加锁，防止多线程同时创建
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new GameManager();
+                    }
+                }
+            }
+            return _instance;
+        }
+    }
+
+    // 3. 私有构造函数：防止外部用 new 创建新实例
+    private GameManager()
+    {
+        Console.WriteLine("游戏管理器已创建！");
+    }
+
+    // 下面是你可以写的游戏逻辑
+    public int Score { get; set; } = 0;
+ 
+    public void AddScore(int point)
+    {
+        Score += point;
+        Console.WriteLine($"当前得分：{Score}");
+    }
+}
+
+// 在别的脚本里调用
+public class Player : MonoBehaviour
+{
+    void Start()
+    {
+        // 直接访问，不需要 new
+        GameManager.Instance.AddScore(100);
+    }
+}
