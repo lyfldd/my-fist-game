@@ -14,6 +14,7 @@ namespace _Game.Editor.UnityMcp
         private const string CAPTURE_GAME = "unity_capture_game";
         private const string CAPTURE_SCENE = "unity_capture_scene";
         private const string CAPTURE_EDITOR = "unity_capture_editor";
+        private const string CAPTURE_FILE = "unity_capture_to_file";
         private const string GET_STATUS = "unity_get_status";
 
         public static void Register()
@@ -22,6 +23,7 @@ namespace _Game.Editor.UnityMcp
             UnityMcpServer.RegisterHandler(CAPTURE_GAME, HandleCaptureGame);
             UnityMcpServer.RegisterHandler(CAPTURE_SCENE, HandleCaptureScene);
             UnityMcpServer.RegisterHandler(CAPTURE_EDITOR, HandleCaptureEditor);
+            UnityMcpServer.RegisterHandler(CAPTURE_FILE, HandleCaptureToFile);
         }
 
         // ── Status ──
@@ -112,6 +114,29 @@ namespace _Game.Editor.UnityMcp
                 return HandleCaptureGame(paramsJson);
             else
                 return HandleCaptureScene(paramsJson);
+        }
+
+        // ── Capture to File ──
+
+        static string HandleCaptureToFile(string paramsJson)
+        {
+            int width = GetIntParam(paramsJson, "width", 1920);
+            int height = GetIntParam(paramsJson, "height", 1080);
+            try
+            {
+                Camera cam = Application.isPlaying ? Camera.main : GetSceneViewCamera();
+                if (cam == null)
+                    return @"{""success"": false, ""error"": ""Camera not available""}";
+                string b64 = RenderCameraToBase64(cam, width, height, "");
+                byte[] bytes = Convert.FromBase64String(b64);
+                string filePath = System.IO.Path.Combine(Application.temporaryCachePath, "_mcp_capture.png");
+                File.WriteAllBytes(filePath, bytes);
+                return $@"{{""success"": true, ""path"": ""{SimpleJson.Escape(filePath)}"", ""width"": {width}, ""height"": {height}, ""size_bytes"": {bytes.Length}}}";
+            }
+            catch (Exception ex)
+            {
+                return $@"{{""success"": false, ""error"": ""{SimpleJson.Escape(ex.Message)}""}}";
+            }
         }
 
         // ═══ Implementation ═══

@@ -80,7 +80,10 @@ class UnityWSClient:
         self._send_text(msg)
         resp_str = self._recv_text()
         resp = json.loads(resp_str)
-        return resp.get("result", {"success": False, "error": "No result"})
+        # Unity returns the result directly; if there IS a "result" wrapper, unwrap it
+        if "result" in resp and len(resp) <= 3:  # JSON-RPC style response
+            return resp["result"]
+        return resp
 
     def close(self):
         """Close the WebSocket connection."""
@@ -165,14 +168,21 @@ class UnityWSClient:
         frame.extend(bytes(b ^ mask_key[i % 4] for i, b in enumerate(payload)))
         self.sock.sendall(bytes(frame))
 
-    @staticmethod
-    def _recv_exact(conn, n):
+    def _recv_exact(self, n):
         data = b""
-        while len(data) < n:
-            chunk = conn.recv(min(n - len(data), 65536))
-            if not chunk:
-                raise ConnectionError("Connection closed")
-            data += chunk
+        # Temporarily increase timeout for large payloads
+        old_timeout = self.sock.gettimeout()
+        if n > 10000:
+            self.sock.settimeout(max(old_timeout or 5, 30.0))
+        try:
+            while len(data) < n:
+                chunk = self.sock.recv(min(n - len(data), 65536))
+                if not chunk:
+                    raise ConnectionError("Connection closed")
+                data += chunk
+        finally:
+            if n > 10000:
+                self.sock.settimeout(old_timeout)
         return data
 
 
@@ -248,7 +258,7 @@ TOOLS = [
         "description": "获取 Unity 编辑器连接状态。返回 Play/Edit 模式、场景名、对象数量等信息。验证 Bridge ↔ Unity 是否正常通信。",
         "inputSchema": {"type": "object", "properties": {}, "required": []},
     },
-    # ── Capture (3) ──
+    # ── Capture (4) ──
     {
         "name": "unity_capture_editor",
         "description": "【推荐】截取 Unity 当前画面。Play 模式截图 Game View，Edit 模式截图 Scene View。截图自动经过 Qwen-VL 翻译为文字描述。这是最重要的工具——每次修改前后都应该截图确认效果。",
@@ -279,6 +289,18 @@ TOOLS = [
             "properties": {
                 "width": {"type": "integer", "default": 1920},
                 "height": {"type": "integer", "default": 1080},
+            },
+        },
+    },
+    {
+        "name": "unity_capture_to_file",
+        "description": "【大图专用】截图直接保存到文件（绕过 base64 WebSocket 传输限制）。支持任意分辨率。返回文件路径。",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "width": {"type": "integer", "default": 1920, "description": "截图宽度"},
+                "height": {"type": "integer", "default": 1080, "description": "截图高度"},
+                "path": {"type": "string", "description": "保存路径（可选，默认临时目录）"},
             },
         },
     },
