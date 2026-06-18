@@ -251,6 +251,7 @@ namespace _Game.Systems.Crafting
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_isVisible || _craftingSystem == null) return;
             InitStyles();
 

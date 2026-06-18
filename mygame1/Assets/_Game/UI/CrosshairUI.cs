@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using _Game.Core;
 
 namespace _Game.UI
 {
@@ -20,6 +21,7 @@ namespace _Game.UI
 
         void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             _aiming = _Game.Core.PlayerRegistry.Get<_Game.Systems.Weapon.WeaponAiming>();
             CreateUI();
         }

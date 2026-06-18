@@ -1,5 +1,6 @@
 using UnityEngine;
 using _Game.Config;
+using _Game.Core;
 
 namespace _Game.Systems.AIBot
 {
@@ -47,6 +48,7 @@ namespace _Game.Systems.AIBot
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || _inventory == null) return;
             InitStyles();
 

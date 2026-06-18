@@ -60,6 +60,7 @@ namespace _Game.UI
 
         private void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             inventory = ServiceLocator.Get<Inventory>();
             if (inventory == null)
             {

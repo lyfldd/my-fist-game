@@ -28,6 +28,7 @@ namespace _Game.UI
 
         private void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             survival = ServiceLocator.Get<SurvivalSystem>();
             CreateCanvas();
             CreateBars();

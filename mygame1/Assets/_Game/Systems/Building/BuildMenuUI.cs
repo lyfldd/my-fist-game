@@ -148,6 +148,7 @@ namespace _Game.Systems.Building
 
         private void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_isVisible || catalog == null || catalog.Count == 0)
                 return;
 

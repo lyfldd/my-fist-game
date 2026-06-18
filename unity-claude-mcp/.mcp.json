@@ -1,0 +1,9 @@
+{
+    "mcpServers": {
+        "unity-editor": {
+            "command": "D:/myblender/5.1/python/bin/python.exe",
+            "args": ["C:/Users/Administrator/Desktop/Unity学习一/mygame/unity-claude-mcp/unity_mcp_bridge.py"],
+            "env": {}
+        }
+    }
+}

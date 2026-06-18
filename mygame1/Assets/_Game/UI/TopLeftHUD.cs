@@ -56,6 +56,7 @@ namespace _Game.UI
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (BuildMenuUI.IsVisible) return;
             if (_vehicle != null)
                 DrawVehicleInfo();

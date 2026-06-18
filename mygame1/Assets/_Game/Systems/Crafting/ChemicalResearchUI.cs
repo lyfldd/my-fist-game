@@ -56,6 +56,7 @@ namespace _Game.Systems.Crafting
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_isVisible || _manager == null || _manager.Data == null) return;
             InitStyles();
 

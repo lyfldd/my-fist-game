@@ -15,6 +15,7 @@ namespace _Game.UI
 
         void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             if (toastText != null)
                 toastText.gameObject.SetActive(false);
 

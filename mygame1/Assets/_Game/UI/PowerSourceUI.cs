@@ -39,6 +39,7 @@ namespace _Game.UI
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || _currentSource == null) return;
             InitStyles();
 

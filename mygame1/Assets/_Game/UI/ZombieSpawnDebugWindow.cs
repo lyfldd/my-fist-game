@@ -59,6 +59,7 @@ namespace _Game.UI
 #if UNITY_EDITOR
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || !Application.isPlaying) return;
 
             float w = 320f;

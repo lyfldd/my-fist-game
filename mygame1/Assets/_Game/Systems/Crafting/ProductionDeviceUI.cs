@@ -164,6 +164,7 @@ namespace _Game.Systems.Crafting
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_isVisible || _currentDevice == null || _deviceData == null) return;
             InitStyles();
 

@@ -54,6 +54,7 @@ namespace _Game.UI
 
         private void Awake()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             Instance = this;
             _inventory = ServiceLocator.Get<Inv>();
         }

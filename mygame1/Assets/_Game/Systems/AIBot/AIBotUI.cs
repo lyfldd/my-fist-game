@@ -84,6 +84,7 @@ namespace _Game.Systems.AIBot
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || _bot == null) return;
             InitStyles();
 

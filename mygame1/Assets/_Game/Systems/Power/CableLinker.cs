@@ -178,6 +178,7 @@ namespace _Game.Systems.Power
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_linking) return;
 
             string modeLabel = _linkMode == LinkMode.FromSource ? "电源 → 终端" : "终端 → 目标";

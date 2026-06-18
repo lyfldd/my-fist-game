@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using _Game.Core;
 
 namespace _Game.UI
 {
@@ -24,6 +25,7 @@ namespace _Game.UI
 
         void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             _mainCamera = Camera.main;
             if (canvasGroup == null)
                 canvasGroup = GetComponent<CanvasGroup>();

@@ -65,6 +65,7 @@ namespace _Game.UI
 
         void Start()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             _inventory = ServiceLocator.Get<Inv>();
 
             // 确保 EventSystem 存在（拖拽必需）

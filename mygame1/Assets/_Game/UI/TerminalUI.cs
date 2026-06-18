@@ -1,4 +1,5 @@
 using UnityEngine;
+using _Game.Core;
 using _Game.Systems.Power;
 
 namespace _Game.UI
@@ -36,6 +37,7 @@ namespace _Game.UI
 
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || _currentTerminal == null) return;
             InitStyles();
 

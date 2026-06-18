@@ -90,6 +90,7 @@ namespace _Game.UI
 #if UNITY_EDITOR
         void OnGUI()
         {
+            if (UIModeConfig.UseUGUI) return;
             if (!_visible || !Application.isPlaying) return;
 
             float x = (Screen.width - _panelW) * 0.5f;
@@ -588,6 +589,18 @@ namespace _Game.UI
 
             // 顶部固定区
             GUILayout.Label("<b>系统调试</b>");
+
+            // UI 模式切换
+            GUILayout.BeginHorizontal();
+            string modeLabel = UIModeConfig.UseUGUI ? "UI 模式: UGUI" : "UI 模式: IMGUI";
+            Color prevColor = GUI.backgroundColor;
+            GUI.backgroundColor = UIModeConfig.UseUGUI ? new Color(0f, 0.6f, 0f, 1f) : new Color(0.5f, 0.5f, 0.5f, 1f);
+            if (GUILayout.Button(modeLabel, GUILayout.Height(24)))
+                UIModeConfig.Toggle();
+            GUI.backgroundColor = prevColor;
+            GUILayout.Label("  切换新旧 UI 渲染系统", GUILayout.Height(24));
+            GUILayout.EndHorizontal();
+
             GUILayout.Label($"Total XP: {_xp.TotalXP}  |  Skill Pts: {_xp.AvailablePoints}");
 
             // XP 按钮

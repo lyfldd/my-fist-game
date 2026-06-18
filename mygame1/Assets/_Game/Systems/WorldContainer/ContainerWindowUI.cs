@@ -39,6 +39,7 @@ namespace _Game.Systems.WorldContainer
 
         void Awake()
         {
+            if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             Instance = this;
             _canvas = GetComponentInParent<Canvas>();
             gameObject.SetActive(false);
