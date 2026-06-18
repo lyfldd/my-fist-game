@@ -28,6 +28,8 @@ namespace _Game.Systems.Weapon
         public Vector3 AimTarget { get; private set; }
         /// <summary> 枪口 → 目标的归一化方向</summary>
         public Vector3 AimDirection { get; private set; } = Vector3.forward;
+        /// <summary> 是否正在右键瞄准（供移动减速/散布显示等系统读取）</summary>
+        public bool IsAimingDownSights { get; private set; }
         /// <summary> 是否有辅助瞄准激活</summary>
         public bool IsAssisting { get; private set; }
         /// <summary> 辅助瞄准的目标 Transform（null=无）</summary>
@@ -48,6 +50,18 @@ namespace _Game.Systems.Weapon
         void Update()
         {
             if (_cam == null) return;
+
+            // 右键瞄准切换：点一次进入，再点一次退出
+            // 只有当前装备热武器时才能进入瞄准
+            var switcher = GetComponent<WeaponSwitcher>();
+            bool hasGun = switcher != null
+                       && switcher.ActiveWeapon != null
+                       && switcher.ActiveWeapon.isFirearm;
+            if (Input.GetMouseButtonDown(1) && hasGun)
+                IsAimingDownSights = !IsAimingDownSights;
+            // 切走枪时强制退出瞄准
+            if (!hasGun)
+                IsAimingDownSights = false;
 
             Ray ray = _cam.ScreenPointToRay(Input.mousePosition);
             AimTarget = Vector3.zero;

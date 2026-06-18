@@ -15,12 +15,19 @@ public class PlayerController : MonoBehaviour
     public float maxOverloadSlow = GameConstants.PLAYER_MAX_OVERLOAD_SLOW;
     public float rotationSpeed = GameConstants.PLAYER_ROTATION_SMOOTH_SPEED;
 
+    [Header("动画平滑")]
+    public float animAcceleration = 3f;   // 加速时 Speed 参数上升速度
+    public float animDeceleration = 5f;   // 减速/松手时 Speed 参数下降速度
+
     private Rigidbody _rb;
     private Inv _inventory;
     private PlayerCharacter _playerCharacter;
     private StaminaSystem _stamina;
     private MouseGroundProjector _projector;
     private Animator _animator;
+    private _Game.Systems.Weapon.WeaponAiming _weaponAiming;
+
+    private float _smoothedSpeedRatio;  // 平滑后的 Speed 参数值，避免瞬间跳变
 
     private const string FootstepKey = "player_footstep";
 
@@ -32,6 +39,7 @@ public class PlayerController : MonoBehaviour
         _stamina = GetComponent<StaminaSystem>();
         _projector = GetComponent<MouseGroundProjector>();
         _animator = GetComponentInChildren<Animator>();
+        _weaponAiming = GetComponent<_Game.Systems.Weapon.WeaponAiming>();
     }
 
     void Update()
@@ -88,9 +96,21 @@ public class PlayerController : MonoBehaviour
         if (_playerCharacter != null)
             currentSpeed *= _playerCharacter.GetMoveSpeedModifier();
 
-        // 动画：将归一化速度传给 Animator Blend Tree（1=Walk, 1.6=Run）
+        // 右键瞄准减速
+        if (_weaponAiming != null && _weaponAiming.IsAimingDownSights)
+            currentSpeed *= GameConstants.AIM_MOVE_SPEED_MULTIPLIER;
+
+        // 动画：归一化速度平滑后传给 1D BlendTree
+        // 角色已在上面朝移动方向旋转，动画只需控制速度（0=Idle, 1=Walk, 1.5=SlowRun, 2=FastRun）
+        float targetRatio = moveInput.sqrMagnitude > 0.01f ? currentSpeed / moveSpeed : 0f;
+
+        // 加速用较慢的上升，减速用较快的下降（更跟手）
+        float smoothSpeed = targetRatio > _smoothedSpeedRatio ? animAcceleration : animDeceleration;
+        _smoothedSpeedRatio = Mathf.MoveTowards(
+            _smoothedSpeedRatio, targetRatio, smoothSpeed * UnityEngine.Time.deltaTime);
+
         if (_animator != null)
-            _animator.SetFloat("Speed", moveInput.sqrMagnitude > 0.01f ? currentSpeed / moveSpeed : 0f);
+            _animator.SetFloat("Speed", _smoothedSpeedRatio);
 
         // 应用移动
         Vector3 velocity = moveInput * currentSpeed;

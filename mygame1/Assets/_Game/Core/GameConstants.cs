@@ -159,6 +159,9 @@ namespace _Game.Core
         /// <summary> Fallback aim distance when no ground-plane hit (m). </summary>
         public const float AIM_FALLBACK_DISTANCE = 10f;
 
+        /// <summary> 右键瞄准时移动速度倍率（0.4 = 降为正常的40%）</summary>
+        public const float AIM_MOVE_SPEED_MULTIPLIER = 0.4f;
+
         /// <summary> Weapon model rotation smoothing speed. </summary>
         public const float WEAPON_ROTATION_SMOOTH_SPEED = 20f;
 

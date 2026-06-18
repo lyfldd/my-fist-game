@@ -66,6 +66,8 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponShooting");
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponAiming");
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponHolder");
+            AddIfMissing(player, "_Game.Systems.Weapon.SpreadVisualizer");
+            AddIfMissing(player, "_Game.UI.CrosshairUI");
             AddIfMissing(player, "_Game.Systems.Building.BuildMenuUI");
             AddIfMissing(player, "_Game.Systems.Building.GhostPreview");
             AddIfMissing(player, "_Game.Systems.Crafting.CraftingUI");

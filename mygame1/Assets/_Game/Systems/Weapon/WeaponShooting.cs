@@ -38,8 +38,6 @@ namespace _Game.Systems.Weapon
         private Inventory.Inventory _inventory;
         public bool IsReloading => _isReloading;
 
-        private static bool _shootDebugOnce;
-        private int _updateDebugCount;
         private ItemData _lastWeapon; // 跟踪武器切换，避免 OnEnable 不触发时扩散/弹匣未初始化
 
         void Awake()
@@ -66,8 +64,6 @@ namespace _Game.Systems.Weapon
                 _currentMag = weapon.magazineSize;
             }
             InputRouter.BindMouse(0, InputPriority.Gameplay, OnFireButton, this);
-            _updateDebugCount = 0;
-            Debug.Log($"[WeaponShooting] OnEnable: activeSlot={_switcher?.ActiveSlot}, weapon={weapon?.name}, isFirearm={weapon?.isFirearm}, mag={_currentMag}/{weapon?.magazineSize}, ammoItem={weapon?.ammoItemName}, myEnabled={enabled}");
         }
 
         void OnDisable()
@@ -81,19 +77,12 @@ namespace _Game.Systems.Weapon
         bool OnFireButton()
         {
             _wantsSemiFire = true;
-            if (!_shootDebugOnce)
-                Debug.Log($"[WeaponShooting] OnFireButton 触发! weapon={GetActiveWeapon()?.name}, mag={_currentMag}");
             return true;
         }
 
         void Update()
         {
             var weapon = GetActiveWeapon();
-            _updateDebugCount++;
-            if (_updateDebugCount <= 5 || (_updateDebugCount % 120 == 0))
-            {
-                Debug.Log($"[WeaponShooting] Update#{_updateDebugCount}: activeSlot={_switcher?.ActiveSlot}, weapon={weapon?.name}, isFirearm={weapon?.isFirearm}, mag={_currentMag}, ammoItem={weapon?.ammoItemName}, wantsSemi={_wantsSemiFire}, reloading={_isReloading}, fireTimer={_fireTimer:F2}, myEnabled={enabled}");
-            }
             if (weapon == null || !weapon.isFirearm)
             {
                 _wantsSemiFire = false;
@@ -109,7 +98,6 @@ namespace _Game.Systems.Weapon
                 _currentMag = weapon.magazineSize;
                 _isReloading = false;
                 _fireTimer = 0f;
-                Debug.Log($"[WeaponShooting] 武器切换: {weapon.name}, mag={_currentMag}, spread={_currentSpread}, ammo={weapon.ammoItemName}, soundType={weapon.gunshotSoundType}, fireRate={weapon.fireRate}");
             }
 
             if (_fireTimer > 0f)
@@ -149,12 +137,18 @@ namespace _Game.Systems.Weapon
             return _switcher.ActiveWeapon;
         }
 
-        /// <summary> 获取枪口位置（世界坐标）</summary>
+        /// <summary> 获取枪口位置（世界坐标）— 实际射线检测用</summary>
         Vector3 GetMuzzlePosition()
         {
             if (_holder != null)
                 return _holder.HandWorldPos;
             return transform.position + transform.forward * GameConstants.MUZZLE_FORWARD_OFFSET + Vector3.up * GameConstants.MUZZLE_UP_OFFSET;
+        }
+
+        /// <summary> 调试可视化射线起点 — 和 SpreadVisualizer 锥形原点一致 (Y=1.3)</summary>
+        Vector3 GetVisualRayOrigin()
+        {
+            return transform.position + Vector3.up * 1.3f;
         }
 
         void TryFire(ItemData weapon)
@@ -166,15 +160,8 @@ namespace _Game.Systems.Weapon
             if (!string.IsNullOrEmpty(weapon.ammoItemName) && _currentMag <= 0)
             {
                 int inInv = CountAmmoInInventory(weapon.ammoItemName);
-                Debug.Log($"[WeaponShooting] 弹匣空! ammoItem={weapon.ammoItemName}, 背包子弹={inInv}, 尝试换弹...");
                 StartReload(weapon);
                 return;
-            }
-
-            if (!_shootDebugOnce)
-            {
-                _shootDebugOnce = true;
-                Debug.Log($"[WeaponShooting] TryFire! weapon={weapon.name}, mag={_currentMag}, ammo={weapon.ammoItemName}, soundType={weapon.gunshotSoundType}, spread={_currentSpread:F2}");
             }
 
             // 扣动扳机：散射扩大
@@ -192,9 +179,12 @@ namespace _Game.Systems.Weapon
             float effectiveSpread = _currentSpread * (1f - gunLevel * GameConstants.GUN_SKILL_SPREAD_REDUCTION);
             Vector3 spreadDir = GetSpreadDirection(aimDir, effectiveSpread * 0.5f);
 
-            // 射线检测
+            // 射线检测（实际从枪口发出）
             Vector3 muzzle = GetMuzzlePosition();
             bool hitSomething = Physics.Raycast(muzzle, spreadDir, out var hit, weapon.weaponRange, shootLayer);
+
+            // 可视化射线从锥形原点（Y=1.3）发出，和 SpreadVisualizer 对齐
+            Vector3 visOrigin = GetVisualRayOrigin();
 
             if (hitSomething)
             {
@@ -208,14 +198,13 @@ namespace _Game.Systems.Weapon
                             gameObject.GetInstanceID(),
                             hit.collider.gameObject.GetInstanceID(),
                             weapon.weaponDamage));
-                        Debug.Log($"命中 {hit.collider.name}！伤害={weapon.weaponDamage}");
                     }
                 }
-                Debug.DrawRay(muzzle, spreadDir * hit.distance, Color.red, debugRayDuration);
+                Debug.DrawRay(visOrigin, spreadDir * hit.distance, Color.red, debugRayDuration);
             }
             else
             {
-                Debug.DrawRay(muzzle, spreadDir * weapon.weaponRange, Color.yellow, debugRayDuration);
+                Debug.DrawRay(visOrigin, spreadDir * weapon.weaponRange, Color.yellow, debugRayDuration);
             }
 
             // 发布事件（携带完整武器数据，供音效/特效/噪音系统订阅）
