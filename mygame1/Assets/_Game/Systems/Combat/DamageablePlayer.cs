@@ -19,8 +19,6 @@ namespace _Game.Systems.Combat
 
             // 转发伤害给生存系统
             EventBus.Publish(new PlayerDamaged(Mathf.RoundToInt(damage), "僵尸"));
-
-            Debug.Log($"玩家受伤: -{damage}");
         }
     }
 }

@@ -98,8 +98,6 @@ namespace _Game.Systems.AIBot
 
             // 无敌
             if (_damageablePlayer != null) _damageablePlayer.Invincible = true;
-
-            Debug.Log("[AIBotPilotInputLock] 进入驾驶模式，玩家组件已禁用");
         }
 
         void OnPilotExited(AIBotPilotExitedEvent evt)
@@ -129,7 +127,6 @@ namespace _Game.Systems.AIBot
             if (_damageablePlayer != null) _damageablePlayer.Invincible = false;
 
             _currentPilot = null;
-            Debug.Log("[AIBotPilotInputLock] 退出驾驶模式，玩家组件已恢复");
         }
 
         // ============================================================

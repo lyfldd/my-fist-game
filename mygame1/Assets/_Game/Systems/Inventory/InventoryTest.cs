@@ -8,7 +8,7 @@ namespace _Game.Systems.Inventory
     /// <summary>
     /// 背包测试脚本（开发用，后续删除）
     /// I=添加物品  O=丢掉物品（丢地上）  F=快速拾取
-    /// </summary>
+    /// </summary>     
     public class InventoryTest : MonoBehaviour
     {
         public Inventory inventory;
@@ -27,8 +27,7 @@ namespace _Game.Systems.Inventory
         {
             if (inventory != null && testItem != null)
             {
-                int added = inventory.AddItem(testItem, 1);
-                Debug.Log($"添加 {testItem.itemName} x1（实际添加: {added}）");
+                inventory.AddItem(testItem, 1);
             }
             return true;
         }
@@ -39,7 +38,6 @@ namespace _Game.Systems.Inventory
             {
                 var item = inventory.placedItems[0].itemData;
                 inventory.DropItem(item, 1);
-                Debug.Log($"丢掉 {item.itemName} x1");
             }
             return true;
         }
@@ -76,13 +74,8 @@ namespace _Game.Systems.Inventory
                 if (added > 0)
                 {
                     nearest.count -= added;
-                    Debug.Log($"拾取 {nearest.itemData.itemName} x{added}");
                     if (nearest.count <= 0)
                         Destroy(nearest.gameObject);
-                }
-                else
-                {
-                    Debug.Log("背包已满！");
                 }
             }
         }

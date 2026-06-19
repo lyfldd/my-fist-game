@@ -59,9 +59,6 @@ namespace _Game.Systems.WorldGen.Stages
                 placementSettlementBuildings(settlement, s, data, root.transform, ref buildingIndex);
                 data.settlements.Add(settlement);
             }
-
-            Debug.Log($"[SettlementStage] 生成 {centers.Count} 个聚落, " +
-                      $"共 {data.buildings.Count} 个建筑");
         }
 
         // ── 地形扫描 ────────────────────────────────
@@ -190,9 +187,6 @@ namespace _Game.Systems.WorldGen.Stages
                 sizesPlaced.Add(size);
             }
 
-            Debug.Log($"[SettlementStage] 选取 {settlements.Count} 个聚落 " +
-                      $"(小={smallCount} 中={mediumCount} 大={largeCount}, " +
-                      $"简陋={shabbyCount} 普通={normalCount} 繁华={prosperCount})");
             return settlements;
         }
 

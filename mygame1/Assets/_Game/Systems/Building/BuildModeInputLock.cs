@@ -77,7 +77,6 @@ namespace _Game.Systems.Building
             if (_weaponShooting != null)
                 _weaponShooting.enabled = false;
 
-            Debug.Log("[BuildModeInputLock] 输入已锁定（移动/武器禁用）");
         }
 
         private void RestoreInput()
@@ -90,8 +89,6 @@ namespace _Game.Systems.Building
 
             if (_weaponShooting != null)
                 _weaponShooting.enabled = true;
-
-            Debug.Log("[BuildModeInputLock] 输入已恢复");
         }
     }
 }

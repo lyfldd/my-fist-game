@@ -169,11 +169,7 @@ namespace _Game.Systems.AIBot
         void TickCombat()
         {
             int hitCount = Physics.OverlapSphereNonAlloc(transform.position, alertRange, _hitBuffer, zombieLayer);
-            if (hitCount == 0)
-            {
-                Debug.LogWarning($"[AIBotCombat] Tick: 未检测到任何Collider (range={alertRange}m, layerMask={zombieLayer.value})");
-                return;
-            }
+            if (hitCount == 0) return;
 
             // 收集有效僵尸目标（有 DamageableZombie 且未死亡）
             int validCount = 0;
@@ -187,14 +183,7 @@ namespace _Game.Systems.AIBot
                 }
             }
 
-            if (validCount == 0)
-            {
-                // 诊断：检查第一个collider是什么
-                var firstCol = _hitBuffer[0];
-                var goName = firstCol != null ? firstCol.transform.parent?.name ?? firstCol.name : "null";
-                Debug.LogWarning($"[AIBotCombat] Tick: 检测到 {hitCount} 个Collider，但无有效僵尸。首个:{goName}, layer:{firstCol?.gameObject.layer}");
-                return;
-            }
+            if (validCount == 0) return;
 
             // 在玩家身边时按距玩家距离排序（优先保护玩家），否则按距机器人距离
             Vector3 sortOrigin = _nearPlayer ? _bot.PlayerTransform.position : transform.position;
@@ -672,12 +661,12 @@ namespace _Game.Systems.AIBot
         /// <summary>激光自动锁敌：扫描范围内最近僵尸→锁定→发射。</summary>
         public void ManualFireLaser()
         {
-            if (!_bot.IsLaserEnabled) { Debug.Log("[AIBotCombat] 激光在节能模式下禁用"); return; }
-            if (_laserTimer > 0f) { Debug.Log("[AIBotCombat] 激光冷却中"); return; }
+            if (!_bot.IsLaserEnabled) return;
+            if (_laserTimer > 0f) return;
 
             float range = GetLaserRange();
             int hitCount = Physics.OverlapSphereNonAlloc(transform.position, range, _hitBuffer, zombieLayer);
-            if (hitCount == 0) { Debug.Log("[AIBotCombat] 激光范围内无目标"); return; }
+            if (hitCount == 0) return;
 
             DamageableZombie nearest = null;
             float nearestDist = float.MaxValue;
@@ -689,12 +678,11 @@ namespace _Game.Systems.AIBot
                 if (d < nearestDist) { nearestDist = d; nearest = dz; }
             }
 
-            if (nearest == null) { Debug.Log("[AIBotCombat] 范围内无活僵尸"); return; }
+            if (nearest == null) return;
 
             float damage = GetLaserDamage();
             nearest.TakeDamage(damage);
             _laserTimer = laserCooldown;
-            Debug.Log($"[AIBotCombat] 激光命中 {nearest.name}, 伤害={damage}");
 
             _bot.ConsumeEnergyForAction(AIBot.ENERGY_LASER_PER_SHOT);
 
@@ -710,12 +698,12 @@ namespace _Game.Systems.AIBot
 
             if (manualWeaponSlot == AttackPriority.RightArm)
             {
-                if (_rightArmTimer > 0f) { Debug.Log("[AIBotCombat] 右臂冷却中"); return; }
-                if (rightArm == RightArmWeapon.None) { Debug.Log("[AIBotCombat] 右臂未装备"); return; }
+                if (_rightArmTimer > 0f) return;
+                if (rightArm == RightArmWeapon.None) return;
 
                 string ammoType = GetRightArmAmmo();
                 if (!string.IsNullOrEmpty(ammoType) && !ConsumeAmmoInternal(ammoType, 1))
-                { Debug.Log($"[AIBotCombat] 弹药不足: {ammoType}"); return; }
+                    return;
 
                 _bot.ConsumeEnergyForAction(AIBot.ENERGY_RIGHTARM_PER_SHOT);
 
@@ -729,13 +717,11 @@ namespace _Game.Systems.AIBot
                     {
                         float dmg = GetRightArmDamage();
                         dz.TakeDamage(dmg);
-                        Debug.Log($"[AIBotCombat] 右臂命中 {dz.name}, 伤害={dmg}");
                         Debug.DrawLine(origin, hit.point, Color.yellow, 0.3f);
                     }
                 }
                 else
                 {
-                    Debug.Log("[AIBotCombat] 右臂射线未命中");
                     Debug.DrawRay(origin, dir * range, Color.white, 0.1f);
                 }
 
@@ -743,9 +729,9 @@ namespace _Game.Systems.AIBot
             }
             else if (manualWeaponSlot == AttackPriority.LeftArm)
             {
-                if (_leftArmTimer > 0f) { Debug.Log("[AIBotCombat] 左臂冷却中"); return; }
-                if (leftArm == LeftArmWeapon.None) { Debug.Log("[AIBotCombat] 左臂未装备"); return; }
-                if (leftArm == LeftArmWeapon.Shield) { Debug.Log("[AIBotCombat] 盾牌不能攻击"); return; }
+                if (_leftArmTimer > 0f) return;
+                if (leftArm == LeftArmWeapon.None) return;
+                if (leftArm == LeftArmWeapon.Shield) return;
 
                 _bot.ConsumeEnergyForAction(AIBot.ENERGY_LEFTARM_PER_SWING);
 
@@ -759,13 +745,8 @@ namespace _Game.Systems.AIBot
                     {
                         float dmg = leftArm == LeftArmWeapon.Knife ? knifeDamage : chainsawDamagePerSec;
                         dz.TakeDamage(dmg);
-                        Debug.Log($"[AIBotCombat] 左臂命中 {dz.name}, 伤害={dmg}");
                         Debug.DrawLine(origin, hit.point, Color.white, 0.2f);
                     }
-                }
-                else
-                {
-                    Debug.Log("[AIBotCombat] 左臂射线未命中");
                 }
 
                 _leftArmTimer = leftArm == LeftArmWeapon.Knife ? knifeCooldown : 1f;

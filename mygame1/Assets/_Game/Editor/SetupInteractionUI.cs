@@ -22,7 +22,6 @@ public class SetupInteractionUI
         var existing = canvas.transform.Find("InteractionPrompt");
         if (existing != null)
         {
-            Debug.Log("InteractionPrompt 已存在，跳过创建");
             return;
         }
 
@@ -99,8 +98,6 @@ public class SetupInteractionUI
         // 创建测试箱子
         CreateTestChest();
 
-        Debug.Log("PlayerInteraction 组件已添加到 Player，测试箱子已创建！");
-        Debug.Log("靠近箱子（2.5米内），Console 会显示日志，按 E 交互。");
     }
 
     static void CreateTestChest()
@@ -108,7 +105,6 @@ public class SetupInteractionUI
         var existing = GameObject.Find("TestChest");
         if (existing != null)
         {
-            Debug.Log("TestChest 已存在，跳过");
             return;
         }
 
@@ -121,6 +117,5 @@ public class SetupInteractionUI
         interactable.prompt = "搜索箱子";
         interactable.holdTime = 2f;
 
-        Debug.Log("测试箱子创建完成（位置: 3, 0.5, 0）");
     }
 }

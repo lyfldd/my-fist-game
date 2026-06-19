@@ -103,10 +103,7 @@ namespace _Game.Systems.Building
             DestroyPreview(); // 安全兜底
 
             if (_currentBuildable == null)
-            {
-                Debug.LogWarning("[GhostPreview] BuildModeEntered 但 BuildableData 为 null");
                 return;
-            }
 
             if (_currentBuildable.previewPrefab != null)
             {

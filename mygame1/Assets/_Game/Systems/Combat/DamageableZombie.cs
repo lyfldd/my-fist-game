@@ -57,7 +57,6 @@ namespace _Game.Systems.Combat
         void Die()
         {
             IsDead = true;
-            Debug.Log("僵尸死亡！");
 
             // 通知 ThreatSystem 清理
             EventBus.Publish(new EntityDeathEvent(gameObject.GetInstanceID()));

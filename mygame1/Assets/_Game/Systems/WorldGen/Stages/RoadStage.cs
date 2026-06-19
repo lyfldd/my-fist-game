@@ -53,8 +53,6 @@ namespace _Game.Systems.WorldGen.Stages
                 BuildSettlementInternalRoads(data.settlements[s], s, data, roadsRoot.transform);
             }
 
-            Debug.Log($"[RoadStage] 生成 {data.roads.Count} 条道路 " +
-                      $"(连接 {data.settlements.Count} 个聚落)");
         }
 
         // ── 材质 ────────────────────────────────────

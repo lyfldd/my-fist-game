@@ -27,11 +27,8 @@ namespace _Game.Systems.WorldGen.Core
 
             foreach (var stage in ordered)
             {
-                Debug.Log($"[WorldGen] Stage {stage.Order}: {stage.GetType().Name}");
                 stage.Execute(data);
             }
-
-            Debug.Log("[WorldGen] 生成完成！");
         }
     }
 }

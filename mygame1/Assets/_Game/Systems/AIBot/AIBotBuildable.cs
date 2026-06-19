@@ -66,7 +66,6 @@ namespace _Game.Systems.AIBot
                 {
                     int refundCount = Mathf.Max(1, Mathf.RoundToInt(req.count * buildableData.deconstructReturnRate));
                     inventory.AddItem(req.itemData, refundCount);
-                    Debug.Log($"[AIBotBuildable] 返还材料: {req.itemData.itemName} x{refundCount}");
                 }
             }
 

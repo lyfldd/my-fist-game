@@ -24,8 +24,6 @@ public class FixMissingComponents
             return;
         }
 
-        Debug.Log($"[FixMissingComponents] 找到 Player: {player.name}");
-
         // ── Player 上需要的所有组件 ──
         AddIfMissing(player, "_Game.Systems.Player.PlayerController");
         AddIfMissing(player, "_Game.Systems.Inventory.Inventory");
@@ -56,7 +54,6 @@ public class FixMissingComponents
         if (managers == null)
         {
             managers = new GameObject("Managers");
-            Debug.Log("[FixMissingComponents] 创建 Managers GameObject");
         }
         AddIfMissing(managers, "_Game.Core.InputRouter");
 
@@ -75,7 +72,6 @@ public class FixMissingComponents
         if (canvas != null) EditorUtility.SetDirty(canvas);
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 
-        Debug.Log("[FixMissingComponents] ✅ 完成！所有缺失组件已补全。现在可以安全删除 FixMissingComponents.cs");
     }
 
     static void AddIfMissing(GameObject go, string fullTypeName)
@@ -83,14 +79,12 @@ public class FixMissingComponents
         var type = System.Type.GetType(fullTypeName + ", Assembly-CSharp");
         if (type == null)
         {
-            Debug.LogWarning($"[FixMissingComponents] 找不到类型: {fullTypeName}");
             return;
         }
 
         if (go.GetComponent(type) == null)
         {
             go.AddComponent(type);
-            Debug.Log($"[FixMissingComponents] ✓ 添加 [{go.name}] ← {type.Name}");
         }
     }
 

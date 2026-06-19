@@ -22,7 +22,14 @@ namespace _Game.Editor.UnityMcp
         {
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
             EditorApplication.update += OnEditorUpdate;
-            // 延迟启动，确保所有脚本已加载、编辑器已就绪
+
+            // Domain Reload 前停止旧服务，释放端口
+            AssemblyReloadEvents.beforeAssemblyReload += () =>
+            {
+                StopServer();
+            };
+
+            // 延迟启动
             EditorApplication.delayCall += () =>
             {
                 if (_server == null || !_server.IsRunning)

@@ -14,7 +14,6 @@ public static class SetupSurvivalHUD
         var existing = Object.FindObjectOfType<_Game.UI.SurvivalHUD>();
         if (existing != null)
         {
-            Debug.Log("SurvivalHUD 已存在于场景中");
             Selection.activeGameObject = existing.gameObject;
             EditorGUIUtility.PingObject(existing);
             return;
@@ -24,7 +23,6 @@ public static class SetupSurvivalHUD
         var go = new GameObject("SurvivalHUD", typeof(_Game.UI.SurvivalHUD));
         Undo.RegisterCreatedObjectUndo(go, "Create Survival HUD");
 
-        Debug.Log("✅ 已创建 SurvivalHUD（屏幕左下角显示生存数值）");
         Selection.activeGameObject = go;
         EditorGUIUtility.PingObject(go);
     }

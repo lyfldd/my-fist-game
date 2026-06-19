@@ -25,7 +25,6 @@ namespace _Game.Systems.WorldGen.Stages
         {
             // [DEPRECATED] 新地形算法不再使用 Voronoi 分块，本 Stage 已禁用。
             // 代码保留供参考，实际不会执行（Enabled=false）。
-            Debug.LogWarning("[VoronoiStage] 已废弃，不再执行。新算法使用多层噪声叠加。");
             return;
 
             /* 原代码保留供参考

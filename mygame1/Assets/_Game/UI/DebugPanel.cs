@@ -58,8 +58,7 @@ namespace _Game.UI
                 GUILayout.BeginHorizontal();
                 if (GUILayout.Button("兑换XP→点数", GUILayout.Height(22f)))
                 {
-                    int got = xp.ConvertXPToPoints();
-                    Debug.Log($"[Debug] 兑换 {got} 技能点");
+                    xp.ConvertXPToPoints();
                 }
                 if (GUILayout.Button("+1 技能点", GUILayout.Height(22f)))
                 {
@@ -87,8 +86,7 @@ namespace _Game.UI
                     GUILayout.Label($"  {sk}: Lv{lv}  (→{lv + 1}: {cost}pt)", GUILayout.Width(220f));
                     if (lv < 10 && GUILayout.Button("↑", GUILayout.Width(28f), GUILayout.Height(18f)))
                     {
-                        if (!xp.SpendPoint(sk))
-                            Debug.Log($"[Debug] 升级 {sk} 失败 (点数不足或已满级)");
+                        xp.SpendPoint(sk);
                     }
                     GUILayout.EndHorizontal();
                 }

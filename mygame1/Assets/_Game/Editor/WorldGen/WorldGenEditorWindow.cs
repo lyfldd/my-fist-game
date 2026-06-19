@@ -163,8 +163,6 @@ namespace _Game.Editor.WorldGen
             gen.AddStage(new ModuleAssignmentStage());
             gen.AddStage(new MeshStage());
 
-            Debug.Log($"[CityGen] Phase 1 一级模块生成: seed={_seed}");
-
             gen.Generate(data);
 
             _lastData = data;
@@ -173,10 +171,6 @@ namespace _Game.Editor.WorldGen
             if (data.parentTransform != null)
                 Selection.activeGameObject = data.parentTransform.gameObject;
 
-            // 输出统计
-            var counts = ModuleAssignmentStage.GetTypeCounts(data.moduleGrid, data.gridSize);
-            Debug.Log($"[CityGen] 完成！风格={data.cityStyle}, 网格={data.gridSize}x{data.gridSize}, " +
-                      $"等级={data.wealthLevel}, 类型数={counts.Count}");
         }
 
         private void ClearAll()
@@ -186,7 +180,6 @@ namespace _Game.Editor.WorldGen
             if (cityRoot != null)
             {
                 DestroyImmediate(cityRoot);
-                Debug.Log("[CityGen] 已清除城市可视化。");
             }
 
             // 清除旧管线根节点

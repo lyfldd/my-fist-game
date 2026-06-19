@@ -110,7 +110,6 @@ namespace _Game.Systems.Crafting
                 inventory.RemoveItem(req.itemData, req.count);
             }
             _completedIds.Add(researchId);
-            Debug.Log($"[ChemicalResearch] 研究完成: {proj.Value.displayName}，解锁设备: {string.Join(", ", proj.Value.unlockedDeviceNames)}");
             return true;
         }
 

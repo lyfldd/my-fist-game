@@ -24,13 +24,11 @@ public class SetupWorldContainer
         var existing = canvas.GetComponentInChildren<ContainerWindowUI>();
         if (existing != null)
         {
-            Debug.Log("ContainerWindowUI 已存在");
             return;
         }
 
         var go = new GameObject("ContainerWindowUI", typeof(ContainerWindowUI));
         go.transform.SetParent(canvas.transform, false);
-        Debug.Log("已创建 ContainerWindowUI（容器子窗口）");
     }
 
     [MenuItem("Tools/WorldContainer/Create Cabinet Prefab")]
@@ -39,7 +37,6 @@ public class SetupWorldContainer
         string prefabPath = "Assets/_Game/Prefabs/Cabinet.prefab";
         if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
         {
-            Debug.Log("Cabinet.prefab 已存在，如需重建请手动删除");
             return;
         }
 
@@ -107,7 +104,6 @@ public class SetupWorldContainer
         PrefabUtility.SaveAsPrefabAsset(go, prefabPath);
         Object.DestroyImmediate(go);
         AssetDatabase.Refresh();
-        Debug.Log("柜子预制体已创建: " + prefabPath);
     }
 
     private static LootEntry NewEntry(string itemPath, float weight, int minCount, int maxCount)

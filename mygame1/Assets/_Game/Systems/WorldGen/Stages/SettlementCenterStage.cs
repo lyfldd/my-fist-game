@@ -47,12 +47,8 @@ namespace _Game.Systems.WorldGen.Stages
 
                 if (centers.Count >= MinSettlementCount)
                 {
-                    Debug.Log($"[SettlementCenterStage] 平坦度阈值={delta}m, 候选={candidates.Count}, 选定={centers.Count}个聚落");
                     break;
                 }
-
-                Debug.Log($"[SettlementCenterStage] 平坦度阈值={delta}m 仅找到{centers.Count}个聚落（候选={candidates.Count}），" +
-                    $"尝试放宽...");
             }
 
             if (centers == null || centers.Count == 0)
@@ -197,9 +193,6 @@ namespace _Game.Systems.WorldGen.Stages
                 sizesPlaced.Add(size);
             }
 
-            Debug.Log($"[SettlementCenterStage] 选取 {settlements.Count} 个聚落 " +
-                      $"(小={smallCount} 中={mediumCount} 大={largeCount}, " +
-                      $"简陋={shabbyCount} 普通={normalCount} 繁华={prosperCount})");
             return settlements;
         }
 

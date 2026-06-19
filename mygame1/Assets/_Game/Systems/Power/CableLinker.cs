@@ -81,17 +81,11 @@ namespace _Game.Systems.Power
             // 距离检查
             float dist = Vector3.Distance(originPos, hit.point);
             if (dist > MAX_CABLE_DISTANCE)
-            {
-                Debug.LogWarning($"[CableLinker] 距离太远 ({dist:F1}m > {MAX_CABLE_DISTANCE}m)");
                 return;
-            }
 
             // 消耗电缆
             if (!ConsumeCable())
-            {
-                Debug.LogWarning("[CableLinker] 背包中没有电缆");
                 return;
-            }
 
             if (_linkMode == LinkMode.FromTerminal && _linkTerminal != null)
             {
@@ -111,7 +105,6 @@ namespace _Game.Systems.Power
             {
                 _linkTerminal.ConnectTerminal(terminal);
                 PowerLineRenderer.Create(_linkTerminal.transform, terminal.transform);
-                Debug.Log("[CableLinker] 终端 ↔ 终端 已连接");
                 FinishLink();
                 return;
             }
@@ -122,7 +115,6 @@ namespace _Game.Systems.Power
             {
                 _linkTerminal.ConnectSource(source);
                 PowerLineRenderer.Create(source.transform, _linkTerminal.transform);
-                Debug.Log($"[CableLinker] 发电端 {source.sourceType} → 终端 已连接");
                 FinishLink();
                 return;
             }
@@ -136,7 +128,6 @@ namespace _Game.Systems.Power
             {
                 terminal.ConnectSource(_linkSource);
                 PowerLineRenderer.Create(_linkSource.transform, terminal.transform);
-                Debug.Log($"[CableLinker] 发电端 {_linkSource.sourceType} → 终端 已连接");
                 FinishLink();
                 return;
             }
@@ -159,7 +150,6 @@ namespace _Game.Systems.Power
                 TerminalUI.Show(_linkTerminal);
             else if (_linkMode == LinkMode.FromSource && _linkSource != null)
                 PowerSourceUI.Show(_linkSource);
-            Debug.Log("[CableLinker] 连线已取消");
         }
 
         bool ConsumeCable()

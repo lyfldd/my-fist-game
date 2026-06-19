@@ -50,7 +50,6 @@ namespace _Game.Systems.Building
             if (workstationTier == WorkstationTier.Chemistry)
             {
                 EventBus.Publish(new ResearchStationOpenedEvent(workstationTier));
-                Debug.Log($"[WorkstationInteract] 打开研究中心面板");
                 return;
             }
 
@@ -62,9 +61,6 @@ namespace _Game.Systems.Building
 
             _craftingSystem.ActiveStation = workstationTier;
             EventBus.Publish(new WorkstationOpenedEvent(workstationTier));
-
-            // TODO Phase 4: 打开 CraftingUI
-            Debug.Log($"[WorkstationInteract] 打开 {workstationTier} 合成面板");
         }
     }
 }

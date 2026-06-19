@@ -20,7 +20,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("所有默认物品创建完成！");
     }
 
     [MenuItem("Tools/Update Military Gear Sizes")]
@@ -35,7 +34,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("军用装备容器尺寸已更新！");
         UpdateGridSizes();
     }
 
@@ -47,7 +45,6 @@ public class CreateDefaultItems
         SetGridSize("TacticalPants", 2, 2);
         SetGridSize("TacticalBelt", 2, 2);
         AssetDatabase.SaveAssets();
-        Debug.Log("装备库存格子尺寸已更新为 2x2");
     }
 
     [MenuItem("Tools/Update Item Sizes (2x2)")]
@@ -70,7 +67,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("消耗品数据已更新！");
     }
 
     [MenuItem("Tools/Update Armor Values")]
@@ -93,7 +89,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("装备护甲值已更新！");
     }
 
     [MenuItem("Tools/Update Clothing Warmth")]
@@ -111,7 +106,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("衣物保暖值已更新！");
     }
 
     static void SetWarmth(string fileName, float warmth)
@@ -125,7 +119,6 @@ public class CreateDefaultItems
             {
                 item.warmthValue = warmth;
                 EditorUtility.SetDirty(item);
-                Debug.Log($"已更新 {item.itemName}: warmth={warmth}");
                 return;
             }
         }
@@ -142,7 +135,6 @@ public class CreateDefaultItems
             {
                 item.armorValue = armor;
                 EditorUtility.SetDirty(item);
-                Debug.Log($"已更新 {item.itemName}: armor={armor}");
                 return;
             }
         }
@@ -167,7 +159,6 @@ public class CreateDefaultItems
                 item.storageWidth = newW;
                 item.storageHeight = newH;
                 EditorUtility.SetDirty(item);
-                Debug.Log($"已更新 {item.itemName} → {newW}x{newH}");
             }
         }
     }
@@ -183,7 +174,6 @@ public class CreateDefaultItems
                 item.gridWidth = w;
                 item.gridHeight = h;
                 EditorUtility.SetDirty(item);
-                Debug.Log($"已更新 {item.itemName} grid size → {w}x{h}");
                 return;
             }
         }
@@ -200,7 +190,6 @@ public class CreateDefaultItems
                 item.useTime = useTime;
                 item.itemEffects = effects;
                 EditorUtility.SetDirty(item);
-                Debug.Log($"已更新消耗品 {item.itemName}: useTime={useTime}, effects={effects.Count}");
             }
         }
     }
@@ -298,7 +287,6 @@ public class CreateDefaultItems
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("武器数据已更新！木棍/长刀=近战, 沙鹰/AK47=枪械");
     }
 
     static void SetEquipSlot(string fileName, EquipSlot slot)
@@ -309,7 +297,6 @@ public class CreateDefaultItems
         {
             item.equipSlot = slot;
             EditorUtility.SetDirty(item);
-            Debug.Log($"已更新 {item.itemName}: equipSlot={slot}");
         }
     }
 
@@ -319,7 +306,7 @@ public class CreateDefaultItems
     {
         string path = $"Assets/_Game/Config/Weapons/{fileName}.asset";
         var item = AssetDatabase.LoadAssetAtPath<ItemData>(path);
-        if (item == null) { Debug.LogWarning($"未找到武器: {path}"); return; }
+        if (item == null) { return; }
 
         item.isFirearm = isFirearm;
         item.weaponDamage = damage;
@@ -333,7 +320,6 @@ public class CreateDefaultItems
         item.magazineSize = magazineSize;
 
         EditorUtility.SetDirty(item);
-        Debug.Log($"已更新 {item.itemName}: firearm={isFirearm}, dmg={damage}, range={range}");
     }
 
     static void CreateMaterials()
@@ -359,7 +345,6 @@ public class CreateDefaultItems
         var existing = AssetDatabase.LoadAssetAtPath<ItemData>(path);
         if (existing != null)
         {
-            Debug.Log($"跳过已存在的物品: {displayName}");
             return;
         }
 
@@ -377,7 +362,6 @@ public class CreateDefaultItems
         item.itemEffects = effects ?? new List<ItemEffect>();
 
         AssetDatabase.CreateAsset(item, path);
-        Debug.Log($"创建物品: {displayName}");
     }
 
     static string GetCategoryFolder(ItemCategory category, EquipSlot slot = EquipSlot.None)

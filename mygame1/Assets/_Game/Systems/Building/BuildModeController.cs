@@ -98,41 +98,27 @@ namespace _Game.Systems.Building
         {
             _state = BuildModeState.MenuOnly;
             EventBus.Publish(new BuildModeEnteredEvent(null));
-
-            Debug.Log("[BuildModeController] 进入建造模式（待选择建造物）");
         }
 
         private void TryStartBuilding()
         {
             // 0. 未选择建造物
             if (activeBuildable == null)
-            {
-                Debug.LogWarning("[BuildModeController] 未选择建造物，请从菜单中选取");
                 return;
-            }
 
             // 1. 位置有效性检查
             if (_ghostPreview != null && !_ghostPreview.IsValidPlacement)
-            {
-                Debug.Log("[BuildModeController] 当前位置不可放置（有阻挡物）");
                 return;
-            }
 
             // 2. 材料检查（DevTools 自由建造模式跳过）
             if (!_Game.UI.DevTools.FreeBuildEnabled && !HasRequiredMaterials())
-            {
-                Debug.LogWarning($"[BuildModeController] 材料不足，无法建造 {activeBuildable.displayName}");
                 return;
-            }
 
             // 3. 工具检查（自由建造模式跳过）
             if (!_Game.UI.DevTools.FreeBuildEnabled && activeBuildable.requiredTool != null)
             {
                 if (!IsRequiredToolEquipped())
-                {
-                    Debug.LogWarning($"[BuildModeController] 需要装备 {activeBuildable.requiredTool.itemName} 才能建造");
                     return;
-                }
             }
 
             // 4. 技能等级检查（自由建造模式跳过）
@@ -143,10 +129,7 @@ namespace _Game.Systems.Building
                 {
                     int skillLevel = pc != null ? pc.GetSkillLevel(req.skill) : 0;
                     if (skillLevel < req.level)
-                    {
-                        Debug.LogWarning($"[BuildModeController] 建造 {activeBuildable.displayName} 需要 {req.skill} Lv{req.level}，当前 Lv{skillLevel}");
                         return;
-                    }
                 }
             }
 
@@ -156,10 +139,7 @@ namespace _Game.Systems.Building
             {
                 var existing = ServiceLocator.Get<_Game.Systems.AIBot.AIBot>();
                 if (existing != null && !existing.IsDead)
-                {
-                    Debug.LogWarning("[BuildModeController] 已有AI机器人，限1台/玩家");
                     return;
-                }
             }
 
             // 5. 开始建造
@@ -177,8 +157,6 @@ namespace _Game.Systems.Building
                 ? 0f
                 : activeBuildable.buildDuration * buildDurationMultiplier;
             float elapsed = 0f;
-
-            Debug.Log($"[BuildModeController] 开始建造 {activeBuildable.displayName}（{duration:F1}秒）");
 
             while (elapsed < duration)
             {
@@ -256,7 +234,6 @@ namespace _Game.Systems.Building
                 if (rb == null) rb = structure.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
 
-                Debug.Log($"[BuildModeController] AI机器人已部署: {activeBuildable.displayName}");
             }
             else
             {
@@ -326,8 +303,6 @@ namespace _Game.Systems.Building
             EventBus.Publish(new StructurePlacedEvent(activeBuildable, placePos, structure));
             EventBus.Publish(new SurvivalXpGained(GameConstants.XP_PLACE_BUILDING, "build"));
 
-            Debug.Log($"[BuildModeController] 建造完成: {activeBuildable.displayName} @ {placePos}");
-
             // 5. 保持预览状态，可连续建造同一物品
             BuildProgress = 0f;
             _state = BuildModeState.Preview;
@@ -349,7 +324,6 @@ namespace _Game.Systems.Building
             BuildProgress = 0f;
             _state = BuildModeState.Inactive;
             EventBus.Publish(new BuildModeExitedEvent());
-            Debug.Log("[BuildModeController] 退出建造模式");
         }
 
         // ============================================================
@@ -404,10 +378,7 @@ namespace _Game.Systems.Building
         public void SwitchBuildable(BuildableData newBuildable)
         {
             if (_state == BuildModeState.Building)
-            {
-                Debug.LogWarning("[BuildModeController] 建造中无法切换建造物");
                 return;
-            }
 
             activeBuildable = newBuildable;
 
@@ -496,7 +467,6 @@ namespace _Game.Systems.Building
                 if (rb == null) rb = structure.AddComponent<Rigidbody>();
                 rb.isKinematic = true;
 
-                Debug.Log($"[BuildModeController] AI机器人已部署(直接放置): {data.displayName}");
             }
             else
             {
@@ -561,7 +531,6 @@ namespace _Game.Systems.Building
             EventBus.Publish(new StructurePlacedEvent(data, position, structure));
             EventBus.Publish(new SurvivalXpGained(GameConstants.XP_PLACE_BUILDING, "build"));
 
-            Debug.Log($"[BuildModeController] 直接放置完成: {data.displayName} @ {position}");
             return structure;
         }
     }

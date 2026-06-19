@@ -54,22 +54,35 @@ namespace _Game.Editor.UnityMcp
 
         public void Start()
         {
-            if (_running) return;
+            if (_running && _thread != null && _thread.IsAlive) return;
+            // 如果旧线程已死，先清理
+            if (_thread != null && !_thread.IsAlive)
+            {
+                try { _listener?.Stop(); } catch { }
+                _listener = null;
+                _thread = null;
+            }
             _running = true;
             _thread = new Thread(AcceptLoop) { IsBackground = true, Name = "UnityMcp-WS" };
             _thread.Start();
-            Debug.Log($"[UnityMcp] WebSocket server started on {_host}:{_port}");
+            Debug.Log($"[UnityMcp] WebSocket server starting on {_host}:{_port}");
         }
 
         public void Stop()
         {
             _running = false;
-            // Wake blocked accept
+            // Wake any blocked AcceptTcpClient call
+            try { _listener?.Server.Close(); } catch { }
+            try { _listener?.Stop(); } catch { }
             try { new TcpClient(_host, _port).Close(); } catch { }
             _clientStream?.Close();
             _client?.Close();
-            _listener?.Stop();
-            _thread?.Join(2000);
+            if (_thread != null && _thread.IsAlive)
+                _thread.Join(3000);
+            _clientStream = null;
+            _client = null;
+            _listener = null;
+            _thread = null;
             Debug.Log("[UnityMcp] WebSocket server stopped");
         }
 
@@ -85,36 +98,79 @@ namespace _Game.Editor.UnityMcp
 
         private void AcceptLoop()
         {
-            _listener = new TcpListener(IPAddress.Parse(_host), _port);
-            _listener.Start();
-
             while (_running)
             {
                 try
                 {
-                    _listener.Server.ReceiveTimeout = 1000;
-                    var client = _listener.AcceptTcpClient();
-                    if (!_running) { client.Close(); return; }
+                    // 创建 TcpListener 并设置 SO_REUSEADDR 避免端口占用
+                    _listener = new TcpListener(IPAddress.Parse(_host), _port);
+                    _listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+                    _listener.Start();
+                    Debug.Log($"[UnityMcp] Listening on {_host}:{_port}");
 
-                    _client = client;
-                    _clientStream = client.GetStream();
-                    _clientStream.ReadTimeout = 1000;
+                    // 内层循环: 接受客户端连接
+                    while (_running)
+                    {
+                        try
+                        {
+                            _listener.Server.ReceiveTimeout = 1000;
+                            var client = _listener.AcceptTcpClient();
+                            if (!_running) { client.Close(); break; }
 
-                    Handshake(_clientStream);
-                    Serve(_clientStream);
+                            // 关闭旧连接（如果有）
+                            _clientStream?.Close();
+                            _client?.Close();
+
+                            _client = client;
+                            _clientStream = client.GetStream();
+                            _clientStream.ReadTimeout = 1000;
+
+                            Handshake(_clientStream);
+                            Serve(_clientStream);
+                        }
+                        catch (SocketException)
+                        {
+                            if (_running) Thread.Sleep(100);
+                        }
+                        catch (IOException)
+                        {
+                            if (_running) Thread.Sleep(100);
+                        }
+                        catch (ThreadAbortException)
+                        {
+                            // 线程被 Unity 关闭时强制中断
+                        }
+                        catch (Exception ex)
+                        {
+                            if (_running)
+                                Debug.LogError($"[UnityMcp] Accept error: {ex.Message}");
+                        }
+                        finally
+                        {
+                            // 客户端断开后清理
+                            _clientStream?.Close();
+                            _client?.Close();
+                            _clientStream = null;
+                            _client = null;
+                        }
+                    }
                 }
-                catch (SocketException)
+                catch (SocketException ex)
                 {
-                    if (_running) Thread.Sleep(100);
-                }
-                catch (IOException)
-                {
-                    if (_running) Thread.Sleep(100);
+                    if (!_running) break;
+                    Debug.LogWarning($"[UnityMcp] Bind failed ({ex.Message}), retrying in 2s...");
+                    Thread.Sleep(2000);
                 }
                 catch (Exception ex)
                 {
-                    if (_running)
-                        Debug.LogError($"[UnityMcp] Accept error: {ex.Message}");
+                    if (!_running) break;
+                    Debug.LogError($"[UnityMcp] Listener error: {ex.Message}, retrying in 2s...");
+                    Thread.Sleep(2000);
+                }
+                finally
+                {
+                    try { _listener?.Stop(); } catch { }
+                    _listener = null;
                 }
             }
         }
@@ -291,28 +347,39 @@ namespace _Game.Editor.UnityMcp
 
         private static void SendFrame(NetworkStream stream, int opcode, byte[] payload)
         {
-            var frame = new System.Collections.Generic.List<byte>();
-            frame.Add((byte)(0x80 | opcode));
+            // 先写 header（最多 10 字节），再写 payload，避免大帧 ToArray 内存拷贝
+            byte[] header = new byte[10];
+            int headerLen = 0;
+            header[headerLen++] = (byte)(0x80 | opcode);
 
             int plen = payload.Length;
             if (plen < 126)
-                frame.Add((byte)plen);
+                header[headerLen++] = (byte)plen;
             else if (plen < 65536)
             {
-                frame.Add(126);
-                frame.Add((byte)(plen >> 8));
-                frame.Add((byte)(plen & 0xFF));
+                header[headerLen++] = 126;
+                header[headerLen++] = (byte)(plen >> 8);
+                header[headerLen++] = (byte)(plen & 0xFF);
             }
             else
             {
-                frame.Add(127);
+                header[headerLen++] = 127;
                 for (int i = 7; i >= 0; i--)
-                    frame.Add((byte)((plen >> (i * 8)) & 0xFF));
+                    header[headerLen++] = (byte)((plen >> (i * 8)) & 0xFF);
             }
 
-            frame.AddRange(payload);
-            stream.Write(frame.ToArray(), 0, frame.Count);
-            stream.Flush();
+            lock (typeof(UnityWebSocketServer))
+            {
+                stream.Write(header, 0, headerLen);
+                // 大 payload 分批写，避免 TCP 缓冲区溢出
+                const int CHUNK = 65536;
+                for (int offset = 0; offset < plen; offset += CHUNK)
+                {
+                    int len = Math.Min(CHUNK, plen - offset);
+                    stream.Write(payload, offset, len);
+                }
+                stream.Flush();
+            }
         }
 
         private static byte[] ReadExact(NetworkStream stream, int n)

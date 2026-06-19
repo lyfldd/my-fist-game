@@ -157,7 +157,6 @@ namespace _Game.Core
             var go = new GameObject("InputRouter");
             UnityEngine.Object.DontDestroyOnLoad(go);
             go.AddComponent<InputRouter>();
-            Debug.Log("[InputRouter] 运行时自动创建（场景中未找到，已新建）");
         }
 
         /// <summary>

@@ -64,7 +64,6 @@ namespace _Game.UI
             inventory = ServiceLocator.Get<Inventory>();
             if (inventory == null)
             {
-                Debug.LogWarning("QuickItemBar: 未找到 Inventory，不显示");
                 return;
             }
 

@@ -117,8 +117,6 @@ namespace _Game.Systems.Building
             float duration = InteractionTime;
             float elapsed = 0f;
 
-            Debug.Log($"[PlacedStructure] 开始拆除 {buildableData?.displayName ?? name}（{duration:F1}秒）");
-
             while (elapsed < duration)
             {
                 elapsed += UnityEngine.Time.deltaTime;
@@ -138,8 +136,6 @@ namespace _Game.Systems.Building
                 gameObject
             ));
 
-            Debug.Log($"[PlacedStructure] 拆除完成: {buildableData?.displayName ?? name}");
-
             DestroyStructure();
         }
 
@@ -153,7 +149,6 @@ namespace _Game.Systems.Building
             {
                 int refundCount = Mathf.Max(1, Mathf.RoundToInt(req.count * rate));
                 inventory.AddItem(req.itemData, refundCount);
-                Debug.Log($"[PlacedStructure] 返还材料: {req.itemData.itemName} x{refundCount} (返还率 {rate:P0})");
             }
         }
 
@@ -168,8 +163,6 @@ namespace _Game.Systems.Building
 
             // 如果是被暴力摧毁（非拆除），也发事件
             OnDestroyed?.Invoke(this);
-
-            Debug.Log($"[PlacedStructure] 建造物摧毁: {buildableData?.displayName ?? name}");
 
             // 延迟销毁，让事件处理完
             Destroy(gameObject, 0.05f);

@@ -16,16 +16,12 @@ namespace _Game.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoad()
         {
-            Debug.Log("[GameBootstrap] BeforeSceneLoad 开始");
             EnsureInputRouter();
-            Debug.Log("[GameBootstrap] BeforeSceneLoad 完成");
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            Debug.Log("[GameBootstrap] AfterSceneLoad 开始");
-
             var player = GameObject.FindWithTag("Player")
                       ?? GameObject.Find("player")
                       ?? GameObject.Find("Player");
@@ -35,8 +31,6 @@ namespace _Game.Core
                 Debug.LogError("[GameBootstrap] ❌ 找不到 Player！请确认场景中有 tag=Player 的对象");
                 return;
             }
-            Debug.Log($"[GameBootstrap] 找到 Player: {player.name}");
-
             // 注册玩家到全局注册表（所有系统通过 PlayerRegistry 访问）
             PlayerRegistry.Register(player);
 
@@ -107,16 +101,8 @@ namespace _Game.Core
             EnsureInputRouter();
 
             // ═══ 自检 ═══
-            Debug.Log($"[GameBootstrap] 自检: FactionSystem={FactionSystem.Instance != null}, ThreatSystem={ThreatSystem.Instance != null}, DecibelSystem={_Game.Systems.Audio.DecibelSystem.Instance != null}");
             var pc = player.GetComponent<_Game.Systems.Character.PlayerCharacter>();
             var fc = player.GetComponent<FactionComponent>();
-            var playerCol = player.GetComponent<CapsuleCollider>();
-            Debug.Log($"[GameBootstrap] 自检: PlayerCharacter={pc != null}, FactionComponent={fc != null}, Faction={fc?.Faction}");
-            Debug.Log($"[GameBootstrap] 碰撞体: CapsuleCollider={playerCol != null} center={playerCol?.center} height={playerCol?.height} radius={playerCol?.radius}, layer={player.layer}({LayerMask.LayerToName(player.layer)}), 子对象数={player.transform.childCount}");
-
-            // 检查所有子对象是否有碰撞体
-            foreach (var c in player.GetComponentsInChildren<Collider>())
-                Debug.Log($"[GameBootstrap] 子碰撞体: {c.gameObject.name} type={c.GetType().Name} layer={c.gameObject.layer}({LayerMask.LayerToName(c.gameObject.layer)}), FactionComponent={c.GetComponent<FactionComponent>() != null}");
         }
 
         // ═══════════════════════════════════════════
@@ -215,7 +201,6 @@ namespace _Game.Core
             if (value != null)
             {
                 field.SetValue(target, value);
-                Debug.Log($"[GameBootstrap] ✅ {target.GetType().Name}.{fieldName} = {value.name}");
             }
         }
 

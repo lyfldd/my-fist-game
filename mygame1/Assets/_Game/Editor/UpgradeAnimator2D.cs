@@ -35,10 +35,6 @@ public class UpgradeAnimator2D
             if (clip != null && !clips.ContainsKey(clip.name))
                 clips[clip.name] = clip;
         }
-        Debug.Log($"[2D升级] 搜索到 {clips.Count} 个动画剪辑");
-        foreach (var kv in clips)
-            Debug.Log($"  \"{kv.Key}\" ← {AssetDatabase.GetAssetPath(kv.Value)}");
-
         // ── 2. 清空 base layer ──
         var baseLayer = controller.layers[0];
         var rootSM = baseLayer.stateMachine;
@@ -54,8 +50,6 @@ public class UpgradeAnimator2D
         RemoveParam(controller, "MoveZ");
         controller.AddParameter("MoveX", AnimatorControllerParameterType.Float);
         controller.AddParameter("MoveZ", AnimatorControllerParameterType.Float);
-        Debug.Log("[2D升级] 参数: MoveX + MoveZ");
-
         // ── 4. 创建 2D Simple Directional BlendTree ──
         var blend = new BlendTree
         {
@@ -93,8 +87,6 @@ public class UpgradeAnimator2D
         TryAddClip2D(blend, clips, "Walking",   -1f, 0f);
         TryAddClip2D(blend, clips, "Fast Run",  -2f, 0f);
 
-        Debug.Log($"[2D升级] BlendTree 共 {blend.children.Length} 个动画点（含方向镜像）");
-
         // ── 6. 创建新状态 ──
         var state = rootSM.AddState("Locomotion");
         state.motion = blend;
@@ -108,9 +100,6 @@ public class UpgradeAnimator2D
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
 
-        Debug.Log("[2D升级] ✅ 完成！Controller 已升级为 2D Freeform Cartesian");
-        Debug.Log("  前(0,Z+) 后(0,Z-) 左(-X,0) 右(X,0) — 同一组动画镜像到四个方向");
-        Debug.Log("  后续替换横移/后退: 把对应位置的前向动画换成 Strafe/WalkBack 即可");
     }
 
     // ═══════════════════════════════════════════
@@ -130,11 +119,6 @@ public class UpgradeAnimator2D
         if (clips.TryGetValue(clipName, out var clip))
         {
             tree.AddChild(clip, new Vector2(posX, posZ));
-            Debug.Log($"  + {clipName} → ({posX}, {posZ})");
-        }
-        else
-        {
-            Debug.LogWarning($"[2D升级] 未找到动画: {clipName}");
         }
     }
 
@@ -153,7 +137,6 @@ public class UpgradeAnimator2D
         foreach (var obj in orphans)
         {
             AssetDatabase.RemoveObjectFromAsset(obj);
-            Debug.Log($"[2D升级] 清理孤儿资源: {obj.name}");
         }
     }
 
@@ -217,7 +200,6 @@ public class UpgradeAnimator2D
         EditorUtility.SetDirty(controller);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("[1D还原] ✅ 已还原为 1D BlendTree: Idle(0)→Walk(1)→SlowRun(1.5)→FastRun(2)");
     }
 
     private static void TryAddClip1D(BlendTree tree, Dictionary<string, AnimationClip> clips,
@@ -226,11 +208,6 @@ public class UpgradeAnimator2D
         if (clips.TryGetValue(clipName, out var clip))
         {
             tree.AddChild(clip, threshold);
-            Debug.Log($"  + {clipName} @ threshold={threshold}");
-        }
-        else
-        {
-            Debug.LogWarning($"[1D还原] 未找到动画: {clipName}");
         }
     }
 

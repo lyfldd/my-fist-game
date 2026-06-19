@@ -62,8 +62,6 @@ namespace _Game.Systems.WorldGen.Stages
                 data.settlements[s] = settlement;
             }
 
-            Debug.Log($"[SettlementBuildingStage] 放置 {data.buildings.Count} 个建筑 " +
-                      $"({data.settlements.Count} 个聚落)");
         }
 
         // ── 沿路排布建筑 ────────────────────────────
@@ -85,7 +83,6 @@ namespace _Game.Systems.WorldGen.Stages
 
             if (localRoads.Count == 0)
             {
-                Debug.LogWarning($"[SettlementBuildingStage] 聚落 {settleIdx} 无内部道路");
                 return;
             }
 

@@ -124,7 +124,7 @@ namespace _Game.UI
             RefreshZombieTypes();
 #endif
             _xp = SurvivalXPSystem.Instance;
-            try { CreateUGUI(); Debug.Log($"[DevTools] UGUI 创建完成, canvas={_canvasGo != null}"); }
+            try { CreateUGUI(); }
             catch (System.Exception e) { Debug.LogError($"[DevTools] UGUI 创建失败: {e.Message}\n{e.StackTrace}"); }
         }
 
@@ -669,7 +669,6 @@ namespace _Game.UI
             if (GUILayout.Button("兑换XP→点数", GUILayout.Height(24)))
             {
                 int got = _xp.ConvertXPToPoints();
-                Debug.Log($"兑换 {got} 技能点");
             }
             if (GUILayout.Button("+5 技能点", GUILayout.Height(24)))
             {
@@ -706,8 +705,7 @@ namespace _Game.UI
                 if (lv < 10 && GUILayout.Button("↑", GUILayout.Width(26), GUILayout.Height(18)))
                 {
                     EnsurePoints(cost);
-                    if (!_xp.SpendPoint(sk))
-                        Debug.Log($"升级 {sk} 失败");
+                    _xp.SpendPoint(sk);
                 }
                 GUILayout.EndHorizontal();
             }
@@ -994,7 +992,6 @@ namespace _Game.UI
             _freeBuildBtn.onClick.AddListener(() =>
             {
                 freeBuildMode = !freeBuildMode;
-                Debug.Log($"[DevTools] 自由建造 = {freeBuildMode}, FreeBuildEnabled = {FreeBuildEnabled}");
                 _freeBuildLabel.text = freeBuildMode ? "✓ 自由建造（开启）" : "✗ 自由建造（关闭）";
                 RefreshFreeBuildBtnColor();
                 if (freeBuildMode && _buildCtrl == null) _buildCtrl = ServiceLocator.Get<BuildModeController>();
@@ -1010,7 +1007,6 @@ namespace _Game.UI
             _instantBuildBtn.onClick.AddListener(() =>
             {
                 instantBuild = !instantBuild;
-                Debug.Log($"[DevTools] 即时建造 = {instantBuild}");
                 _instantBuildLabel.text = instantBuild ? "✓ 即时建造（开启）" : "✗ 即时建造（关闭）";
                 RefreshInstantBuildBtnColor();
                 if (instantBuild && _buildCtrl == null) _buildCtrl = ServiceLocator.Get<BuildModeController>();
@@ -1122,8 +1118,6 @@ namespace _Game.UI
 
             // 物品行容器 —— 直接用 _contentGo 的 VerticalLayoutGroup 管理，不嵌套 ScrollRect
             _uguiItemScrollContent = _contentGo.GetComponent<RectTransform>();
-
-            Debug.Log($"[DevTools] 物品Tab构建完成: {(_allItems != null ? _allItems.Length : 0)} 个物品");
         }
 
         void AddCatBtn(GameObject row, string label, ItemCategory cat)
@@ -1175,8 +1169,6 @@ namespace _Game.UI
             if (_itemCatFilter != null) hash = hash * 17 + (int)_itemCatFilter.Value;
             if (hash == _lastItemHash) return;
             _lastItemHash = hash;
-
-            Debug.Log($"[DevTools] 刷新物品: {filtered.Count}个, search='{_itemSearch}'");
 
             // 清除旧行，直接用 contentGo
             foreach (var r in _uguiItemRows) Destroy(r);
@@ -1274,7 +1266,7 @@ namespace _Game.UI
             var convRow = UguiMakeRow(_contentGo, 28);
             var convBtn = UguiMakeSmallBtn("ConvertXP", "兑换XP→点数", new Color(0.3f, 0.3f, 0.3f), 120, 26);
             convBtn.transform.SetParent(convRow.transform, false);
-            convBtn.onClick.AddListener(() => { int got = _xp.ConvertXPToPoints(); Debug.Log($"兑换 {got} 技能点"); });
+            convBtn.onClick.AddListener(() => { _xp.ConvertXPToPoints(); });
 
             var add5Btn = UguiMakeSmallBtn("+5Pt", "+5 技能点", new Color(0.3f, 0.3f, 0.3f), 100, 26);
             add5Btn.transform.SetParent(convRow.transform, false);
@@ -1385,7 +1377,7 @@ namespace _Game.UI
                     upgradeBtn.onClick.AddListener(() =>
                     {
                         EnsurePoints(cRef);
-                        if (!_xp.SpendPoint(skRef)) Debug.Log($"升级 {skRef} 失败");
+                        _xp.SpendPoint(skRef);
                     });
                 }
                 _uguiSysRows.Add(row);

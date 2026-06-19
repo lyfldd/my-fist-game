@@ -25,8 +25,6 @@ public class SetupWeaponModel
             return;
         }
 
-        Debug.Log($"找到模型: {modelPath}");
-
         var model = AssetDatabase.LoadMainAssetAtPath(modelPath) as GameObject;
         if (model == null)
         {
@@ -42,7 +40,6 @@ public class SetupWeaponModel
 
         PrefabUtility.SaveAsPrefabAsset(instance, PrefabPath);
         Object.DestroyImmediate(instance);
-        Debug.Log($"Prefab 已创建: {PrefabPath}");
 
         // 绑定 ItemData
         var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath);
@@ -60,7 +57,6 @@ public class SetupWeaponModel
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("武器模型设置完成！");
     }
 
     static string FindModelFile()

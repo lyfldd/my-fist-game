@@ -26,7 +26,6 @@ namespace _Game.Editor
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"[SetupPowerComponents] 已配置/清理 {configured} 个设备");
             EditorUtility.DisplayDialog("完成", $"已配置/清理 {configured} 个设备。\n\n未找到的会在 Console 提示。", "好的");
         }
 
@@ -166,7 +165,6 @@ namespace _Game.Editor
             // 已迁移过则跳过
             if (data.category == BuildableCategory.EnergyIndustry && data.powerOutput > 0f)
             {
-                Debug.Log("[SetupPower] 旧发电机已迁移，跳过");
                 return 0;
             }
 
@@ -183,7 +181,6 @@ namespace _Game.Editor
             data.productionDeviceRef = null;
 
             EditorUtility.SetDirty(data);
-            Debug.Log("[SetupPower] 已将旧「发电机」迁移为电力系统电源 (200W, Combustion)");
             return 1;
         }
 
@@ -212,7 +209,6 @@ namespace _Game.Editor
             if (data == null || data.productionDeviceRef == null) return 0;
             data.productionDeviceRef = null;
             EditorUtility.SetDirty(data);
-            Debug.Log($"[SetupPower] 已清除 {displayName} 的 ProductionDeviceRef");
             return 1;
         }
 
@@ -221,7 +217,6 @@ namespace _Game.Editor
             string path = $"Assets/_Game/Config/ProductionDevices/{assetName}.asset";
             if (!AssetDatabase.LoadAssetAtPath<ProductionDeviceData>(path)) return 0;
             AssetDatabase.DeleteAsset(path);
-            Debug.Log($"[SetupPower] 已删除 ProductionDeviceData: {assetName}");
             return 1;
         }
 
@@ -236,7 +231,6 @@ namespace _Game.Editor
 
             if (data.builtPrefab == null)
             {
-                Debug.LogWarning($"[SetupPower] {name}: builtPrefab 未设置，跳过 prefab 组件配置（BuildableData 已有参数）");
                 return 0;
             }
 
@@ -244,7 +238,6 @@ namespace _Game.Editor
             if (comp == null) comp = data.builtPrefab.AddComponent<T>();
             action(comp);
             EditorUtility.SetDirty(data.builtPrefab);
-            Debug.Log($"[SetupPower] 已配置: {name}");
             return 1;
         }
 
@@ -275,7 +268,6 @@ namespace _Game.Editor
                 EditorUtility.SetDirty(data.builtPrefab);
             }
 
-            Debug.Log($"[SetupPower] 已配置用电设备: {name} ({power}W, coal={allowCoal})");
             return 1;
         }
 
@@ -288,7 +280,6 @@ namespace _Game.Editor
                 var data = AssetDatabase.LoadAssetAtPath<BuildableData>(path);
                 if (data != null && data.displayName == name) return data;
             }
-            Debug.LogWarning($"[SetupPower] 未找到 BuildableData: {name}");
             return null;
         }
 
@@ -300,7 +291,6 @@ namespace _Game.Editor
                 var data = AssetDatabase.LoadAssetAtPath<ItemData>(AssetDatabase.GUIDToAssetPath(g));
                 if (data != null && data.itemName == name) return data;
             }
-            Debug.LogWarning($"[SetupPower] 未找到物品: {name}");
             return null;
         }
     }

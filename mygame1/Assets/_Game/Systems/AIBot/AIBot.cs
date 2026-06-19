@@ -452,38 +452,25 @@ namespace _Game.Systems.AIBot
 
         private _Game.Systems.Time.TimeManager _cachedTimeManager;
         private _Game.Systems.Weather.WeatherManager _cachedWeatherManager;
-        private float _solarDebugTimer;
 
         void SolarRecharge()
         {
             CurrentSolarRate = 0f;
-            if (solarRechargeRate <= 0f)
-            {
-                if (UnityEngine.Time.frameCount % 300 == 0) Debug.LogWarning("[AIBot] 太阳能速率=0，跳过充电");
-                return;
-            }
+            if (solarRechargeRate <= 0f) return;
             if (batteryCurrent >= batteryMax) return;
             if (IsShutdown) return;
 
             // 白天检查
             if (_cachedTimeManager == null)
                 _cachedTimeManager = ServiceLocator.Get<_Game.Systems.Time.TimeManager>();
-            if (_cachedTimeManager == null)
-            {
-                if (UnityEngine.Time.frameCount % 300 == 0) Debug.LogWarning("[AIBot] TimeManager未找到");
-                return;
-            }
+            if (_cachedTimeManager == null) return;
             float hour = _cachedTimeManager.CurrentHour;
             if (hour < 6f || hour >= 18f) return;
 
             // 天气检查
             if (_cachedWeatherManager == null)
                 _cachedWeatherManager = ServiceLocator.Get<_Game.Systems.Weather.WeatherManager>();
-            if (_cachedWeatherManager == null)
-            {
-                if (UnityEngine.Time.frameCount % 300 == 0) Debug.LogWarning("[AIBot] WeatherManager未找到");
-                return;
-            }
+            if (_cachedWeatherManager == null) return;
             var weather = _cachedWeatherManager.CurrentWeather;
             float weatherMult;
             switch (weather)
@@ -497,14 +484,6 @@ namespace _Game.Systems.AIBot
             float recharge = rate / 3600f * UnityEngine.Time.deltaTime;
             batteryCurrent = Mathf.Min(batteryCurrent + recharge, batteryMax);
             CurrentSolarRate = rate;
-
-            // 每5秒打印一次充电状态
-            _solarDebugTimer -= UnityEngine.Time.deltaTime;
-            if (_solarDebugTimer <= 0f)
-            {
-                _solarDebugTimer = 5f;
-                Debug.Log($"[AIBot] 太阳能充电中: +{rate:F1}/h, 电池 {batteryCurrent:F0}/{batteryMax:F0}, 天气={weather}");
-            }
         }
 
         float GetActivityRate()
@@ -674,7 +653,6 @@ namespace _Game.Systems.AIBot
             if (_agent != null && _agent.enabled)
                 _agent.enabled = false;
 
-            Debug.Log("[AIBot] 机器人已报废");
             EventBus.Publish(new AIBotDestroyedEvent(transform.position));
         }
 
@@ -780,7 +758,6 @@ namespace _Game.Systems.AIBot
 
                 _teleportCooldownTimer = TELEPORT_COOLDOWN;
                 _stuckTimer = 0f;
-                Debug.Log("[AIBot] 传送至玩家身边");
             }
         }
 
@@ -827,7 +804,6 @@ namespace _Game.Systems.AIBot
                 if (distToPlayer > guardAutoRecallDistance)
                 {
                     SetCommand(AIBotCommand.Follow);
-                    Debug.Log("[AIBot] 驻守超距，自动切回跟随");
                     return;
                 }
             }
@@ -861,7 +837,6 @@ namespace _Game.Systems.AIBot
                 if (distToPlayer > patrolAutoRecallDistance)
                 {
                     SetCommand(AIBotCommand.Follow);
-                    Debug.Log("[AIBot] 巡逻超距，自动切回跟随");
                     return;
                 }
             }
@@ -945,7 +920,6 @@ namespace _Game.Systems.AIBot
             {
                 SetCommand(AIBotCommand.Follow);
                 followDistance = 1f;
-                Debug.Log("[AIBot] 受到重创，触发紧急撤退！");
             }
         }
 
@@ -979,7 +953,6 @@ namespace _Game.Systems.AIBot
                     break;
             }
 
-            Debug.Log($"[AIBot] 切换到 {cmd} 模式");
         }
 
         public void CycleCommand()

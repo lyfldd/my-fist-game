@@ -50,7 +50,6 @@ namespace _Game.Systems.AIBot
             float dist = Vector3.Distance(transform.position, Pilot.transform.position);
             if (dist > maxPilotDistance)
             {
-                Debug.Log("[AIBotPilot] 距离过远，自动退出驾驶");
                 ExitPilot();
                 return;
             }
@@ -62,7 +61,6 @@ namespace _Game.Systems.AIBot
             if (Input.GetKeyDown(KeyCode.Q))
             {
                 CycleManualWeapon();
-                Debug.Log($"[AIBotPilot] Q切换武器 → {ManualWeaponSlot}");
             }
 
             // 鼠标瞄准（非激光模式下需要）
@@ -152,7 +150,6 @@ namespace _Game.Systems.AIBot
 
             ManualWeaponSlot = AttackPriority.Laser;
 
-            Debug.Log($"[AIBotPilot] 玩家进入驾驶模式");
             EventBus.Publish(new AIBotPilotEnteredEvent(gameObject, pilot));
         }
 
@@ -174,7 +171,6 @@ namespace _Game.Systems.AIBot
                 _combat.manualWeaponSlot = AttackPriority.Laser;
             }
 
-            Debug.Log($"[AIBotPilot] 退出驾驶模式");
             EventBus.Publish(new AIBotPilotExitedEvent(gameObject, Pilot));
 
             Pilot = null;
@@ -208,43 +204,25 @@ namespace _Game.Systems.AIBot
 
             if (_combat != null)
                 _combat.manualWeaponSlot = ManualWeaponSlot;
-
-            Debug.Log($"[AIBotPilot] 切换到: {ManualWeaponSlot} (combat={_combat != null})");
         }
 
         public void ManualFire()
         {
-            Debug.Log($"[AIBotPilot] ManualFire 被调用, slot={ManualWeaponSlot}, combat={_combat != null}, shutdown={_bot.IsShutdown}");
             if (_combat == null || _bot.IsShutdown) return;
 
             if (ManualWeaponSlot == AttackPriority.Laser)
             {
-                if (!_bot.IsLaserEnabled)
-                {
-                    Debug.Log("[AIBotPilot] 激光在节能模式下禁用");
-                    return;
-                }
-                Debug.Log("[AIBotPilot] 激光开火");
+                if (!_bot.IsLaserEnabled) return;
                 _combat.ManualFireLaser();
             }
             else if (ManualWeaponSlot == AttackPriority.RightArm)
             {
-                if (_combat.CurrentRightArm == RightArmWeapon.None)
-                {
-                    Debug.Log("[AIBotPilot] 右臂未装备武器");
-                    return;
-                }
-                Debug.Log($"[AIBotPilot] 右臂武器开火: {_combat.CurrentRightArm}");
+                if (_combat.CurrentRightArm == RightArmWeapon.None) return;
                 _combat.ManualFireAimed(_aimPosition);
             }
             else if (ManualWeaponSlot == AttackPriority.LeftArm)
             {
-                if (_combat.CurrentLeftArm == LeftArmWeapon.None || _combat.CurrentLeftArm == LeftArmWeapon.Shield)
-                {
-                    Debug.Log("[AIBotPilot] 左臂未装备近战武器");
-                    return;
-                }
-                Debug.Log($"[AIBotPilot] 左臂武器开火: {_combat.CurrentLeftArm}");
+                if (_combat.CurrentLeftArm == LeftArmWeapon.None || _combat.CurrentLeftArm == LeftArmWeapon.Shield) return;
                 _combat.ManualFireAimed(_aimPosition);
             }
         }

@@ -20,7 +20,6 @@ namespace _Game.Systems.Interaction
 
         public void OnInteract(GameObject interactor)
         {
-            Debug.Log($"玩家与 {gameObject.name} 交互：{prompt}");
             EventBus.Publish(new InteractionEvent(prompt, true));
         }
 

@@ -213,7 +213,6 @@ namespace _Game.UI
         {
             _pilot = evt.Bot != null ? evt.Bot.GetComponent<AIBotPilot>() : null;
             _pilotedBot = evt.Bot != null ? evt.Bot.GetComponent<AIBot>() : null;
-            Debug.Log($"[TopLeftHUD] 进入驾驶, pilot={_pilot != null}, weapon={_pilot?.GetManualWeaponName()}");
         }
 
         void OnPilotExit(AIBotPilotExitedEvent evt)

@@ -82,6 +82,5 @@ public class SetupOverviewPanel
         }
 
         EditorUtility.SetDirty(invUI);
-        Debug.Log("总览面板创建完成，已自动绑定到 InventoryUI！");
     }
 }

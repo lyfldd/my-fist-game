@@ -48,7 +48,6 @@ namespace _Game.Systems.Interaction
         {
             if (isBuildModeActive || _currentTarget == null) return false;
 
-            Debug.Log($"玩家与 {(_currentTarget as MonoBehaviour)?.name} 交互: {_currentTarget.InteractionPrompt}");
             _currentTarget.OnInteract(gameObject);
             EventBus.Publish(new InteractionEvent(_currentTarget.InteractionPrompt, true));
             return true;
@@ -87,11 +86,6 @@ namespace _Game.Systems.Interaction
                 }
             }
 
-            // 日志：检测到目标
-            if (_currentTarget != null)
-            {
-                Debug.Log($"检测到可交互物体: {(_currentTarget as MonoBehaviour)?.name}");
-            }
         }
 
         void OnDrawGizmosSelected()

@@ -153,7 +153,6 @@ namespace _Game.Systems.Character
             if (pointsEarned <= 0) return 0;
             _availablePoints += pointsEarned;
             _totalXP -= pointsEarned * GameConstants.XP_PER_SKILL_POINT;
-            Debug.Log($"[SurvivalXPSystem] 兑换 {pointsEarned} 技能点 (剩余XP: {_totalXP}, 总点数: {_availablePoints})");
             EventBus.Publish(new CharacterStatsChanged("xp_converted", "", pointsEarned));
             return pointsEarned;
         }
@@ -172,7 +171,6 @@ namespace _Game.Systems.Character
 
             _availablePoints -= cost;
             rs.level++;
-            Debug.Log($"[SurvivalXPSystem] {skill} → Lv{rs.level} (花费 {cost} 点，剩余 {_availablePoints} 点)");
             OnSkillLevelUp?.Invoke(skill, rs.level);
             EventBus.Publish(new CharacterStatsChanged("skill_up", skill.ToString(), rs.level));
             return true;
@@ -192,7 +190,6 @@ namespace _Game.Systems.Character
 
             _availablePoints -= cost;
             ra.value++;
-            Debug.Log($"[SurvivalXPSystem] {attr} → {ra.value} (花费 {cost} 点)");
             OnAttributeUp?.Invoke(attr, ra.value);
             EventBus.Publish(new CharacterStatsChanged("attr_up", attr.ToString(), ra.value));
             return true;
