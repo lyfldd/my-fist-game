@@ -115,12 +115,37 @@ namespace _UnityMcp_Dynamic
             options.GenerateExecutable = false;
             options.IncludeDebugInformation = false;
 
-            // 引用当前 AppDomain 中的程序集
+            // 只引用核心程序集，避免重复类型定义导致 CS0436
+            var coreAssemblies = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "mscorlib", "System", "System.Core",
+                "UnityEngine", "UnityEngine.CoreModule", "UnityEngine.UIModule",
+                "UnityEngine.PhysicsModule", "UnityEngine.AnimationModule",
+                "UnityEngine.AudioModule", "UnityEngine.ImageConversionModule",
+                "UnityEngine.TextRenderingModule", "UnityEngine.IMGUIModule",
+                "UnityEngine.InputLegacyModule", "UnityEngine.UnityWebRequestModule",
+                "UnityEngine.UI", "UnityEditor", "UnityEditor.CoreModule",
+                "Assembly-CSharp", "Assembly-CSharp-Editor",
+            };
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
                 {
-                    if (!asm.IsDynamic && !string.IsNullOrEmpty(asm.Location))
+                    if (!asm.IsDynamic && !string.IsNullOrEmpty(asm.Location)
+                        && coreAssemblies.Contains(asm.GetName().Name))
+                        options.ReferencedAssemblies.Add(asm.Location);
+                }
+                catch { }
+            }
+            // 也引用项目自定义程序集（_Game 等）
+            foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    var name = asm.GetName().Name;
+                    if (!asm.IsDynamic && !string.IsNullOrEmpty(asm.Location)
+                        && !coreAssemblies.Contains(name)
+                        && name.StartsWith("_Game", StringComparison.OrdinalIgnoreCase))
                         options.ReferencedAssemblies.Add(asm.Location);
                 }
                 catch { }

@@ -61,23 +61,9 @@ namespace _Game.Editor.UnityMcp
                 }}";
             }
 
-            try
-            {
-                // 优先用 ScreenCapture（包含 UI），回退到 Camera.Render()
-                string b64 = CaptureGameViewWithUI(width, height);
-                return $@"{{
-                    ""success"": true,
-                    ""image_base64"": ""{b64}"",
-                    ""width"": {width},
-                    ""height"": {height},
-                    ""view"": ""game"",
-                    ""play_mode"": true
-                }}";
-            }
-            catch (Exception ex)
-            {
-                return $@"{{""success"": false, ""error"": ""{SimpleJson.Escape(ex.Message)}""}}";
-            }
+            // 截图到文件（避免 WebSocket 大帧超时）
+            return CaptureToFileJson(Camera.main, width, height, "game",
+                "No Camera.main available for game capture");
         }
 
         // ── Capture Scene View (Edit mode) ──
@@ -87,23 +73,9 @@ namespace _Game.Editor.UnityMcp
             int width = GetIntParam(paramsJson, "width", 1920);
             int height = GetIntParam(paramsJson, "height", 1080);
 
-            try
-            {
-                string b64 = RenderCameraToBase64(GetSceneViewCamera(), width, height,
-                    "Scene View camera not available. Open the Scene tab.");
-                return $@"{{
-                    ""success"": true,
-                    ""image_base64"": ""{b64}"",
-                    ""width"": {width},
-                    ""height"": {height},
-                    ""view"": ""scene"",
-                    ""play_mode"": {Application.isPlaying.ToString().ToLower()}
-                }}";
-            }
-            catch (Exception ex)
-            {
-                return $@"{{""success"": false, ""error"": ""{SimpleJson.Escape(ex.Message)}""}}";
-            }
+            // 截图到文件（避免 WebSocket 大帧超时）
+            return CaptureToFileJson(GetSceneViewCamera(), width, height, "scene",
+                "Scene View camera not available. Open the Scene tab.");
         }
 
         // ── Capture Editor (auto-detect) ──
@@ -122,16 +94,87 @@ namespace _Game.Editor.UnityMcp
         {
             int width = GetIntParam(paramsJson, "width", 1920);
             int height = GetIntParam(paramsJson, "height", 1080);
+            Camera cam = Application.isPlaying ? Camera.main : GetSceneViewCamera();
+            string view = Application.isPlaying ? "game" : "scene";
+            return CaptureToFileJson(cam, width, height, view, "Camera not available");
+        }
+
+        // ═══ Implementation ═══
+
+        /// <summary> 渲染截图到临时文件，返回文件路径 JSON </summary>
+        static string CaptureToFileJson(Camera cam, int width, int height, string view, string errorMsg)
+        {
             try
             {
-                Camera cam = Application.isPlaying ? Camera.main : GetSceneViewCamera();
                 if (cam == null)
-                    return @"{""success"": false, ""error"": ""Camera not available""}";
-                string b64 = RenderCameraToBase64(cam, width, height, "");
-                byte[] bytes = Convert.FromBase64String(b64);
-                string filePath = System.IO.Path.Combine(Application.temporaryCachePath, "_mcp_capture.png");
+                    throw new Exception(string.IsNullOrEmpty(errorMsg) ? "Camera is null" : errorMsg);
+
+                byte[] bytes;
+
+                if (Application.isPlaying)
+                {
+                    // Play 模式：将 Overlay Canvas 临时切到 Camera 模式，
+                    // 确保 UI 能渲染到相机的 RenderTexture 中被捕获
+                    var allCanvases = UnityEngine.Object.FindObjectsOfType<Canvas>();
+                    var overlayCanvases = new System.Collections.Generic.List<Canvas>();
+                    var originalModes = new System.Collections.Generic.List<RenderMode>();
+                    var originalCameras = new System.Collections.Generic.List<Camera>();
+
+                    foreach (var cv in allCanvases)
+                    {
+                        if (cv.renderMode == RenderMode.ScreenSpaceOverlay)
+                        {
+                            overlayCanvases.Add(cv);
+                            originalModes.Add(cv.renderMode);
+                            originalCameras.Add(cv.worldCamera);
+                            cv.renderMode = RenderMode.ScreenSpaceCamera;
+                            cv.worldCamera = cam;
+                        }
+                    }
+
+                    var rt = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGB32);
+                    rt.antiAliasing = 1;
+                    var prevTarget = cam.targetTexture;
+                    var prevActive = RenderTexture.active;
+                    cam.targetTexture = rt;
+                    cam.Render();
+                    Canvas.ForceUpdateCanvases();
+                    RenderTexture.active = rt;
+                    var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+                    tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+                    tex.Apply();
+                    cam.targetTexture = prevTarget;
+                    RenderTexture.active = prevActive;
+                    RenderTexture.ReleaseTemporary(rt);
+
+                    // 恢复 Canvas 原始模式
+                    for (int i = 0; i < overlayCanvases.Count; i++)
+                    {
+                        overlayCanvases[i].renderMode = originalModes[i];
+                        overlayCanvases[i].worldCamera = originalCameras[i];
+                    }
+
+                    bytes = tex.EncodeToPNG();
+                    UnityEngine.Object.DestroyImmediate(tex);
+                }
+                else
+                {
+                    // Edit 模式：直接渲染相机
+                    bytes = RenderToBytes(cam, width, height);
+                }
+
+                string filePath = Path.Combine(Application.temporaryCachePath, "_mcp_capture.png");
                 File.WriteAllBytes(filePath, bytes);
-                return $@"{{""success"": true, ""path"": ""{SimpleJson.Escape(filePath)}"", ""width"": {width}, ""height"": {height}, ""size_bytes"": {bytes.Length}}}";
+
+                return $@"{{
+                    ""success"": true,
+                    ""path"": ""{SimpleJson.Escape(filePath)}"",
+                    ""width"": {width},
+                    ""height"": {height},
+                    ""view"": ""{view}"",
+                    ""size_bytes"": {bytes.Length},
+                    ""play_mode"": {Application.isPlaying.ToString().ToLower()}
+                }}";
             }
             catch (Exception ex)
             {
@@ -139,91 +182,24 @@ namespace _Game.Editor.UnityMcp
             }
         }
 
-        // ═══ Implementation ═══
-
-        /// <summary> Game View 含 UI — 使用 ScreenCapture API 写文件 + 等待 </summary>
-        static string CaptureGameViewWithUI(int width, int height)
+        static byte[] RenderToBytes(Camera cam, int width, int height)
         {
-            // ScreenCapture 写入临时文件（异步，EndOfFrame）
-            string tmpPath = Path.Combine(Application.temporaryCachePath, "_mcp_game_capture.png");
-
-            // 删除旧文件
-            if (File.Exists(tmpPath))
-                File.Delete(tmpPath);
-
-            ScreenCapture.CaptureScreenshot(tmpPath, 2); // supersize=2 for quality
-
-            // 等待文件写入（最多 3 秒）
-            float timeout = 3f;
-            float elapsed = 0f;
-            while (!File.Exists(tmpPath) && elapsed < timeout)
-            {
-                System.Threading.Thread.Sleep(50);
-                elapsed += 0.05f;
-            }
-
-            // 文件可能只有头，等待写入完成
-            if (File.Exists(tmpPath))
-            {
-                long prevSize = 0;
-                elapsed = 0f;
-                while (elapsed < 2f)
-                {
-                    System.Threading.Thread.Sleep(100);
-                    elapsed += 0.1f;
-                    var fi = new FileInfo(tmpPath);
-                    if (fi.Length > 0 && fi.Length == prevSize)
-                        break; // 文件大小稳定
-                    prevSize = fi.Length;
-                }
-            }
-
-            if (!File.Exists(tmpPath))
-            {
-                // 回退：只用 Camera 渲染
-                Debug.LogWarning("[UnityMcp] ScreenCapture 超时，回退到 Camera.Render()");
-                var cam = Camera.main;
-                if (cam == null)
-                    throw new Exception("No Camera.main available for fallback capture");
-                return RenderCameraToBase64(cam, width, height, "");
-            }
-
-            byte[] bytes = File.ReadAllBytes(tmpPath);
-            try { File.Delete(tmpPath); } catch { }
-
-            if (bytes.Length == 0)
-                throw new Exception("Screenshot file empty");
-
-            return Convert.ToBase64String(bytes);
-        }
-
-        /// <summary> 用 RenderTexture 从指定相机同步渲染 </summary>
-        static string RenderCameraToBase64(Camera cam, int width, int height, string errorMsg)
-        {
-            if (cam == null)
-                throw new Exception(string.IsNullOrEmpty(errorMsg) ? "Camera is null" : errorMsg);
-
             var rt = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGB32);
             rt.antiAliasing = 1;
-
             var prevTarget = cam.targetTexture;
             var prevActive = RenderTexture.active;
             cam.targetTexture = rt;
             cam.Render();
-
             RenderTexture.active = rt;
             var tex = new Texture2D(width, height, TextureFormat.RGB24, false);
             tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
             tex.Apply();
-
             cam.targetTexture = prevTarget;
             RenderTexture.active = prevActive;
             RenderTexture.ReleaseTemporary(rt);
-
             byte[] bytes = tex.EncodeToPNG();
             UnityEngine.Object.DestroyImmediate(tex);
-
-            return Convert.ToBase64String(bytes);
+            return bytes;
         }
 
         static Camera GetSceneViewCamera()
