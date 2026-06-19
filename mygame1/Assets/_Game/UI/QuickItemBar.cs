@@ -161,7 +161,8 @@ namespace _Game.UI
             canvas.sortingOrder = 90;
 
             canvasObject.AddComponent<CanvasScaler>();
-            canvasObject.AddComponent<GraphicRaycaster>();
+            var gr = canvasObject.AddComponent<GraphicRaycaster>();
+            gr.blockingObjects = GraphicRaycaster.BlockingObjects.None;
 
             CreateSlots();
             CreateArrows();

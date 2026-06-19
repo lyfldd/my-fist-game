@@ -53,7 +53,6 @@ namespace _Game.UI
             canvas.sortingOrder = 100;
 
             canvasObject.AddComponent<CanvasScaler>();
-            canvasObject.AddComponent<GraphicRaycaster>();
         }
 
         private void CreateBars()
