@@ -166,25 +166,5 @@ namespace _Game.Systems.Power
             return inv.CountItemByName(CABLE_ITEM_NAME);
         }
 
-        void OnGUI()
-        {
-            if (UIModeConfig.UseUGUI) return;
-            if (!_linking) return;
-
-            string modeLabel = _linkMode == LinkMode.FromSource ? "电源 → 终端" : "终端 → 目标";
-            string text = $"⚡ {modeLabel}  左键点击目标  右键取消  (最大{MAX_CABLE_DISTANCE}m)";
-
-            float w = 420f, h = 40f;
-            GUI.color = new Color(0f, 0f, 0f, 0.85f);
-            GUI.DrawTexture(new Rect((Screen.width - w) * 0.5f, Screen.height * 0.1f, w, h), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-            var s = new GUIStyle(GUI.skin.label)
-            {
-                fontSize = 16,
-                alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.yellow }
-            };
-            GUI.Label(new Rect((Screen.width - w) * 0.5f, Screen.height * 0.1f, w, h), text, s);
-        }
     }
 }

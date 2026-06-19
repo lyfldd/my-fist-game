@@ -40,20 +40,12 @@ namespace _Game.Systems.Crafting
         List<RecipeData> _displayedRecipes;
         RecipeData _selectedRecipe;
         int _selectedIndex = -1;
-        Vector2 _scrollPos;
         int _craftableCount;
-        Rect _recipeListRect;
 
         RecipeCategory _activeCategory;
         bool _categoryFilterActive;
         List<RecipeCategory> _availableCategories;
         string _searchText = "";
-
-        // IMGUI styles
-        GUIStyle _headerStyle, _recipeStyle, _selectedRecipeStyle, _detailLabelStyle;
-        GUIStyle _craftBtnStyle, _disabledBtnStyle, _closeBtnStyle, _dimLabelStyle;
-        GUIStyle _categoryBtnStyle, _categoryActiveBtnStyle;
-        bool _stylesReady;
 
         // ============================================================
         // UGUI (代码自动创建)
@@ -118,10 +110,7 @@ namespace _Game.Systems.Crafting
             EventBus.Subscribe<WorkstationOpenedEvent>(OnStationOpened);
             EventBus.Subscribe<WorkstationClosedEvent>(OnStationClosed);
             InputRouter.BindKey(KeyCode.Escape, InputPriority.UI, HandleEsc, this);
-            InputRouter.BindKey(KeyCode.F7, InputPriority.Debug, ToggleUIMode, this);
         }
-
-        bool ToggleUIMode() { UIModeConfig.Toggle(); return true; }
 
         void OnDisable()
         {
@@ -729,15 +718,13 @@ namespace _Game.Systems.Crafting
         void SetCategoryFilter(RecipeCategory cat)
         {
             _categoryFilterActive = true; _activeCategory = cat;
-            _selectedRecipe = null; _selectedIndex = -1; _scrollPos = Vector2.zero;
-            UpdateDisplayedRecipes();
+            _selectedRecipe = null; _selectedIndex = -1;            UpdateDisplayedRecipes();
         }
 
         void ClearCategoryFilter()
         {
             _categoryFilterActive = false;
-            _selectedRecipe = null; _selectedIndex = -1; _scrollPos = Vector2.zero;
-            UpdateDisplayedRecipes();
+            _selectedRecipe = null; _selectedIndex = -1;            UpdateDisplayedRecipes();
         }
 
         void SelectRecipeByIndex(int index)
@@ -792,188 +779,5 @@ namespace _Game.Systems.Crafting
             };
         }
 
-        // ============================================================
-        // IMGUI (保留不动)
-        // ============================================================
-
-        void OnGUI()
-        {
-            if (UIModeConfig.UseUGUI) return;
-            if (!_isVisible || _craftingSystem == null) return;
-            InitStyles();
-
-            Rect panelRect = new Rect(
-                (Screen.width - panelWidth) * 0.5f, (Screen.height - panelHeight) * 0.5f,
-                panelWidth, panelHeight);
-
-            GUI.color = bgColor;
-            GUI.DrawTexture(panelRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
-
-            DrawHeader(panelRect);
-            DrawCategoryBar(panelRect);
-            DrawRecipeList(panelRect);
-            DrawRecipeDetail(panelRect);
-
-            var dispList = _displayedRecipes;
-            if (Event.current.type == EventType.ScrollWheel && dispList != null && dispList.Count > 1)
-            {
-                Vector2 smp = new Vector2(Event.current.mousePosition.x, Screen.height - Event.current.mousePosition.y);
-                if (_recipeListRect.Contains(smp))
-                {
-                    int dir = Event.current.delta.y > 0f ? 1 : -1;
-                    int newIdx = _selectedIndex + dir;
-                    if (newIdx >= dispList.Count) newIdx = 0;
-                    if (newIdx < 0) newIdx = dispList.Count - 1;
-                    SelectRecipeByIndex(newIdx);
-                    Event.current.Use();
-                }
-            }
-        }
-
-        void InitStyles()
-        {
-            if (_stylesReady) return; _stylesReady = true;
-            _headerStyle = new GUIStyle(GUI.skin.label) { fontSize = 18, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleLeft, normal = { textColor = textColor } };
-            _recipeStyle = new GUIStyle(GUI.skin.button) { fontSize = 13, alignment = TextAnchor.MiddleLeft, normal = { textColor = textColor }, padding = new RectOffset(8, 8, 4, 4) };
-            _selectedRecipeStyle = new GUIStyle(_recipeStyle) { normal = { textColor = Color.white } };
-            _detailLabelStyle = new GUIStyle(GUI.skin.label) { fontSize = 13, alignment = TextAnchor.MiddleLeft, normal = { textColor = textColor }, wordWrap = true, padding = new RectOffset(6, 6, 3, 3) };
-            _dimLabelStyle = new GUIStyle(_detailLabelStyle) { fontSize = 12, normal = { textColor = dimTextColor } };
-            _craftBtnStyle = new GUIStyle(GUI.skin.button) { fontSize = 15, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { textColor = Color.white }, padding = new RectOffset(8, 8, 6, 6) };
-            _disabledBtnStyle = new GUIStyle(_craftBtnStyle) { normal = { textColor = dimTextColor } };
-            _closeBtnStyle = new GUIStyle(GUI.skin.button) { fontSize = 14, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, normal = { textColor = textColor } };
-            _categoryBtnStyle = new GUIStyle(GUI.skin.button) { fontSize = 11, alignment = TextAnchor.MiddleCenter, normal = { textColor = dimTextColor }, padding = new RectOffset(6, 6, 2, 2), fixedHeight = 20 };
-            _categoryActiveBtnStyle = new GUIStyle(_categoryBtnStyle) { fontStyle = FontStyle.Bold, normal = { textColor = Color.white } };
-        }
-
-        void DrawHeader(Rect panel)
-        {
-            string stationName = GetStationName();
-            Rect headerRect = new Rect(panel.x + padding, panel.y + padding, panel.width - padding * 2, 30f);
-            int total = _recipes?.Count ?? 0, shown = _displayedRecipes?.Count ?? 0;
-            string countStr = _categoryFilterActive ? $"{shown}/{total} 配方" : $"{total} 配方";
-            GUI.Label(headerRect, $"  {stationName} — 合成 ({countStr})", _headerStyle);
-
-            Rect closeRect = new Rect(panel.x + panel.width - 60f, panel.y + padding, 48f, 28f);
-            if (GUI.Button(closeRect, "✕", _closeBtnStyle)) Close();
-
-            Rect lineRect = new Rect(panel.x + padding, headerRect.y + headerRect.height + 2f, panel.width - padding * 2, 2f);
-            GUI.color = new Color(0.3f, 0.3f, 0.3f, 1f);
-            GUI.DrawTexture(lineRect, Texture2D.whiteTexture);
-            GUI.color = Color.white;
-
-            float searchY = lineRect.y + 4f;
-            GUI.Label(new Rect(panel.x + padding, searchY, 30f, 22f), "🔍", _dimLabelStyle);
-            var newSearch = GUI.TextField(new Rect(panel.x + padding + 32f, searchY, 200f, 22f), _searchText, 20, GUI.skin.textField);
-            if (newSearch != _searchText) { _searchText = newSearch; _selectedRecipe = null; _selectedIndex = -1; UpdateDisplayedRecipes(); }
-            if (!string.IsNullOrEmpty(_searchText))
-            { if (GUI.Button(new Rect(panel.x + padding + 236f, searchY, 30f, 22f), "✕", _categoryBtnStyle)) { _searchText = ""; _selectedRecipe = null; _selectedIndex = -1; UpdateDisplayedRecipes(); } }
-            if (!string.IsNullOrEmpty(_searchText))
-            { GUI.Label(new Rect(panel.x + padding + 270f, searchY, 120f, 22f), $"匹配 {_displayedRecipes?.Count ?? 0} 个", _dimLabelStyle); }
-        }
-
-        void DrawCategoryBar(Rect panel)
-        {
-            if (_availableCategories == null || _availableCategories.Count <= 1) return;
-            float barX = panel.x + padding, barY = panel.y + padding + 62f;
-            GUI.backgroundColor = !_categoryFilterActive ? recipeSelectedColor : recipeNormalColor;
-            if (GUI.Button(new Rect(barX, barY, 40f, 22f), "全部", !_categoryFilterActive ? _categoryActiveBtnStyle : _categoryBtnStyle)) ClearCategoryFilter();
-            float btnX = barX + 44f, maxX = barX + panel.width - padding * 2;
-            foreach (var cat in _availableCategories)
-            {
-                string label = GetCategoryLabel(cat);
-                float btnW = _categoryBtnStyle.CalcSize(new GUIContent(label)).x + 12f; if (btnW < 44f) btnW = 44f;
-                if (btnX + btnW > maxX) break;
-                bool active = _categoryFilterActive && _activeCategory == cat;
-                GUI.backgroundColor = active ? recipeSelectedColor : recipeNormalColor;
-                if (GUI.Button(new Rect(btnX, barY, btnW, 22f), label, active ? _categoryActiveBtnStyle : _categoryBtnStyle))
-                { if (active) ClearCategoryFilter(); else SetCategoryFilter(cat); }
-                btnX += btnW + 4f;
-            }
-            GUI.backgroundColor = Color.white;
-        }
-
-        void DrawRecipeList(Rect panel)
-        {
-            float listX = panel.x + padding, listY = panel.y + padding + 90f, listH = panel.height - padding * 2 - 94f;
-            GUI.color = new Color(0.12f, 0.12f, 0.12f, 0.8f);
-            GUI.DrawTexture(new Rect(listX, listY, recipeListWidth, listH), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-            _recipeListRect = new Rect(listX, Screen.height - (listY + listH), recipeListWidth, listH);
-
-            var disp = _displayedRecipes;
-            if (disp == null || disp.Count == 0) { GUI.Label(new Rect(listX + 8f, listY + 8f, recipeListWidth - 16f, 24f), "没有配方", _dimLabelStyle); return; }
-
-            float totalH = disp.Count * (buttonHeight + 2f), viewH = listH - 8f;
-            _scrollPos = GUI.BeginScrollView(new Rect(listX, listY + 4f, recipeListWidth, viewH), _scrollPos, new Rect(0, 0, recipeListWidth - 20f, totalH));
-            for (int i = 0; i < disp.Count; i++)
-            {
-                if (disp[i] == null) continue;
-                bool sel = _selectedRecipe == disp[i];
-                GUI.backgroundColor = sel ? recipeSelectedColor : recipeNormalColor;
-                if (GUI.Button(new Rect(2f, i * (buttonHeight + 2f), recipeListWidth - 24f, buttonHeight), disp[i].recipeName, sel ? _selectedRecipeStyle : _recipeStyle))
-                    SelectRecipeByIndex(i);
-            }
-            GUI.EndScrollView(); GUI.backgroundColor = Color.white;
-        }
-
-        void DrawRecipeDetail(Rect panel)
-        {
-            float dx = panel.x + padding + recipeListWidth + 8f, dy = panel.y + padding + 90f;
-            float dw = detailWidth, dh = panel.height - padding * 2 - 94f;
-            GUI.color = new Color(0.12f, 0.12f, 0.12f, 0.8f);
-            GUI.DrawTexture(new Rect(dx, dy, dw, dh), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-
-            if (_selectedRecipe == null) { GUI.Label(new Rect(dx + 8f, dy + 8f, dw - 16f, 24f), "← 从左侧列表选择一个配方", _dimLabelStyle); return; }
-
-            float y = dy + 8f, x = dx + 10f;
-            GUI.Label(new Rect(x, y, dw - 20f, 24f), $"《{_selectedRecipe.recipeName}》   [{_selectedRecipe.category}]", _headerStyle); y += 28f;
-            if (!string.IsNullOrEmpty(_selectedRecipe.description)) { GUI.Label(new Rect(x, y, dw - 20f, 20f), _selectedRecipe.description, _dimLabelStyle); y += 22f; }
-            GUI.color = new Color(0.25f, 0.25f, 0.25f, 1f);
-            GUI.DrawTexture(new Rect(x, y, dw - 20f, 1f), Texture2D.whiteTexture);
-            GUI.color = Color.white; y += 8f;
-            GUI.Label(new Rect(x, y, dw - 20f, 22f), "所需材料:", _detailLabelStyle); y += 22f;
-
-            if (_selectedRecipe.materials != null)
-            {
-                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
-                foreach (var req in _selectedRecipe.materials)
-                {
-                    int owned = inv != null ? inv.GetItemCount(req.itemData) : 0;
-                    GUI.Label(new Rect(x, y, dw - 20f, 18f),
-                        $"  {req.itemData?.itemName ?? "???"} ×{req.count}   (拥有: {owned})",
-                        owned >= req.count ? _detailLabelStyle : new GUIStyle(_detailLabelStyle) { normal = { textColor = missingMatColor } });
-                    y += 18f;
-                }
-            }
-            y += 6f;
-
-            if (_selectedRecipe.skillRequirements != null && _selectedRecipe.skillRequirements.Length > 0)
-            {
-                GUI.Label(new Rect(x, y, dw - 20f, 18f), "技能需求:", _detailLabelStyle); y += 18f;
-                foreach (var sk in _selectedRecipe.skillRequirements) { GUI.Label(new Rect(x, y, dw - 20f, 18f), $"  {sk.skill} Lv.{sk.level}", _dimLabelStyle); y += 18f; }
-                y += 4f;
-            }
-
-            GUI.Label(new Rect(x, y, dw - 20f, 18f), $"耗时: {_selectedRecipe.craftTime:F1}秒  |  XP: +{_selectedRecipe.xpReward:F0}", _dimLabelStyle); y += 20f;
-            _craftableCount = _craftingSystem.GetCraftableCount(_selectedRecipe);
-            GUI.Label(new Rect(x, y, dw - 20f, 18f), $"可制作: {_craftableCount} 次", _detailLabelStyle); y += 28f;
-
-            bool canCraft = _craftingSystem.CanCraft(_selectedRecipe) && _craftableCount > 0;
-            GUI.enabled = canCraft;
-            GUI.backgroundColor = canCraft ? new Color(0f, 0.6f, 0f, 1f) : new Color(0.3f, 0.3f, 0.3f, 0.6f);
-            if (GUI.Button(new Rect(x, y, 160f, 36f), canCraft ? "制作 ×1" : (!_craftingSystem.HasMaterialsFor(_selectedRecipe) ? "材料不足" : "无法制作"), _craftBtnStyle))
-                DoCraft(_selectedRecipe);
-            GUI.backgroundColor = Color.white; GUI.enabled = true;
-
-            if (canCraft && _craftableCount > 1)
-            {
-                GUI.backgroundColor = new Color(0f, 0.6f, 0f, 1f);
-                if (GUI.Button(new Rect(x + 170f, y, 120f, 36f), $"全部 ({_craftableCount})", _craftBtnStyle))
-                { for (int i = 0; i < _craftableCount; i++) if (!_craftingSystem.Craft(_selectedRecipe)) break; PostCraftRefresh(); }
-                GUI.backgroundColor = Color.white;
-            }
-        }
     }
 }

@@ -50,18 +50,15 @@ namespace _Game.UI
 
         // ---- 物品 ----
         string _itemSearch = "";
-        Vector2 _itemScroll;
         ItemData[] _allItems;
         bool _itemsLoaded;
         ItemCategory? _itemCatFilter; // null=全部, 非null=仅该分类
-        Vector2 _sysScroll;
 
         // ---- 系统 ----
         SurvivalXPSystem _xp;
 
         // ---- 天气 ----
         WeatherManager _weather;
-        Vector2 _weatherScroll;
 
         // ---- layout ----
         float _panelW = 420f;
@@ -142,63 +139,8 @@ namespace _Game.UI
             }
         }
 
-#if UNITY_EDITOR
-        void OnGUI()
-        {
-            if (UIModeConfig.UseUGUI) return;
-            if (!_visible || !Application.isPlaying) return;
-
-            float x = (Screen.width - _panelW) * 0.5f;
-            float y = (Screen.height - _panelH) * 0.5f;
-
-            // 背景
-            GUI.color = new Color(0.06f, 0.06f, 0.06f, 0.93f);
-            GUI.DrawTexture(new Rect(x, y, _panelW, _panelH), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-
-            // 标题
-            GUI.Label(new Rect(x + 10f, y + 6f, _panelW - 20f, 24f),
-                "<b>DevTools [F1 关闭]</b>");
-
-            // Tab 栏
-            float tabY = y + 30f;
-            string[] tabNames = { "僵尸", "建造", "物品", "系统", "天气" };
-            float tabW = (_panelW - 20f) / 5f;
-            for (int i = 0; i < 5; i++)
-            {
-                Rect tabRect = new Rect(x + 10f + i * tabW, tabY, tabW - 2f, 26f);
-                Color prev = GUI.backgroundColor;
-                GUI.backgroundColor = (int)_tab == i ? new Color(0f, 0.5f, 0f, 1f) : new Color(0.25f, 0.25f, 0.25f, 1f);
-                if (GUI.Button(tabRect, tabNames[i]))
-                    _tab = (Tab)i;
-                GUI.backgroundColor = prev;
-            }
-
-            // 分隔线
-            GUI.color = new Color(0.3f, 0.3f, 0.3f, 1f);
-            GUI.DrawTexture(new Rect(x + 10f, tabY + 28f, _panelW - 20f, 1f), Texture2D.whiteTexture);
-            GUI.color = Color.white;
-
-            // 内容区
-            float contentY = tabY + 34f;
-            GUILayout.BeginArea(new Rect(x + 12f, contentY, _panelW - 24f, _panelH - (contentY - y) - 8f));
-            GUILayout.BeginVertical();
-
-            switch (_tab)
-            {
-                case Tab.Zombie: DrawZombieTab(); break;
-                case Tab.Build: DrawBuildTab(); break;
-                case Tab.Item: DrawItemTab(); break;
-                case Tab.System: DrawSystemTab(); break;
-                case Tab.Weather: DrawWeatherTab(); break;
-            }
-
-            GUILayout.EndVertical();
-            GUILayout.EndArea();
-        }
-
         // ================================================================
-        // 僵尸调试
+        // 僵尸调试 (shared logic)
         // ================================================================
 
         void RefreshZombieTypes()
@@ -218,49 +160,6 @@ namespace _Game.UI
             }
             if (_zTypes.Count > 0 && _zTypeIndex >= _zTypes.Count)
                 _zTypeIndex = 0;
-        }
-
-        void DrawZombieTab()
-        {
-            GUILayout.Label("<b>僵尸调试</b>");
-
-            // 距离
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"距离: {_zDistance:F0}m", GUILayout.Width(120));
-            _zDistance = GUILayout.HorizontalSlider(_zDistance, 2f, 50f);
-            GUILayout.EndHorizontal();
-
-            // 类型
-            if (_zTypes.Count > 0)
-            {
-                GUILayout.Label("类型:");
-                string[] names = new string[_zTypes.Count];
-                for (int i = 0; i < _zTypes.Count; i++)
-                    names[i] = _zTypes[i].zombieName;
-                int cols = Mathf.Min(names.Length, 3);
-                _zTypeIndex = GUILayout.SelectionGrid(_zTypeIndex, names, cols);
-            }
-
-            // 数量
-            GUILayout.BeginHorizontal();
-            GUILayout.Label($"数量: {_zCount}", GUILayout.Width(120));
-            _zCount = Mathf.RoundToInt(GUILayout.HorizontalSlider(_zCount, 1, 30));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Space(8);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("刷新类型列表", GUILayout.Height(28)))
-                RefreshZombieTypes();
-
-            GUI.backgroundColor = new Color(0.85f, 0.25f, 0.25f);
-            if (GUILayout.Button($"刷新 {_zCount} 只僵尸", GUILayout.Height(28)))
-                SpawnZombies();
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            if (_zMsgTimer > 0f)
-                GUILayout.Label(_zMsg);
         }
 
         void SpawnZombies()
@@ -303,133 +202,6 @@ namespace _Game.UI
 
         void ShowZMsg(string m) { _zMsg = m; _zMsgTimer = 3f; }
 
-        // ================================================================
-        // 建造调试
-        // ================================================================
-
-        void DrawBuildTab()
-        {
-            GUILayout.Label("<b>建造调试</b>");
-
-            bool prevFree = freeBuildMode;
-            freeBuildMode = GUILayout.Toggle(freeBuildMode, "自由建造（免材料检查，免扣材料）");
-            if (freeBuildMode != prevFree && _buildCtrl == null)
-                _buildCtrl = ServiceLocator.Get<BuildModeController>();
-
-            bool prevInstant = instantBuild;
-            instantBuild = GUILayout.Toggle(instantBuild, "即时建造（跳过读条，0秒完成）");
-            if (instantBuild != prevInstant && _buildCtrl == null)
-                _buildCtrl = ServiceLocator.Get<BuildModeController>();
-
-            if (freeBuildMode || instantBuild)
-            {
-                if (_buildCtrl == null) _buildCtrl = ServiceLocator.Get<BuildModeController>();
-            }
-
-            GUILayout.Space(8);
-
-            if (GUILayout.Button("B 键进入建造模式", GUILayout.Height(30)))
-            {
-                GUILayout.Label("  按 B 进入建造模式后可自由放置");
-                GUILayout.Label("  左键确认 / 右键或 Esc 取消");
-            }
-
-            GUILayout.Space(4);
-
-            if (GUILayout.Button("给100个木头(建造材料)", GUILayout.Height(26)))
-                GiveItem("WoodLog", 100);
-
-            if (GUILayout.Button("给50个石头", GUILayout.Height(26)))
-                GiveItem("Stone", 50);
-
-            if (GUILayout.Button("给50个铁锭", GUILayout.Height(26)))
-                GiveItem("IronIngot", 50);
-        }
-
-        // ================================================================
-        // 物品调试
-        // ================================================================
-
-        void DrawItemTab()
-        {
-            GUILayout.Label("<b>物品调试</b>");
-
-            if (!_itemsLoaded)
-            {
-                LoadAllItems();
-                _itemsLoaded = true;
-            }
-
-            // 搜索
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("搜索:", GUILayout.Width(40));
-            _itemSearch = GUILayout.TextField(_itemSearch, GUILayout.Width(150));
-            if (GUILayout.Button("×", GUILayout.Width(28)))
-                _itemSearch = "";
-            if (_itemCatFilter != null && GUILayout.Button("清除筛选", GUILayout.Width(60)))
-                _itemCatFilter = null;
-            GUILayout.EndHorizontal();
-
-            // 分类筛选按钮
-            GUILayout.BeginHorizontal();
-            DrawCatBtn("材料", ItemCategory.RawMaterial);
-            DrawCatBtn("消耗品", ItemCategory.Consumable);
-            DrawCatBtn("弹药", ItemCategory.Ammo);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            DrawCatBtn("装备", ItemCategory.Equipment);
-            DrawCatBtn("半成品", ItemCategory.SemiFinished);
-            DrawCatBtn("工作站", ItemCategory.Workstation);
-            GUILayout.EndHorizontal();
-
-            DrawCatBtn("建筑", ItemCategory.Buildable);
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("给当前筛选 ×10", GUILayout.Height(26)))
-                GiveFiltered(10);
-            GUI.backgroundColor = new Color(0.85f, 0.45f, 0.25f);
-            if (GUILayout.Button("一键给全部 ×10", GUILayout.Height(26)))
-                GiveAllItems(10);
-            GUI.backgroundColor = Color.white;
-            GUILayout.EndHorizontal();
-
-            // 物品列表 — 填满剩余空间，不够才滚动
-            if (_allItems != null && _allItems.Length > 0)
-            {
-                var filtered = FilterItems();
-                string filterLabel = _itemCatFilter != null ? $" [{_itemCatFilter}]" : "";
-                GUILayout.Label($"物品{filterLabel} ({filtered.Count}/{_allItems.Length}):");
-
-                _itemScroll = GUILayout.BeginScrollView(_itemScroll, GUILayout.ExpandHeight(true));
-                foreach (var item in filtered)
-                {
-                    GUILayout.BeginHorizontal();
-                    string label = $"{item.itemName} [{item.category}]";
-                    GUILayout.Label(label, GUILayout.Width(220));
-                    if (GUILayout.Button("+1", GUILayout.Width(36)))
-                        GiveItem(item, 1);
-                    if (GUILayout.Button("+10", GUILayout.Width(40)))
-                        GiveItem(item, 10);
-                    GUILayout.EndHorizontal();
-                }
-                GUILayout.EndScrollView();
-            }
-        }
-
-        void DrawCatBtn(string label, ItemCategory cat)
-        {
-            bool active = _itemCatFilter == cat;
-            Color prev = GUI.backgroundColor;
-            GUI.backgroundColor = active
-                ? new Color(0f, 0.5f, 0f, 1f) : new Color(0.25f, 0.25f, 0.25f, 1f);
-            if (GUILayout.Button(label, GUILayout.Height(22)))
-            {
-                _itemCatFilter = active ? null : cat;
-                _itemScroll = Vector2.zero;
-            }
-            GUI.backgroundColor = prev;
-        }
 
         void GiveFiltered(int count)
         {
@@ -536,79 +308,6 @@ namespace _Game.UI
 
         void GiveAllWorkstations() => GiveByCategory(ItemCategory.Workstation, 2);
 
-        // ================================================================
-        // 天气调试
-        // ================================================================
-
-        void DrawWeatherTab()
-        {
-            if (_weather == null) _weather = WeatherManager.Instance;
-            if (_weather == null) { GUILayout.Label("WeatherManager 未找到，请挂载到场景"); return; }
-
-            var data = _weather.CurrentData;
-            bool isForced = _weather.IsForceOverride;
-
-            // 固定头部：当前状态
-            GUILayout.Label("<b>天气调试</b>");
-            string stateLabel = isForced ? "<color=orange>强制覆盖</color>" : "<color=green>自然轮转</color>";
-            GUILayout.Label($"当前: <b>{data.displayName}</b>  |  {stateLabel}");
-
-            // 天气强制按钮
-            GUILayout.BeginHorizontal();
-            string[] weatherNames = { "☀晴", "☁多云", "🌧雨", "⛈暴雨" };
-            for (int i = 0; i < 4; i++)
-            {
-                Color prev = GUI.backgroundColor;
-                bool isActive = isForced
-                    ? _weather.ForcedType == (Config.WeatherType)i
-                    : _weather.CurrentWeather == (Config.WeatherType)i;
-                GUI.backgroundColor = isActive
-                    ? new Color(0f, 0.55f, 0f, 1f) : new Color(0.25f, 0.25f, 0.25f, 1f);
-                if (GUILayout.Button(weatherNames[i], GUILayout.Height(26)))
-                    _weather.ForceWeather((Config.WeatherType)i);
-                GUI.backgroundColor = prev;
-            }
-            GUILayout.EndHorizontal();
-
-            if (isForced)
-            {
-                GUI.backgroundColor = new Color(0.2f, 0.7f, 0.2f);
-                if (GUILayout.Button("恢复自然轮转", GUILayout.Height(22)))
-                    _weather.ReleaseOverride();
-                GUI.backgroundColor = Color.white;
-            }
-
-            // 难度
-            GUILayout.Label("<b>难度:</b>");
-            GUILayout.BeginHorizontal();
-            var diffs = new[] { WeatherDifficulty.Easy, WeatherDifficulty.Normal, WeatherDifficulty.Hard };
-            string[] diffNames = { "简单", "普通", "困难" };
-            for (int i = 0; i < 3; i++)
-            {
-                Color prev = GUI.backgroundColor;
-                GUI.backgroundColor = _weather.Difficulty == diffs[i]
-                    ? new Color(0f, 0.5f, 0f, 1f) : new Color(0.25f, 0.25f, 0.25f, 1f);
-                if (GUILayout.Button(diffNames[i], GUILayout.Height(22)))
-                    _weather.SetDifficulty(diffs[i]);
-                GUI.backgroundColor = prev;
-            }
-            GUILayout.EndHorizontal();
-
-            // ── 可滚动的数据区 ──
-            _weatherScroll = GUILayout.BeginScrollView(_weatherScroll, GUILayout.ExpandHeight(true));
-
-            GUILayout.Label($"环境温度: {_weather.AmbientTemperature:F1}°C  雨强: {data.rainIntensity * 100f:F0}%");
-            GUILayout.Label($"暴风冷却: {_weather.StormCooldownRemaining}轮  连续雨: {_weather.ConsecutiveRainCount}/{GameConstants.WEATHER_MAX_CONSECUTIVE_RAIN}");
-
-            GUILayout.Label("<b>当前效果:</b>");
-            GUILayout.Label($"  口渴速率: ×{data.thirstRateMult:F1}");
-            GUILayout.Label($"  环境暗度: {data.ambientDarkness * 100f:F0}%");
-            GUILayout.Label($"  日光强度: {data.sunIntensity:F1}");
-            GUILayout.Label($"  日光颜色: {data.sunColor}");
-
-            GUILayout.EndScrollView();
-        }
-
         void GiveAllItems(int count)
         {
             if (_allItems == null) return;
@@ -624,10 +323,6 @@ namespace _Game.UI
                     GiveItem(item, count);
         }
 
-        // ================================================================
-        // 系统调试
-        // ================================================================
-
         void EnsurePoints(int needed)
         {
             while (_xp.AvailablePoints < needed)
@@ -636,104 +331,6 @@ namespace _Game.UI
                 _xp.ConvertXPToPoints();
             }
         }
-
-        void DrawSystemTab()
-        {
-            if (_xp == null) _xp = SurvivalXPSystem.Instance;
-            if (_xp == null) { GUILayout.Label("SurvivalXPSystem 未找到"); return; }
-
-            // 顶部固定区
-            GUILayout.Label("<b>系统调试</b>");
-
-            // UI 模式切换
-            GUILayout.BeginHorizontal();
-            string modeLabel = UIModeConfig.UseUGUI ? "UI 模式: UGUI" : "UI 模式: IMGUI";
-            Color prevColor = GUI.backgroundColor;
-            GUI.backgroundColor = UIModeConfig.UseUGUI ? new Color(0f, 0.6f, 0f, 1f) : new Color(0.5f, 0.5f, 0.5f, 1f);
-            if (GUILayout.Button(modeLabel, GUILayout.Height(24)))
-                UIModeConfig.Toggle();
-            GUI.backgroundColor = prevColor;
-            GUILayout.Label("  切换新旧 UI 渲染系统", GUILayout.Height(24));
-            GUILayout.EndHorizontal();
-
-            GUILayout.Label($"Total XP: {_xp.TotalXP}  |  Skill Pts: {_xp.AvailablePoints}");
-
-            // XP 按钮
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("+100 XP", GUILayout.Height(24))) _xp.AddXP(100);
-            if (GUILayout.Button("+500 XP", GUILayout.Height(24))) _xp.AddXP(500);
-            if (GUILayout.Button("+2000 XP", GUILayout.Height(24))) _xp.AddXP(2000);
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("兑换XP→点数", GUILayout.Height(24)))
-            {
-                int got = _xp.ConvertXPToPoints();
-            }
-            if (GUILayout.Button("+5 技能点", GUILayout.Height(24)))
-            {
-                _xp.AddXP(GameConstants.XP_PER_SKILL_POINT * 5);
-                _xp.ConvertXPToPoints();
-            }
-            GUILayout.EndHorizontal();
-
-            // 体力（顶部固定）
-            var stamina = ServiceLocator.Get<StaminaSystem>();
-            if (stamina != null)
-            {
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"<b>体力:</b> {stamina.CurrentStamina:F0}/{stamina.MaxStamina:F0}");
-                if (GUILayout.Button("回满", GUILayout.Width(50), GUILayout.Height(20)))
-                    stamina.Consume(-stamina.MaxStamina);
-                GUILayout.EndHorizontal();
-            }
-
-            // ── 可滚动区：属性 + 全部技能 ──
-            _sysScroll = GUILayout.BeginScrollView(_sysScroll, GUILayout.ExpandHeight(true));
-
-            GUILayout.Label("<b>属性:</b>");
-            foreach (AttributeType attr in System.Enum.GetValues(typeof(AttributeType)))
-                GUILayout.Label($"  {attr}: Lv{_xp.GetAttributeValue(attr)}");
-
-            GUILayout.Label("<b>技能:</b>");
-            foreach (SkillType sk in System.Enum.GetValues(typeof(SkillType)))
-            {
-                int lv = _xp.GetSkillLevel(sk);
-                int cost = SkillCostTable.GetCost(sk, lv);
-                GUILayout.BeginHorizontal();
-                GUILayout.Label($"  {sk}: Lv{lv} (→{lv + 1}: {cost}pt)", GUILayout.Width(240));
-                if (lv < 10 && GUILayout.Button("↑", GUILayout.Width(26), GUILayout.Height(18)))
-                {
-                    EnsurePoints(cost);
-                    _xp.SpendPoint(sk);
-                }
-                GUILayout.EndHorizontal();
-            }
-
-            GUILayout.EndScrollView();
-
-            // 底部快速给经验
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("满级全技能", GUILayout.Height(22)))
-            {
-                _xp.AddXP(100000);
-                _xp.ConvertXPToPoints();
-                for (int i = 0; i < 10; i++)
-                {
-                    foreach (SkillType s in System.Enum.GetValues(typeof(SkillType)))
-                    {
-                        if (_xp.GetSkillLevel(s) < 10)
-                        {
-                            int c = SkillCostTable.GetCost(s, _xp.GetSkillLevel(s));
-                            EnsurePoints(c);
-                            _xp.SpendPoint(s);
-                        }
-                    }
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
-
 
         // ============================================================
         // UGUI 实现
@@ -1241,13 +838,6 @@ namespace _Game.UI
         {
             if (_xp == null) _xp = SurvivalXPSystem.Instance;
 
-            // UI模式切换按钮
-            var modeRow = UguiMakeRow(_contentGo, 26);
-            string modeLabel = UIModeConfig.UseUGUI ? "UI 模式: UGUI" : "UI 模式: IMGUI";
-            var modeBtn = UguiMakeSmallBtn("UIMode", modeLabel, UIModeConfig.UseUGUI ? new Color(0f, 0.6f, 0f) : new Color(0.5f, 0.5f, 0.5f), 140, 24);
-            modeBtn.transform.SetParent(modeRow.transform, false);
-            modeBtn.onClick.AddListener(UIModeConfig.Toggle);
-
             // XP 标签
             _uguiXpLabel = UguiMakeText("XpLabel", 13, FontStyle.Normal, TextAnchor.MiddleLeft, 400, 24);
             _uguiXpLabel.transform.SetParent(_contentGo.transform, false);
@@ -1714,6 +1304,5 @@ namespace _Game.UI
             return go.GetComponent<Button>();
         }
 
-#endif
     }
 }

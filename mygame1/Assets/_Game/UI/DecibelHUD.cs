@@ -92,20 +92,5 @@ namespace _Game.UI
             _noiseRect.anchoredPosition = new Vector2(10, -y);
         }
 
-        void OnGUI()
-        {
-            if (UIModeConfig.UseUGUI) return;
-            if (BuildMenuUI.IsVisible) return;
-            if (_player == null) return;
-
-            DecodeNoiseLevel(_noiseLevel, out var label, out var color);
-
-            float y = _inVehicle ? 75f : 45f;
-
-            var oldColor = GUI.color;
-            GUI.color = color;
-            GUI.Label(new Rect(10, y, 300, 24), $"噪声: {label}  ({_noiseLevel * 100f:F0}%)");
-            GUI.color = oldColor;
-        }
     }
 }
