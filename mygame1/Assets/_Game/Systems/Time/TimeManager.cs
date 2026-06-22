@@ -195,5 +195,8 @@ namespace _Game.Systems.Time
             return h >= 21f || h < 5f;
         }
 
+        // 存档系统接口
+        public float GetTotalGameDays() => _totalGameDays;
+        public void SetTotalGameDays(float days) => _totalGameDays = days;
     }
 }

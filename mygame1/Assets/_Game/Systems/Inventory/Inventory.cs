@@ -32,6 +32,18 @@ namespace _Game.Systems.Inventory
         [Header("容器列表（调试用）")]
         public List<InventoryContainer> containers = new List<InventoryContainer>();
 
+        /// <summary> PlacedItem 实例 ID 自增计数器（存档系统用） </summary>
+        private int _nextItemInstanceId = 1;
+
+        /// <summary> 分配下一个实例 ID </summary>
+        public int AllocateItemInstanceId() => _nextItemInstanceId++;
+
+        /// <summary> 重置实例 ID 计数器（加载存档后调用） </summary>
+        public void ResetInstanceCounter(int nextId) => _nextItemInstanceId = nextId;
+
+        /// <summary> 获取当前计数器值 </summary>
+        public int PeekNextInstanceId() => _nextItemInstanceId;
+
         private PlayerCharacter _playerCharacter;
 
         /// <summary> 力量加成后的有效负重上限 </summary>
@@ -724,6 +736,212 @@ namespace _Game.Systems.Inventory
             wi.count = count;
 
             EventBus.Publish(new InventoryChanged("removed", item.itemName, count));
+        }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 导出背包存档数据 </summary>
+        public SaveLoad.InventorySaveData GetSaveData()
+        {
+            var inv = new SaveLoad.InventorySaveData();
+
+            // 7 个容器
+            inv.containers = new System.Collections.Generic.List<SaveLoad.ContainerSaveData>();
+            foreach (var c in containers)
+            {
+                var csd = new SaveLoad.ContainerSaveData
+                {
+                    containerName = c.containerName,
+                    equipSlotName = c.equipSlot.ToString(),
+                    gridWidth = c.gridWidth,
+                    gridHeight = c.gridHeight,
+                    slots = new System.Collections.Generic.List<SaveLoad.SlotSaveData>(),
+                };
+
+                foreach (var item in c.placedItems)
+                {
+                    csd.slots.Add(new SaveLoad.SlotSaveData
+                    {
+                        instanceId = item.instanceId,
+                        itemName = (item.isGhost || item.itemData == null) ? null : item.itemData.itemName,
+                        count = item.count,
+                        gridX = item.gridX,
+                        gridY = item.gridY,
+                        rotated = item.rotated,
+                        isGhost = item.isGhost,
+                        ghostSourceSlot = item.isGhost ? item.ghostSourceSlot.ToString() : null,
+                    });
+                }
+                inv.containers.Add(csd);
+            }
+
+            // 装备物品（用 instanceId 定位）
+            inv.equippedItems = new System.Collections.Generic.Dictionary<string, SaveLoad.EquippedItemSaveData>();
+            foreach (var kv in equipped)
+            {
+                if (kv.Value == null || IsWeaponSlot(kv.Key))
+                    continue; // 武器槽的装备物品在各自槽位中，不在此处存
+
+                // 找到物品在容器中的实例
+                var slotName = kv.Key.ToString();
+                foreach (var c in containers)
+                {
+                    for (int i = 0; i < c.placedItems.Count; i++)
+                    {
+                        var pi = c.placedItems[i];
+                        if (!pi.isGhost && pi.itemData == kv.Value && pi.instanceId > 0)
+                        {
+                            inv.equippedItems[slotName] = new SaveLoad.EquippedItemSaveData
+                            {
+                                equipSlotName = slotName,
+                                itemInstanceId = pi.instanceId,
+                            };
+                            break;
+                        }
+                    }
+                    if (inv.equippedItems.ContainsKey(slotName)) break;
+                }
+            }
+
+            // 武器信息（由 Weapon 系统在 SaveLoadManager 中补充）
+            inv.ammoReserves = new System.Collections.Generic.Dictionary<string, int>();
+
+            return inv;
+        }
+
+        /// <summary> 从存档恢复背包 </summary>
+        public void RestoreFromSave(SaveLoad.InventorySaveData inv, SaveLoad.ItemCatalog itemCatalog = null)
+        {
+            if (inv == null || inv.containers == null) return;
+
+            if (itemCatalog == null)
+                itemCatalog = ServiceLocator.Get<SaveLoad.ItemCatalog>();
+            if (itemCatalog != null)
+                itemCatalog.Build();
+
+            // 1. 清空所有容器
+            foreach (var c in containers)
+                c.placedItems.Clear();
+
+            // 2. 恢复容器内容
+            foreach (var csd in inv.containers)
+            {
+                if (!System.Enum.TryParse<EquipSlot>(csd.equipSlotName, out var slot))
+                    continue;
+
+                var container = GetContainer(slot);
+                if (container == null) continue;
+
+                container.gridWidth = csd.gridWidth;
+                container.gridHeight = csd.gridHeight;
+                container.placedItems.Clear();
+
+                if (csd.slots == null) continue;
+
+                // 收集恢复的物品 instanceId，用于后续计算最大 ID
+                int maxId = 0;
+
+                foreach (var s in csd.slots)
+                {
+                    if (s.isGhost)
+                    {
+                        if (System.Enum.TryParse<EquipSlot>(s.ghostSourceSlot, out var gs))
+                        {
+                            container.placedItems.Add(new PlacedItem
+                            {
+                                instanceId = s.instanceId,
+                                itemData = null,
+                                count = 0,
+                                gridX = s.gridX,
+                                gridY = s.gridY,
+                                isGhost = true,
+                                ghostSourceSlot = gs,
+                            });
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(s.itemName) && itemCatalog != null)
+                    {
+                        var itemData = itemCatalog.Find(s.itemName);
+                        if (itemData != null)
+                        {
+                            container.placedItems.Add(new PlacedItem
+                            {
+                                instanceId = s.instanceId,
+                                itemData = itemData,
+                                count = s.count,
+                                gridX = s.gridX,
+                                gridY = s.gridY,
+                                rotated = s.rotated,
+                            });
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[Inventory] 恢复时找不到物品: {s.itemName}");
+                        }
+                    }
+
+                    if (s.instanceId > maxId) maxId = s.instanceId;
+                }
+
+                // 更新 instanceId 计数器
+                if (maxId >= _nextItemInstanceId)
+                    _nextItemInstanceId = maxId + 1;
+            }
+
+            // 3. 恢复 equipped（先清空）
+            var keysToRemove = new System.Collections.Generic.List<EquipSlot>();
+            foreach (var kv in equipped)
+                if (!IsWeaponSlot(kv.Key))
+                    keysToRemove.Add(kv.Key);
+            foreach (var k in keysToRemove)
+                equipped.Remove(k);
+
+            // 4. 按 instanceId 定位装备物品
+            if (inv.equippedItems != null)
+            {
+                foreach (var kv in inv.equippedItems)
+                {
+                    if (!System.Enum.TryParse<EquipSlot>(kv.Key, out var equipSlot))
+                        continue;
+
+                    var targetInstanceId = kv.Value.itemInstanceId;
+                    ItemData foundItem = null;
+
+                    foreach (var c in containers)
+                    {
+                        foreach (var pi in c.placedItems)
+                        {
+                            if (!pi.isGhost && pi.instanceId == targetInstanceId && pi.itemData != null)
+                            {
+                                foundItem = pi.itemData;
+                                break;
+                            }
+                        }
+                        if (foundItem != null) break;
+                    }
+
+                    if (foundItem != null) // ⚠️ 注意：RestoreFromSave 不调用 EquipItem（避免副作用），
+                        equipped[equipSlot] = foundItem; // 直接设置装备字典
+                }
+            }
+
+            PublishView();
+        }
+
+        /// <summary> 获取指定武器槽的当前弹夹子弹数（供存档系统采集） </summary>
+        public int GetWeaponAmmo(EquipSlot weaponSlot)
+        {
+            var ws = GetComponent<_Game.Systems.Weapon.WeaponShooting>();
+            return ws != null ? ws.GetCurrentMag(weaponSlot) : 0;
+        }
+
+        /// <summary> 设置指定武器槽的当前弹夹子弹数（供存档系统恢复） </summary>
+        public void SetWeaponAmmo(EquipSlot weaponSlot, int ammo)
+        {
+            var ws = GetComponent<_Game.Systems.Weapon.WeaponShooting>();
+            if (ws != null) ws.SetCurrentMag(weaponSlot, ammo);
         }
     }
 }

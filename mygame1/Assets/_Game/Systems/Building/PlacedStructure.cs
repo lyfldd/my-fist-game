@@ -70,6 +70,14 @@ namespace _Game.Systems.Building
 
             if (buildableData != null)
                 _currentHealth = buildableData.maxHealth;
+
+            // 添加 PersistentGUID（如果尚未附加）
+            var guid = GetComponent<SaveLoad.PersistentGUID>();
+            if (guid == null)
+                guid = gameObject.AddComponent<SaveLoad.PersistentGUID>();
+            if (string.IsNullOrEmpty(guid.EntityType))
+                guid.SetGuidRaw(_Game.Systems.SaveLoad.PersistentGUIDRegistry.Exists(guid.Guid)
+                    ? System.Guid.NewGuid().ToString("N") : guid.Guid);
         }
 
         private void OnEnable()
@@ -77,6 +85,14 @@ namespace _Game.Systems.Building
             // 确保碰撞体是可触发的（用于 OverlapBox 检测交互）
             if (_collider != null && !_collider.isTrigger)
                 _collider.isTrigger = false;
+
+            // 注册到建筑注册表
+            SaveLoad.PlacedStructureRegistry.Instance?.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            SaveLoad.PlacedStructureRegistry.Instance?.Unregister(this);
         }
 
         // ============================================================

@@ -45,6 +45,7 @@ namespace _Game.Systems.AIBot
             _instance._inventory = inventory;
             _instance._visible = true;
             if (_instance._canvasGo != null) _instance._canvasGo.SetActive(UIModeConfig.UseUGUI);
+            _instance.MarkDirty();
         }
 
         public static void Hide()
@@ -72,8 +73,15 @@ namespace _Game.Systems.AIBot
                 bool shouldShow = _visible && UIModeConfig.UseUGUI;
                 if (_canvasGo.activeSelf != shouldShow) _canvasGo.SetActive(shouldShow);
             }
-            if (UIModeConfig.UseUGUI && _visible && _inventory != null) RefreshUGUI();
+            if (UIModeConfig.UseUGUI && _visible && _inventory != null
+                && UnityEngine.Time.frameCount - _lastRefreshFrame > 30)
+            {
+                _lastRefreshFrame = UnityEngine.Time.frameCount;
+                RefreshUGUI();
+            }
         }
+        private int _lastRefreshFrame;
+        public void MarkDirty() { _lastRefreshFrame = 0; }
 
         // 窗口拖动
         Vector2 _dragOffset;

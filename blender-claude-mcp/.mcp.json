@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "blender": {
+      "command": "D:/myblender/5.1/python/bin/python.exe",
+      "args": [
+        "C:/Users/Administrator/Desktop/Unity学习一/mygame/blender-claude-mcp/blender_mcp_bridge.py"
+      ],
+      "env": {
+        "BLENDER_MCP_HOST": "127.0.0.1",
+        "BLENDER_MCP_PORT": "9876",
+        "DASHSCOPE_API_KEY": "${DASHSCOPE_API_KEY}"
+      }
+    }
+  }
+}

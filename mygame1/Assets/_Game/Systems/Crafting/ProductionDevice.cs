@@ -276,5 +276,102 @@ namespace _Game.Systems.Crafting
                 _inventoryFallback.AddItem(item, count);
             }
         }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        public SaveLoad.ProductionSaveData GetSaveData()
+        {
+            var guid = GetComponent<SaveLoad.PersistentGUID>();
+            var psd = new SaveLoad.ProductionSaveData
+            {
+                guid = guid != null ? guid.Guid : "",
+                deviceName = _data != null ? _data.deviceName : "",
+                fuelRemaining = _fuelRemaining,
+                cycleTimer = _cycleTimer,
+            };
+
+            // 输入槽物品
+            if (_inputSlot != null && _inputSlot.placedItems.Count > 0)
+            {
+                foreach (var pi in _inputSlot.placedItems)
+                {
+                    if (pi.itemData == null) continue;
+                    psd.inputInstanceId = pi.instanceId;
+                    psd.inputItemName = pi.itemData.itemName;
+                    psd.inputCount = pi.count;
+                    break; // 只存第一个物品（当前设备单物品输入）
+                }
+            }
+
+            // 产出槽物品
+            if (_outputSlot != null && _outputSlot.placedItems.Count > 0)
+            {
+                foreach (var pi in _outputSlot.placedItems)
+                {
+                    if (pi.itemData == null) continue;
+                    psd.outputInstanceId = pi.instanceId;
+                    psd.outputItemName = pi.itemData.itemName;
+                    psd.outputCount = pi.count;
+                    break;
+                }
+            }
+
+            // 输出链接目标
+            if (_outputDestination != null)
+            {
+                var destGuid = _outputDestination.GetComponent<SaveLoad.PersistentGUID>();
+                if (destGuid != null) psd.outputDestinationGuid = destGuid.Guid;
+            }
+
+            return psd;
+        }
+
+        public void RestoreFromSave(SaveLoad.ProductionSaveData psd, SaveLoad.ItemCatalog itemCatalog)
+        {
+            if (psd == null) return;
+
+            _fuelRemaining = psd.fuelRemaining;
+            _cycleTimer = psd.cycleTimer;
+
+            // 恢复输入槽
+            if (_inputSlot != null && !string.IsNullOrEmpty(psd.inputItemName) && itemCatalog != null)
+            {
+                _inputSlot.placedItems.Clear();
+                var item = itemCatalog.Find(psd.inputItemName);
+                if (item != null && psd.inputCount > 0)
+                {
+                    _inputSlot.placedItems.Add(new Inventory.PlacedItem
+                    {
+                        instanceId = psd.inputInstanceId,
+                        itemData = item,
+                        count = psd.inputCount,
+                    });
+                }
+            }
+
+            // 恢复产出槽
+            if (_outputSlot != null && !string.IsNullOrEmpty(psd.outputItemName) && itemCatalog != null)
+            {
+                _outputSlot.placedItems.Clear();
+                var item = itemCatalog.Find(psd.outputItemName);
+                if (item != null && psd.outputCount > 0)
+                {
+                    _outputSlot.placedItems.Add(new Inventory.PlacedItem
+                    {
+                        instanceId = psd.outputInstanceId,
+                        itemData = item,
+                        count = psd.outputCount,
+                    });
+                }
+            }
+
+            // 输出链接恢复（由 SaveLoadManager 集中处理的步骤）
+            _pendingRestoreDestGuid = psd.outputDestinationGuid;
+        }
+
+        /// <summary> 待恢复的输出链接 GUID（加载第二阶段处理） </summary>
+        [System.NonSerialized] public string _pendingRestoreDestGuid;
     }
 }

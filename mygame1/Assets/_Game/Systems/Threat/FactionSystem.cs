@@ -150,5 +150,68 @@ namespace _Game.Systems.Threat
         {
             LoadDefaults();
         }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 导出运行时修改过的阵营关系（只存与默认值不同的） </summary>
+        public System.Collections.Generic.List<SaveLoad.FactionDeltaSaveData> GetFactionDeltas()
+        {
+            // 先构建默认关系快照
+            var defaults = new Dictionary<(FactionType, FactionType), FactionRelation>();
+            var allTypes = System.Enum.GetValues(typeof(FactionType)) as FactionType[];
+            foreach (var a in allTypes)
+            {
+                foreach (var b in allTypes)
+                {
+                    if (a == b) continue;
+                    defaults[(a, b)] = FactionRelation.Neutral;
+                }
+            }
+            // 加载默认（从 FactionData）
+            if (_defaultFactions != null)
+            {
+                foreach (var data in _defaultFactions)
+                {
+                    if (data == null) continue;
+                    foreach (var ally in data.allies)
+                        defaults[(data.factionType, ally)] = FactionRelation.Ally;
+                    foreach (var hostile in data.hostiles)
+                        defaults[(data.factionType, hostile)] = FactionRelation.Hostile;
+                }
+            }
+
+            // 只导出与默认值不同的
+            var deltas = new System.Collections.Generic.List<SaveLoad.FactionDeltaSaveData>();
+            foreach (var kv in _relations)
+            {
+                if (defaults.TryGetValue(kv.Key, out var defRel) && defRel != kv.Value)
+                {
+                    deltas.Add(new SaveLoad.FactionDeltaSaveData
+                    {
+                        factionA = kv.Key.Item1.ToString(),
+                        factionB = kv.Key.Item2.ToString(),
+                        relation = kv.Value.ToString(),
+                    });
+                }
+            }
+            return deltas;
+        }
+
+        /// <summary> 从存档恢复阵营关系变更 </summary>
+        public void ApplyDeltas(System.Collections.Generic.List<SaveLoad.FactionDeltaSaveData> deltas)
+        {
+            if (deltas == null) return;
+            foreach (var d in deltas)
+            {
+                if (System.Enum.TryParse<FactionType>(d.factionA, out var a)
+                    && System.Enum.TryParse<FactionType>(d.factionB, out var b)
+                    && System.Enum.TryParse<FactionRelation>(d.relation, out var rel))
+                {
+                    SetRelation(a, b, rel);
+                }
+            }
+        }
     }
 }

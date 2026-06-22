@@ -10,6 +10,9 @@ namespace _Game.Systems.WorldContainer
     /// </summary>
     public class WorldItem : MonoBehaviour
     {
+        /// <summary> 唯一实例 ID（存档系统用，跨存读定位地面物品） </summary>
+        public int instanceId;
+
         public ItemData itemData;
         public int count = 1;
 

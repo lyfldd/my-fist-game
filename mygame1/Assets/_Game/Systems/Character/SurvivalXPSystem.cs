@@ -236,5 +236,77 @@ namespace _Game.Systems.Character
             }
             return list;
         }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 导出存档数据（由 SaveLoadManager 调用，回调填充传入的 PlayerSaveData） </summary>
+        public void PopulateSaveData(SaveLoad.PlayerSaveData pd)
+        {
+            if (pd == null) return;
+            pd.totalXP = _totalXP;
+            pd.availablePoints = _availablePoints;
+
+            pd.attributes = new System.Collections.Generic.List<SaveLoad.AttributeSaveData>();
+            foreach (var attr in _attributes)
+            {
+                pd.attributes.Add(new SaveLoad.AttributeSaveData
+                {
+                    type = attr.type.ToString(),
+                    value = attr.value,
+                });
+            }
+
+            pd.skills = new System.Collections.Generic.List<SaveLoad.SkillSaveData>();
+            foreach (var sk in _skills)
+            {
+                pd.skills.Add(new SaveLoad.SkillSaveData
+                {
+                    skillType = sk.skillType.ToString(),
+                    level = sk.level,
+                    xp = sk.xp,
+                    xpToNext = sk.xpToNext,
+                });
+            }
+        }
+
+        /// <summary> 从存档恢复 </summary>
+        public void RestoreFromSave(SaveLoad.PlayerSaveData pd)
+        {
+            if (pd == null) return;
+
+            _totalXP = pd.totalXP;
+            _availablePoints = pd.availablePoints;
+
+            if (pd.attributes != null)
+            {
+                foreach (var ad in pd.attributes)
+                {
+                    if (System.Enum.TryParse<Config.AttributeType>(ad.type, out var at))
+                    {
+                        var attr = _attributes.Find(a => a.type == at);
+                        if (attr != null) attr.value = ad.value;
+                    }
+                }
+            }
+
+            if (pd.skills != null)
+            {
+                foreach (var sd in pd.skills)
+                {
+                    if (System.Enum.TryParse<Config.SkillType>(sd.skillType, out var st))
+                    {
+                        var skill = _skills.Find(s => s.skillType == st);
+                        if (skill != null)
+                        {
+                            skill.level = sd.level;
+                            skill.xp = sd.xp;
+                            skill.xpToNext = sd.xpToNext;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

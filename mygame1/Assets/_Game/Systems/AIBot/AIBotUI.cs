@@ -63,6 +63,8 @@ namespace _Game.Systems.AIBot
         // Sub-panels (expandable sections instead of floating windows)
         private GameObject _subFollow, _subGuard, _subPatrol, _subRightArm, _subLeftArm, _subReactor;
         private bool _lastVisible;
+        private bool _needsRefresh = true;
+        private int _lastRefreshFrame;
 
         // ============================================================
         // 静态接口
@@ -80,6 +82,7 @@ namespace _Game.Systems.AIBot
             _instance._visible = true;
             _instance._lastVisible = true;
             if (_instance._canvasGo != null) _instance._canvasGo.SetActive(UIModeConfig.UseUGUI);
+            _instance.MarkDirty();
         }
 
         public static void Hide()
@@ -100,6 +103,8 @@ namespace _Game.Systems.AIBot
             catch (System.Exception e) { Debug.LogError($"[AIBotUI] UGUI 创建失败: {e.Message}\n{e.StackTrace}"); }
         }
 
+        void MarkDirty() => _needsRefresh = true;
+
         void OnEnable() { }
         void OnDisable() { InputRouter.UnbindAll(this); }
 
@@ -112,7 +117,12 @@ namespace _Game.Systems.AIBot
             }
             if (UIModeConfig.UseUGUI && _visible && _bot != null)
             {
-                RefreshUGUI();
+                if (_needsRefresh || UnityEngine.Time.frameCount - _lastRefreshFrame > 30)
+                {
+                    _lastRefreshFrame = UnityEngine.Time.frameCount;
+                    _needsRefresh = false;
+                    RefreshUGUI();
+                }
                 // 点击主面板外关闭
                 if (Input.GetMouseButtonDown(0) && _mainPanelGo != null)
                 {

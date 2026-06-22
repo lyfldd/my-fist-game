@@ -119,18 +119,26 @@ namespace _Game.Systems.Crafting
             InputRouter.UnbindAll(this);
         }
 
+        private bool _needsRefresh = true;
+        private int _lastRefreshFrame;
+
         void Update()
         {
-            // F7 切换模式时同步 Canvas 显隐
             if (_canvasGo != null)
             {
                 bool shouldShow = _isVisible && UIModeConfig.UseUGUI;
-                if (_canvasGo.activeSelf != shouldShow)
-                    _canvasGo.SetActive(shouldShow);
+                if (_canvasGo.activeSelf != shouldShow) { _canvasGo.SetActive(shouldShow); if (shouldShow) MarkDirty(); }
             }
-
-            if (UIModeConfig.UseUGUI && _isVisible) RefreshUGUI();
+            // 只脏刷新 + 30帧兜底 (0.5秒)
+            if (UIModeConfig.UseUGUI && _isVisible && (_needsRefresh || UnityEngine.Time.frameCount - _lastRefreshFrame > 30))
+            {
+                _lastRefreshFrame = UnityEngine.Time.frameCount;
+                _needsRefresh = false;
+                RefreshUGUI();
+            }
         }
+
+        void MarkDirty() => _needsRefresh = true;
 
         // ============================================================
         // UGUI — 创建全部 UI (代码自动搭建)
@@ -489,7 +497,7 @@ namespace _Game.Systems.Crafting
                 var btn = UguiMakeRecipeBtn(i);
                 btn.GetComponentInChildren<Text>().text = list[i].recipeName;
                 btn.GetComponent<Image>().color = (_selectedRecipe == list[i]) ? recipeSelectedColor : recipeNormalColor;
-                btn.onClick.AddListener(() => SelectRecipeByIndex(idx));
+                btn.onClick.AddListener(() => { SelectRecipeByIndex(idx); MarkDirty(); });
                 _recipeBtns.Add(btn);
             }
             _lastSelectedIndex = _selectedIndex;
@@ -580,6 +588,7 @@ namespace _Game.Systems.Crafting
             _clearSearchBtn.gameObject.SetActive(!string.IsNullOrEmpty(_searchText));
             _selectedRecipe = null; _selectedIndex = -1;
             UpdateDisplayedRecipes();
+            MarkDirty();
         }
 
         void ClearSearch()
@@ -589,15 +598,17 @@ namespace _Game.Systems.Crafting
             _selectedRecipe = null; _selectedIndex = -1;
             _clearSearchBtn.gameObject.SetActive(false);
             UpdateDisplayedRecipes();
+            MarkDirty();
         }
 
-        void CraftOne() { if (_selectedRecipe != null) DoCraft(_selectedRecipe); }
+        void CraftOne() { if (_selectedRecipe != null) { DoCraft(_selectedRecipe); MarkDirty(); } }
         void CraftAll()
         {
             if (_selectedRecipe == null) return;
             for (int i = 0; i < _craftableCount; i++)
                 if (!_craftingSystem.Craft(_selectedRecipe)) break;
             PostCraftRefresh();
+            MarkDirty();
         }
 
         // ============================================================
@@ -610,10 +621,10 @@ namespace _Game.Systems.Crafting
         {
             CloseOtherUIs();
             _isVisible = true;
-            // 只在 UGUI 模式下显示 Canvas（IMGUI 模式走 OnGUI）
             if (UIModeConfig.UseUGUI && _canvasGo != null)
                 _canvasGo.SetActive(true);
             RefreshRecipes();
+            MarkDirty();
         }
 
         void OnStationClosed(WorkstationClosedEvent evt)

@@ -354,5 +354,83 @@ namespace _Game.Systems.Survival
         }
 
         #endregion
+
+        #region 存档系统接口
+
+        /// <summary> 导出存档数据 </summary>
+        public SaveLoad.PlayerSaveData GetSaveData()
+        {
+            var pd = new SaveLoad.PlayerSaveData
+            {
+                health = health,
+                hunger = hunger,
+                thirst = thirst,
+                temperature = temperature,
+                currentStamina = 0f, // 由 StaminaSystem 填充
+            };
+
+            // 活跃的生存状态
+            pd.activeStates = new System.Collections.Generic.List<string>();
+            foreach (var kv in survivalStates)
+                if (kv.Value) pd.activeStates.Add(kv.Key.ToString());
+
+            // 食物类型（转换为游戏时间）
+            pd.lastFoodType = _lastFoodType;
+            pd.lastEatGameTime = timeManager != null
+                ? (UnityEngine.Time.time - _lastEatTime) / timeManager.timeScale
+                : 0f;
+
+            // 药品冷却（实时时间 → 游戏剩余秒数）
+            pd.medCooldownsRemaining = new System.Collections.Generic.Dictionary<string, float>();
+            float now = UnityEngine.Time.time;
+            float scale = timeManager != null ? timeManager.timeScale : 1f;
+            foreach (var kv in _medCooldowns)
+            {
+                float remaining = kv.Value - now;
+                if (remaining > 0)
+                    pd.medCooldownsRemaining[kv.Key] = remaining / scale;
+            }
+
+            return pd;
+        }
+
+        /// <summary> 从存档恢复 </summary>
+        public void RestoreFromSave(SaveLoad.PlayerSaveData pd)
+        {
+            if (pd == null) return;
+
+            health = pd.health;
+            hunger = pd.hunger;
+            thirst = pd.thirst;
+            temperature = pd.temperature;
+
+            // 恢复生存状态
+            foreach (SurvivalStateType state in System.Enum.GetValues(typeof(SurvivalStateType)))
+                survivalStates[state] = false;
+            if (pd.activeStates != null)
+            {
+                foreach (var stateName in pd.activeStates)
+                {
+                    if (System.Enum.TryParse<SurvivalStateType>(stateName, out var st))
+                        survivalStates[st] = true;
+                }
+            }
+
+            // 食物类型
+            _lastFoodType = pd.lastFoodType;
+            float scale = timeManager != null ? timeManager.timeScale : 1f;
+            _lastEatTime = UnityEngine.Time.time - pd.lastEatGameTime * scale;
+
+            // 药品冷却（游戏剩余秒数 → 实时时间）
+            _medCooldowns.Clear();
+            float now = UnityEngine.Time.time;
+            if (pd.medCooldownsRemaining != null)
+            {
+                foreach (var kv in pd.medCooldownsRemaining)
+                    _medCooldowns[kv.Key] = now + kv.Value * scale;
+            }
+        }
+
+        #endregion
     }
 }

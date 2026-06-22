@@ -135,9 +135,17 @@ namespace _Game.UI
                 bool show = UIModeConfig.UseUGUI && _visible && Application.isPlaying;
                 if (_canvasGo.activeSelf != show)
                     _canvasGo.SetActive(show);
-                if (show) RefreshUGUI();
+                if (show && (_needsRefresh || UnityEngine.Time.frameCount - _lastRefreshFrame > 30))
+                {
+                    _lastRefreshFrame = UnityEngine.Time.frameCount;
+                    _needsRefresh = false;
+                    RefreshUGUI();
+                }
             }
         }
+        private bool _needsRefresh = true;
+        private int _lastRefreshFrame;
+        void MarkDirty() => _needsRefresh = true;
 
         // ================================================================
         // 僵尸调试 (shared logic)

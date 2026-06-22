@@ -78,14 +78,14 @@ namespace _Game.Systems.Crafting
 
         void Awake()
         {
-            // 单例：防止 GameBootstrap 自动添加 + 场景已有 → 双实例同时画
-            if (_instance != null && _instance != this)
+            // 单例：优先使用 Managers 上的实例（如果已有则销毁自己）
+            if (_instance != null)
             {
-                Debug.LogWarning($"[ProductionDeviceUI] 检测到重复实例，销毁 {gameObject.name} 上的副本");
                 Destroy(this);
                 return;
             }
             _instance = this;
+            DontDestroyOnLoad(gameObject);
 
             _playerInv = ServiceLocator.Get<Inventory.Inventory>();
             // 强制不透明，防止 Inspector 旧序列化值导致透出残影
@@ -120,7 +120,14 @@ namespace _Game.Systems.Crafting
                 bool shouldShow = _isVisible && UIModeConfig.UseUGUI;
                 if (_canvasGo.activeSelf != shouldShow) _canvasGo.SetActive(shouldShow);
             }
-            if (UIModeConfig.UseUGUI && _isVisible) RefreshUGUI();
+            // 不自动定时刷新 — 只在选择配方或打开设备时手动刷新，按钮不会频繁重建
+        }
+
+        /// <summary> 手动触发刷新（仅在需要时调用） </summary>
+        void MarkDirty()
+        {
+            if (UIModeConfig.UseUGUI && _isVisible)
+                RefreshUGUI();
         }
 
         void OnDestroy()
@@ -147,6 +154,7 @@ namespace _Game.Systems.Crafting
             _isVisible = true;
             if (UIModeConfig.UseUGUI && _canvasGo != null) _canvasGo.SetActive(true);
             ScanNearbyDevices();
+            MarkDirty(); // 首次打开时渲染 UI
         }
 
         void ScanNearbyDevices()
@@ -464,7 +472,7 @@ namespace _Game.Systems.Crafting
                 UguiSetStretch(lblGo.GetComponent<RectTransform>());
 
                 if (!recipeLocked)
-                    go.GetComponent<Button>().onClick.AddListener(() => { _selectedRecipeIdx = idx; _lastRecipeIdx = -2; });
+                    go.GetComponent<Button>().onClick.AddListener(() => { _selectedRecipeIdx = idx; _lastRecipeIdx = -2; MarkDirty(); });
 
                 _recipeBtns.Add(go.GetComponent<Button>());
             }
@@ -564,7 +572,7 @@ namespace _Game.Systems.Crafting
                         if (_playerInv != null)
                         {
                             int added = _playerInv.AddItem(itemCap.itemData, itemCap.count);
-                            if (added > 0) outSlot.RemoveItem(itemCap.itemData, added);
+                            if (added > 0) { outSlot.RemoveItem(itemCap.itemData, added); MarkDirty(); }
                         }
                     });
                     _outputRows.Add(rowGo);
@@ -612,7 +620,10 @@ namespace _Game.Systems.Crafting
                         btn.transform.SetParent(_supplySection.transform, false);
                         btn.interactable = canFeed;
                         var capItem = req.itemData; var capCount = req.count;
-                        btn.onClick.AddListener(() => SupplyInput(capItem, capCount));
+                        btn.onClick.AddListener(() => {
+                            Debug.Log($"[ProductionDeviceUI] 🔘 点击补充: {capItem?.itemName} ×{capCount}");
+                            SupplyInput(capItem, capCount);
+                        });
                         _supplyBtns.Add(btn);
                     }
                 }
@@ -628,7 +639,10 @@ namespace _Game.Systems.Crafting
                     btn.transform.SetParent(_supplySection.transform, false);
                     btn.interactable = canFeed;
                     var capItem = sel.input; var capCount = sel.inputCount;
-                    btn.onClick.AddListener(() => SupplyInput(capItem, capCount));
+                    btn.onClick.AddListener(() => {
+                        Debug.Log($"[ProductionDeviceUI] 🔘 点击补充材料: {capItem?.itemName} ×{capCount}");
+                        SupplyInput(capItem, capCount);
+                    });
                     _supplyBtns.Add(btn);
                 }
             }
@@ -773,21 +787,36 @@ namespace _Game.Systems.Crafting
                 if (added > 0)
                     outSlot.RemoveItem(pi.itemData, added);
             }
+            MarkDirty();
         }
 
         void SupplyInput(ItemData item, int count)
         {
-            if (_playerInv == null || _currentDevice == null || item == null) return;
+            // 三重兜底找 Inventory
+            if (_playerInv == null)
+                _playerInv = ServiceLocator.Get<Inventory.Inventory>();
+            if (_playerInv == null)
+                _playerInv = FindObjectOfType<Inventory.Inventory>();
+            if (_playerInv == null)
+                _playerInv = PlayerRegistry.Get<Inventory.Inventory>();
+
+            if (_playerInv == null) { Debug.LogError("[ProductionDeviceUI] ❌ SupplyInput: 找不到 Inventory"); return; }
+            if (_currentDevice == null) { Debug.Log("[ProductionDeviceUI] SupplyInput: _currentDevice 为 null"); return; }
+            if (item == null) { Debug.Log("[ProductionDeviceUI] SupplyInput: item 为 null"); return; }
 
             var inSlot = _currentDevice.InputSlot;
-            if (inSlot == null) return;
+            if (inSlot == null) { Debug.Log("[ProductionDeviceUI] SupplyInput: InputSlot 为 null，尝试初始化..."); return; }
 
             int toTransfer = Mathf.Min(count, _playerInv.GetItemCount(item));
-            if (toTransfer <= 0) return;
+            if (toTransfer <= 0) { Debug.Log($"[ProductionDeviceUI] SupplyInput: 背包无 {item.itemName}"); return; }
 
             int added = inSlot.AddItem(item, toTransfer, float.MaxValue);
             if (added > 0)
+            {
                 _playerInv.RemoveItem(item, added);
+                Debug.Log($"[ProductionDeviceUI] ✅ 补充成功: {item.itemName} ×{added}");
+                MarkDirty();
+            }
         }
 
         /// <summary>当前设备的产出能否被目标设备作为原料接收</summary>

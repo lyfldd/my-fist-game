@@ -65,7 +65,7 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Building.BuildMenuUI");
             AddIfMissing(player, "_Game.Systems.Building.GhostPreview");
             AddIfMissing(player, "_Game.Systems.Crafting.CraftingUI");
-            AddIfMissing(player, "_Game.Systems.Crafting.ProductionDeviceUI");
+            // ProductionDeviceUI 是单例，由场景中的设备负责创建，不在 Player 上复刻
             AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchManager");
             AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchUI");
             AddIfMissing(player, "_Game.Systems.PlayerInput.MouseGroundProjector");
@@ -228,6 +228,23 @@ namespace _Game.Core
             // ThreatSystem — 威胁/仇恨系统
             if (go.GetComponent<_Game.Systems.Threat.ThreatSystem>() == null)
                 go.AddComponent<_Game.Systems.Threat.ThreatSystem>();
+
+            // ===== 存档系统 =====
+            // SaveLoadManager — 存档入口管理器
+            if (go.GetComponent<_Game.Systems.SaveLoad.SaveLoadManager>() == null)
+                go.AddComponent<_Game.Systems.SaveLoad.SaveLoadManager>();
+            // WorldItemManager — 地面物品实例ID管理器
+            if (go.GetComponent<_Game.Systems.SaveLoad.WorldItemManager>() == null)
+                go.AddComponent<_Game.Systems.SaveLoad.WorldItemManager>();
+            // SaveTriggerSystem — 自动保存触发器
+            if (go.GetComponent<_Game.Systems.SaveLoad.SaveTriggerSystem>() == null)
+                go.AddComponent<_Game.Systems.SaveLoad.SaveTriggerSystem>();
+            // PlacedStructureRegistry — 已放置建筑注册表
+            if (go.GetComponent<_Game.Systems.SaveLoad.PlacedStructureRegistry>() == null)
+                go.AddComponent<_Game.Systems.SaveLoad.PlacedStructureRegistry>();
+            // ProductionDeviceUI — 工业设备UI单例，挂在 Managers 上任一设备共用
+            if (go.GetComponent<_Game.Systems.Crafting.ProductionDeviceUI>() == null)
+                go.AddComponent<_Game.Systems.Crafting.ProductionDeviceUI>();
         }
 
         static void AddIfMissing(GameObject go, string fullTypeName)

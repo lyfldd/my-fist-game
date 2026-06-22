@@ -77,13 +77,17 @@ class UnityWSClient:
         """Send a method call and return the response dict."""
         req_id = "".join(random.choices(string.ascii_lowercase + string.digits, k=10))
         msg = json.dumps({"id": req_id, "method": method, "params": params or {}})
-        self._send_text(msg)
-        resp_str = self._recv_text()
-        resp = json.loads(resp_str)
-        # Unity returns the result directly; if there IS a "result" wrapper, unwrap it
-        if "result" in resp and len(resp) <= 3:  # JSON-RPC style response
-            return resp["result"]
-        return resp
+        try:
+            self._send_text(msg)
+            resp_str = self._recv_text()
+            resp = json.loads(resp_str)
+            # Unity returns the result directly; if there IS a "result" wrapper, unwrap it
+            if "result" in resp and len(resp) <= 3:  # JSON-RPC style response
+                return resp["result"]
+            return resp
+        except Exception:
+            self.close()  # 连接失败时标记断开，下次自动重连
+            raise
 
     def close(self):
         """Close the WebSocket connection."""
@@ -173,7 +177,7 @@ class UnityWSClient:
         # Temporarily increase timeout for large payloads
         old_timeout = self.sock.gettimeout()
         if n > 10000:
-            self.sock.settimeout(max(old_timeout or 5, 30.0))
+            self.sock.settimeout(max(old_timeout or 5, 120.0))  # 2 mins for large screenshots
         try:
             while len(data) < n:
                 chunk = self.sock.recv(min(n - len(data), 65536))
@@ -209,40 +213,39 @@ class VisionTranslator:
             f"用中文回答，尽量具体，列出所有可识别的UI元素和位置。"
         )
 
-        body = json.dumps({
-            "model": "qwen-vl-max",
-            "messages": [{
+        try:
+            from dashscope import MultiModalConversation
+
+            messages = [{
                 "role": "user",
                 "content": [
-                    {"type": "image_url",
-                     "image_url": {"url": f"data:image/png;base64,{image_base64}"}},
+                    {"type": "image",
+                     "image": f"data:image/png;base64,{image_base64}"},
                     {"type": "text", "text": prompt}
                 ]
-            }],
-            "max_tokens": 1000,
-        })
+            }]
 
-        try:
-            ctx = ssl.create_default_context()
-            conn = http.client.HTTPSConnection("dashscope.aliyuncs.com", timeout=30,
-                                               context=ctx)
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {self.api_key}",
-            }
-            conn.request("POST", "/compatible-mode/v1/chat/completions",
-                         body, headers)
-            resp = conn.getresponse()
-            raw = resp.read().decode("utf-8")
-            conn.close()
+            response = MultiModalConversation.call(
+                model="qwen-vl-max",
+                messages=messages,
+                api_key=self.api_key,
+                max_tokens=1000
+            )
 
-            data = json.loads(raw)
-            if "choices" in data and len(data["choices"]) > 0:
-                return data["choices"][0]["message"]["content"]
-            elif "error" in data:
-                return f"[视觉API错误] {data['error'].get('message', data['error'])}"
+            if response.status_code == 200 and response.output and response.output.choices:
+                content = response.output.choices[0].message.content
+                # content may be a list of dicts like [{"text": "..."}]
+                if isinstance(content, list):
+                    texts = []
+                    for item in content:
+                        if isinstance(item, dict) and "text" in item:
+                            texts.append(item["text"])
+                        else:
+                            texts.append(str(item))
+                    return "".join(texts)
+                return str(content)
             else:
-                return f"[视觉API异常响应] {raw[:300]}"
+                return f"[视觉API错误] {response.code}: {response.message}"
         except Exception as e:
             return f"[视觉分析异常] {e}"
 
@@ -552,26 +555,32 @@ class MCPBridge:
         # Build MCP content array
         content = []
 
-        is_screenshot = tool_name in SCREENSHOT_TOOLS
+        is_screenshot = tool_name in SCREENSHOT_TOOLS or tool_name == "unity_capture_to_file"
 
         if is_screenshot and result.get("success"):
-            # Translate screenshot(s) via Qwen-VL
-            if "image_base64" in result:
+            # 获取 base64 图片数据：优先从文件读，兼容旧的 image_base64 字段
+            img_b64 = result.get("image_base64")
+            if not img_b64 and result.get("path"):
+                try:
+                    with open(result["path"], "rb") as f:
+                        img_b64 = base64.b64encode(f.read()).decode()
+                except Exception as e:
+                    img_b64 = None
+                    content.append({"type": "text", "text": f"[文件读取失败] {result['path']}: {e}"})
+
+            if img_b64:
                 ctx = (f"视角: {result.get('view', 'Unknown')}, "
                        f"Play模式: {result.get('play_mode', False)}, "
                        f"分辨率: {result.get('width', '?')}x{result.get('height', '?')}")
-                visual_text = self._translator.describe(result["image_base64"], ctx)
+                visual_text = self._translator.describe(img_b64, ctx)
                 content.append({"type": "text", "text": f"[Unity 视觉分析] {visual_text}"})
-                content.append({"type": "image", "data": result["image_base64"],
+                content.append({"type": "image", "data": img_b64,
                                 "mimeType": "image/png"})
-                # Also include metadata
-                content.append({"type": "text", "text": json.dumps({
-                    k: v for k, v in result.items()
-                    if k not in ("image_base64", "success") and v is not None
-                }, indent=2, ensure_ascii=False)})
-            else:
-                content.append({"type": "text",
-                                "text": json.dumps(result, indent=2, ensure_ascii=False)})
+            # metadata
+            content.append({"type": "text", "text": json.dumps({
+                k: v for k, v in result.items()
+                if k not in ("image_base64", "success") and v is not None
+            }, indent=2, ensure_ascii=False)})
         else:
             content.append({"type": "text",
                             "text": json.dumps(result, indent=2, ensure_ascii=False)})
@@ -601,9 +610,9 @@ class MCPBridge:
 def main():
     """Read MCP requests from stdin, write responses to stdout."""
     if hasattr(sys.stdout, 'reconfigure'):
-        sys.stdout.reconfigure(line_buffering=True)
+        sys.stdout.reconfigure(encoding='utf-8', line_buffering=True)
     if hasattr(sys.stderr, 'reconfigure'):
-        sys.stderr.reconfigure(line_buffering=True)
+        sys.stderr.reconfigure(encoding='utf-8', line_buffering=True)
 
     bridge = MCPBridge()
 

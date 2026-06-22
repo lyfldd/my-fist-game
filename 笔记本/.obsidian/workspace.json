@@ -4,19 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "619586a3c94f8a86",
+        "id": "832dd84757c9e0e7",
         "type": "tabs",
         "children": [
           {
-            "id": "4ccddd3dcd15f741",
+            "id": "cfbfb088a33b0704",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "unity笔记一/Pasted image 20260506204232.png"
+                "file": "整理之后的笔记/csharp核心整理/面向对象封装整理/06_this的作用.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "Pasted image 20260506204232"
+              "icon": "lucide-file",
+              "title": "06_this的作用"
             }
           }
         ]
@@ -92,6 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "unity学习二/unity核心/动画基础/动画窗口/认识Animation动画窗口.pdf",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -101,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "反向链接"
+              "title": "认识Animation动画窗口 的反向链接列表"
             }
           },
           {
@@ -178,36 +181,53 @@
       "bases:新建数据库": false
     }
   },
-  "active": "4ccddd3dcd15f741",
+  "active": "bd32ad1c98f3d0a0",
   "lastOpenFiles": [
-    "unity笔记一/Pasted image 20260506202451.png",
-    "unity笔记一/Pasted image 20260505165640.png",
-    "unity笔记一/Pasted image 20260505164115.png",
-    "unity笔记一/Pasted image 20260505162807.png",
-    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/物理材质.md",
-    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/碰撞器.md",
-    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/碰撞检测函数.md",
-    "unity笔记一/unity入门/核心系统/物理碰撞检测系统/刚体加力.md",
-    "unity笔记一/unity入门/transform/位置和位移/vector3.md",
-    "unity笔记一/unity入门/核心系统/光源组件/光源系统基础.md",
-    "unity笔记一/unity入门/核心系统/光源组件/光面板相关.md",
-    "整理之后的笔记/csharp进阶整理/协变和逆变整理/02_对比汇总表.md",
-    "整理之后的笔记/csharp进阶整理/协变和逆变整理/01_协变与逆变概念.md",
-    "整理之后的笔记/csharp进阶整理/委托和事件整理/03_事件.md",
-    "整理之后的笔记/csharp进阶整理/委托和事件整理/02_委托方法.md",
-    "整理之后的笔记/csharp进阶整理/委托和事件整理/01_委托概念.md",
-    "整理之后的笔记/csharp进阶整理/委托和事件整理/01_事件.md",
-    "整理之后的笔记/csharp进阶整理/匿名函数整理/01_匿名函数概念.md",
-    "数据结构与算法笔记/学习清单.md",
-    "数据结构与算法笔记/2026.5.20.md",
-    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/04-反射注意事项与坑点.md",
-    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/03-反射底层原理.md",
-    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/02-反射怎么用.md",
-    "整理之后的笔记/csharp进阶整理/反射和特性整理/反射/01-反射是什么.md",
-    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/04_查找.md",
-    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/02_安全取值.md",
-    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/Dictionary整理/00_Dictionary概念和创建.md",
-    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/LinkedList整理/04_查找.md",
-    "整理之后的笔记/csharp进阶整理/数据结构整理/泛型数据结构整理/LinkedList整理/05_遍历.md"
+    "shader/shader开发概述/6  如何学习Shader开发_笔记.pdf",
+    "shader/shader开发概述/5  Shader开发是什么_笔记.pdf",
+    "shader/shader开发概述",
+    "整理之后的笔记/csharp核心整理/面向对象封装整理/01_类和对象.md",
+    "整理之后的笔记/csharp核心整理/面向对象多态整理/01_虚方法与重写.md",
+    "Pasted image 20260612141224.png",
+    "shader/渲染管线/4  渲染管线——光栅化阶段_笔记(1).pdf",
+    "shader/渲染管线/3  渲染管线——几何阶段_笔记.pdf",
+    "shader/渲染管线/2  渲染管线——应用阶段_笔记.pdf",
+    "shader/渲染管线",
+    "shader/渲染管线/应用阶段",
+    "shader",
+    "Pasted image 20260612134058.png",
+    "Pasted image 20260612134056.png",
+    "unity学习二/unity核心/模型导入相关设置/Rig操纵骨骼页签/Rig操纵页签.pdf",
+    "unity学习二/unity核心/导航寻路系统/94.导航网格动态障碍组件 知识点_笔记.pdf",
+    "unity学习二/unity核心/2d相关/Tilemap/新版unity注意事项.md",
+    "unity学习二/unity核心/2d相关/Tilemap/瓦片地图的脚本的参数.md",
+    "unity学习二/unity核心/动画基础/动画窗口/未命名.md",
+    "unity学习二/unity核心/2d相关/Tilemap/Unity Tilemap 网格布局类型.md",
+    "unity学习二/unity核心/2d相关/Tilemap/Unity 2D Tilemap 全瓦片类型详解.md",
+    "unity学习二/unity核心/2d相关/Tilemap/Unity 2D Tile Palette 网格类型详解.md",
+    "unity学习二/unity核心/2d相关/Tilemap/瓦片调色板的窗口.md",
+    "Pasted image 20260612143324.png",
+    "Pasted image 20260612141831.png",
+    "unity学习二/unity核心/2d相关/Tilemap/瓦片地图的排序问题.md",
+    "Pasted image 20260612143655.png",
+    "Pasted image 20260612143336.png",
+    "Pasted image 20260612142838.png",
+    "unity笔记一/Pasted image 20260507183402.png",
+    "unity笔记一/Pasted image 20260507181044.png",
+    "unity学习二/unity核心/2d相关/Tilemap/瓦片资源.md",
+    "unity学习二/UGUI/UGUI进阶/UI性能优化/UI性能优化.md",
+    "unity学习二/UGUI/UGUI进阶/CanvasGroup/CanvasGroup.md",
+    "unity学习二/UGUI/UGUI进阶/模型和粒子显示在UI之前/模型和粒子显示在UI之前.md",
+    "unity学习二/UGUI/UGUI基础/三大基础控件/image图片/Image图像控件.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/六大基础组件概述.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas渲染模式控制组件/Canvas渲染模式的控制.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Gra-Ray射线事件交互组件/GraphicRaycater图形射线投射器组件.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas Scaler分辨率自适应组件/CanvasScaler必备知识.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas Scaler分辨率自适应组件/CanvasScaler恒定物理模式.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas Scaler分辨率自适应组件/CanvasScaler恒定像素模式.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas Scaler分辨率自适应组件/CanvasScaler缩放模式.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/吸附与安全区适配/吸附与安全区适配.md",
+    "unity学习二/UGUI/UGUI基础/六大基础组件/Canvas Scaler分辨率自适应组件/CanvasScaler3D模式.md",
+    "unity笔记一/unity入门/gameobject/游戏体成员方法.md"
   ]
 }

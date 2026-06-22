@@ -273,5 +273,29 @@ namespace _Game.Systems.Weather
             if (idx < 0 || idx >= 4) return WeatherData.CreateDefault(WeatherType.Sunny);
             return _sorted[idx] ?? WeatherData.CreateDefault(type);
         }
+
+        // 存档系统接口
+        public SaveLoad.TimeWeatherSaveData GetSaveData()
+        {
+            return new SaveLoad.TimeWeatherSaveData
+            {
+                currentWeather = _currentWeather.ToString(),
+                stormCooldownRemaining = _stormCooldownRemaining,
+                consecutiveRainCount = _consecutiveRainCount,
+                recentWeatherHistory = new System.Collections.Generic.List<string> { _currentWeather.ToString() },
+            };
+        }
+
+        public void RestoreFromSave(SaveLoad.TimeWeatherSaveData tw)
+        {
+            if (tw == null) return;
+            if (System.Enum.TryParse<WeatherType>(tw.currentWeather, out var wt))
+            {
+                _currentWeather = wt;
+                ApplyWeather(wt);
+            }
+            _stormCooldownRemaining = tw.stormCooldownRemaining;
+            _consecutiveRainCount = tw.consecutiveRainCount;
+        }
     }
 }

@@ -9,6 +9,8 @@ namespace _Game.Systems.Inventory
     [Serializable]
     public struct PlacedItem
     {
+        /// <summary> 唯一实例 ID（存档系统用，跨存读定位物品） </summary>
+        public int instanceId;
         public ItemData itemData;
         public int count;
         public int gridX;
@@ -23,6 +25,7 @@ namespace _Game.Systems.Inventory
 
         public PlacedItem(ItemData itemData, int count, int gridX, int gridY)
         {
+            this.instanceId = 0; // 由 Inventory 分配
             this.itemData = itemData;
             this.count = count;
             this.gridX = gridX;

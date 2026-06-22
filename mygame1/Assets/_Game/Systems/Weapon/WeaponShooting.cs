@@ -284,5 +284,27 @@ namespace _Game.Systems.Weapon
 
         /// <summary> 当前散射半角（度）— 供 UI/HUD 读取 </summary>
         public float CurrentSpreadAngle => _currentSpread;
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 获取指定武器槽的当前弹夹子弹数（供存档系统采集） </summary>
+        public int GetCurrentMag(EquipSlot slot)
+        {
+            // 当前只追踪活跃武器的一个 _currentMag
+            var switcher = GetComponent<_Game.Systems.Weapon.WeaponSwitcher>();
+            if (switcher != null && switcher.ActiveSlot == slot)
+                return _currentMag;
+            return 0;
+        }
+
+        /// <summary> 设置指定武器槽的当前弹夹子弹数（供存档系统恢复） </summary>
+        public void SetCurrentMag(EquipSlot slot, int ammo)
+        {
+            var switcher = GetComponent<_Game.Systems.Weapon.WeaponSwitcher>();
+            if (switcher != null && switcher.ActiveSlot == slot)
+                _currentMag = ammo;
+        }
     }
 }

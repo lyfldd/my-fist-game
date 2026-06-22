@@ -819,4 +819,55 @@ namespace _Game.Core
             Temperature = temp;
         }
     }
+
+    // ===== 存档系统事件 =====
+
+    /// <summary> 请求保存（手动/自动） </summary>
+    public readonly struct RequestSaveGame
+    {
+        public int SlotIndex { get; }
+        public bool IsAutoSave { get; }
+        public RequestSaveGame(int slotIndex, bool isAutoSave)
+        {
+            SlotIndex = slotIndex;
+            IsAutoSave = isAutoSave;
+        }
+    }
+
+    /// <summary> 保存完成 </summary>
+    public readonly struct SaveCompleted
+    {
+        public int SlotIndex { get; }
+        public bool Success { get; }
+        public SaveCompleted(int slotIndex, bool success)
+        {
+            SlotIndex = slotIndex;
+            Success = success;
+        }
+    }
+
+    /// <summary> 加载完成 </summary>
+    public readonly struct LoadCompleted
+    {
+        public int SlotIndex { get; }
+        public bool Success { get; }
+        public LoadCompleted(int slotIndex, bool success)
+        {
+            SlotIndex = slotIndex;
+            Success = success;
+        }
+    }
+
+    /// <summary> 开始加载游戏 </summary>
+    public readonly struct GameLoadStarted
+    {
+        public int SlotIndex { get; }
+        public GameLoadStarted(int slotIndex) { SlotIndex = slotIndex; }
+    }
+
+    /// <summary> 世界生成管线完成 </summary>
+    public readonly struct WorldGenCompleted { }
+
+    /// <summary> Phase 4 全部实体 Instantiate + GUID 注册完毕 </summary>
+    public readonly struct WorldEntitiesRestored { }
 }

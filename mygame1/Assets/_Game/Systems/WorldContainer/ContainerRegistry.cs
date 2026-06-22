@@ -107,5 +107,96 @@ namespace _Game.Systems.WorldContainer
                 record.container = null;
             }
         }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 导出所有容器记录（存档用） </summary>
+        public System.Collections.Generic.List<SaveLoad.ContainerSaveRecord> GetAllRecords()
+        {
+            var result = new System.Collections.Generic.List<SaveLoad.ContainerSaveRecord>();
+            foreach (var kv in _records)
+            {
+                var r = kv.Value;
+                var csr = new SaveLoad.ContainerSaveRecord
+                {
+                    containerId = r.containerId,
+                    isOpened = r.isOpened,
+                    openedGameDay = r.openedGameDay,
+                    profileName = r.profile != null ? r.profile.name : "",
+                };
+
+                // 导出容器内物品
+                if (r.container != null && r.container.placedItems.Count > 0)
+                {
+                    csr.items = new System.Collections.Generic.List<SaveLoad.SlotSaveData>();
+                    foreach (var pi in r.container.placedItems)
+                    {
+                        csr.items.Add(new SaveLoad.SlotSaveData
+                        {
+                            instanceId = pi.instanceId,
+                            itemName = (pi.isGhost || pi.itemData == null) ? null : pi.itemData.itemName,
+                            count = pi.count,
+                            gridX = pi.gridX,
+                            gridY = pi.gridY,
+                            rotated = pi.rotated,
+                            isGhost = pi.isGhost,
+                        });
+                    }
+                }
+                // csr.items = null 表示未生成过 loot，读档后由 profile 重新生成
+
+                result.Add(csr);
+            }
+            return result;
+        }
+
+        /// <summary> 从存档恢复单个容器记录 </summary>
+        public void RestoreRecord(SaveLoad.ContainerSaveRecord csr, SaveLoad.ItemCatalog itemCatalog)
+        {
+            if (csr == null) return;
+            if (!_records.TryGetValue(csr.containerId, out var record)) return;
+
+            record.isOpened = csr.isOpened;
+            record.openedGameDay = csr.openedGameDay;
+
+            if (csr.items != null)
+            {
+                // 确保容器已创建
+                if (record.container == null && record.profile != null)
+                {
+                    record.container = new Inventory.InventoryContainer
+                    {
+                        containerName = record.profile.displayName,
+                        gridWidth = record.profile.gridWidth,
+                        gridHeight = record.profile.gridHeight,
+                    };
+                }
+
+                if (record.container != null)
+                {
+                    record.container.placedItems.Clear();
+                    foreach (var s in csr.items)
+                    {
+                        if (string.IsNullOrEmpty(s.itemName) || itemCatalog == null)
+                            continue;
+                        var itemData = itemCatalog.Find(s.itemName);
+                        if (itemData != null)
+                        {
+                            record.container.placedItems.Add(new Inventory.PlacedItem
+                            {
+                                instanceId = s.instanceId,
+                                itemData = itemData,
+                                count = s.count,
+                                gridX = s.gridX,
+                                gridY = s.gridY,
+                                rotated = s.rotated,
+                            });
+                        }
+                    }
+                }
+            }
+        }
     }
 }

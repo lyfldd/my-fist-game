@@ -147,5 +147,13 @@ namespace _Game.Systems.Crafting
                 if (p.researchId == researchId) return p;
             return null;
         }
+
+        // 存档系统接口
+        public System.Collections.Generic.List<string> GetCompletedIds() => new System.Collections.Generic.List<string>(_completedIds);
+        public void RestoreCompletedIds(System.Collections.Generic.List<string> ids)
+        {
+            _completedIds.Clear();
+            if (ids != null) _completedIds.AddRange(ids);
+        }
     }
 }

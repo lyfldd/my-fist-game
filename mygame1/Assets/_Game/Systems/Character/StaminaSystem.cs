@@ -95,5 +95,23 @@ namespace _Game.Systems.Character
         {
             _currentStamina = _maxStamina;
         }
+
+        // ============================================================
+        // 存档系统接口
+        // ============================================================
+
+        /// <summary> 填充存档数据中的体力字段 </summary>
+        public void PopulateSaveData(SaveLoad.PlayerSaveData pd)
+        {
+            if (pd == null) return;
+            pd.currentStamina = _currentStamina;
+        }
+
+        /// <summary> 从存档恢复体力 </summary>
+        public void RestoreFromSave(SaveLoad.PlayerSaveData pd)
+        {
+            if (pd == null) return;
+            _currentStamina = pd.currentStamina;
+        }
     }
 }

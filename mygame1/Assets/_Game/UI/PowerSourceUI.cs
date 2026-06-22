@@ -38,6 +38,7 @@ namespace _Game.UI
             _instance._visible = true;
             if (UIModeConfig.UseUGUI && _instance._canvasGo != null)
                 _instance._canvasGo.SetActive(true);
+            _instance.MarkDirty();
         }
 
         public static void Hide()
@@ -54,11 +55,17 @@ namespace _Game.UI
                 CreateUGUI();
         }
 
+        private int _lastRefreshFrame;
         void Update()
         {
-            if (UIModeConfig.UseUGUI && _visible && _currentSource != null)
+            if (UIModeConfig.UseUGUI && _visible && _currentSource != null
+                && UnityEngine.Time.frameCount - _lastRefreshFrame > 30)
+            {
+                _lastRefreshFrame = UnityEngine.Time.frameCount;
                 RefreshUGUI();
+            }
         }
+        void MarkDirty() { _lastRefreshFrame = 0; }
 
         // ============================================================
         // UGUI

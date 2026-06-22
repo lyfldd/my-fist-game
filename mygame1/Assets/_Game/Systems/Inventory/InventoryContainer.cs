@@ -170,7 +170,8 @@ namespace _Game.Systems.Inventory
                     if (perStack <= 0) break;
                 }
 
-                placedItems.Add(new PlacedItem(item, perStack, fx, fy));
+                var placed = new PlacedItem(item, perStack, fx, fy);
+                placedItems.Add(placed);
                 remaining -= perStack;
             }
 
