@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Config;
 using _Game.Core;
+using _Game.UI;
 using System.Collections.Generic;
 
 namespace _Game.Systems.Building
@@ -225,7 +226,7 @@ namespace _Game.Systems.Building
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             // Canvas
             _canvasGo = new GameObject("BuildMenuUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

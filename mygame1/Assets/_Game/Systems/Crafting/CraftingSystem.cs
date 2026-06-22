@@ -29,12 +29,12 @@ namespace _Game.Systems.Crafting
                 return;
             }
             Instance = this;
+            ServiceLocator.Register(this);
             if (_catalog == null) _catalog = Resources.Load<RecipeCatalog>("RecipeCatalog");
-            _inventory = ServiceLocator.Get<Inventory.Inventory>();
-            _xpSystem = SurvivalXPSystem.Instance;
-            if (_xpSystem == null)
-                _xpSystem = ServiceLocator.Get<SurvivalXPSystem>();
-            _stamina = ServiceLocator.Get<StaminaSystem>();
+            // 这些组件都在同一个 GameObject 上，用 GetComponent 避免 ServiceLocator 时序问题
+            _inventory = GetComponent<Inventory.Inventory>();
+            _xpSystem = GetComponent<SurvivalXPSystem>();
+            _stamina = GetComponent<StaminaSystem>();
         }
 
         /// <summary>

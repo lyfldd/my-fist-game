@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Config;
 using _Game.Core;
+using _Game.UI;
 using _Game.Systems.Power;
 
 namespace _Game.Systems.Crafting
@@ -225,7 +226,7 @@ namespace _Game.Systems.Crafting
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             _canvasGo = new GameObject("ProductionDeviceUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             _canvasGo.transform.SetParent(transform, false);

@@ -54,6 +54,7 @@ namespace _Game.Systems.Building
 
         private void Awake()
         {
+            ServiceLocator.Register(this);
             _inventory = GetComponent<Inv>();
             _ghostPreview = GetComponent<GhostPreview>();
             _staminaSystem = GetComponent<_Game.Systems.Character.StaminaSystem>();

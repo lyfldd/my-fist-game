@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Config;
 using _Game.Core;
+using _Game.UI;
 
 namespace _Game.Systems.Crafting
 {
@@ -53,6 +54,7 @@ namespace _Game.Systems.Crafting
         {
             if (_instance != null && _instance != this) { Destroy(this); return; }
             _instance = this;
+            ServiceLocator.Register(this);
             _manager = GetComponent<ChemicalResearchManager>();
             _inventory = GetComponent<Inventory.Inventory>();
         }
@@ -97,7 +99,7 @@ namespace _Game.Systems.Crafting
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             _canvasGo = new GameObject("ChemicalResearchUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             _canvasGo.transform.SetParent(transform, false);

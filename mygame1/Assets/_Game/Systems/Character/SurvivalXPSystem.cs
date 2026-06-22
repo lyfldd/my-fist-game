@@ -38,6 +38,7 @@ namespace _Game.Systems.Character
                 return;
             }
             Instance = this;
+            ServiceLocator.Register(this);
             DontDestroyOnLoad(gameObject);
         }
 
@@ -102,6 +103,8 @@ namespace _Game.Systems.Character
             // 职业加成
             if (data != null && data.profession != null)
             {
+                Debug.Log($"[SurvivalXPSystem] ✅ 职业模板: {data.profession.templateName}, startWithAIBot={data.profession.startWithAIBot}");
+
                 ApplyProfession(data.profession);
 
                 // 投放初始装备和物品
@@ -112,6 +115,10 @@ namespace _Game.Systems.Character
                         applier = pc.gameObject.AddComponent<ProfessionApplier>();
                     applier.ApplyStartingGear(data.profession);
                 }
+            }
+            else
+            {
+                Debug.LogWarning($"[SurvivalXPSystem] ⚠️ 职业未设置 — data={data != null}, profession={data?.profession != null}");
             }
         }
 

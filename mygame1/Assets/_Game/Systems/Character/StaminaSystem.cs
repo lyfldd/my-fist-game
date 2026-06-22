@@ -23,6 +23,8 @@ namespace _Game.Systems.Character
         private bool _isWalking;
         private float _overloadBonusDrain;
 
+        void Awake() { ServiceLocator.Register(this); }
+
         void Start()
         {
             _player = GetComponent<PlayerCharacter>();

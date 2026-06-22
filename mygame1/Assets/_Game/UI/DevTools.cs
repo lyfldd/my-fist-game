@@ -345,7 +345,7 @@ namespace _Game.UI
         // ============================================================
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
             float pw = _panelW + 60f; // UGUI 稍宽
             float ph = _panelH + 60f;
 

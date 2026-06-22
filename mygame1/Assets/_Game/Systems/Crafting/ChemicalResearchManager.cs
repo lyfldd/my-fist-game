@@ -18,6 +18,7 @@ namespace _Game.Systems.Crafting
 
         void Awake()
         {
+            ServiceLocator.Register(this);
             if (_researchData == null)
                 _researchData = Resources.Load<ChemicalResearchData>("ChemicalResearchData");
         }

@@ -43,6 +43,11 @@ namespace _Game.Systems.SaveLoad
         /// <summary> 世界是否正在生成 </summary>
         public bool IsWorldGenerating { get; set; }
 
+        /// <summary> 从主菜单传入：待使用的存档槽（-1 表示无） </summary>
+        [System.NonSerialized] public int _pendingSlot = -1;
+        /// <summary> 从主菜单传入：是否加载已有存档 </summary>
+        [System.NonSerialized] public bool _pendingLoad;
+
         // ═══ 冷却 ═══
         private float _lastManualSaveTime = -999f;
 
@@ -122,6 +127,18 @@ namespace _Game.Systems.SaveLoad
         public void AutoSave()
         {
             RequestSave(_currentSlotIndex, true);
+        }
+
+        /// <summary> 开始新游戏 </summary>
+        public void NewGame(int slotIndex)
+        {
+            _currentSlotIndex = slotIndex;
+            // 删除旧存档（如果存在）
+            if (SaveService.SlotExists(slotIndex))
+                SaveService.DeleteSlot(slotIndex);
+            IsLoading = false;
+            UnityEngine.Time.timeScale = 1f;
+            Debug.Log($"[SaveLoadManager] 新游戏开始 slot={slotIndex}");
         }
 
         /// <summary> 手动加载 </summary>
@@ -322,7 +339,8 @@ namespace _Game.Systems.SaveLoad
 
             // Phase 6: 恢复系统实体状态
             RestoreProductionDevices(saveData.productions);
-            // TODO: P4 — 电力网/AIBot/车辆/僵尸
+            // ✅ AI 机器人已通过建筑+状态恢复（P4 已完成）
+            // TODO: P4 — 电力网/车辆/僵尸
 
             // Phase 7: 恢复全局状态
             RestoreTimeWeather(saveData.timeWeather);
@@ -449,7 +467,7 @@ namespace _Game.Systems.SaveLoad
                 foreach (var ps in registry.AllStructures)
                 {
                     if (ps == null || ps.buildableData == null) continue;
-                    // 排除会移动的独立实体（AI机器人、车辆）——它们将来走 Phase 4 实体保存
+                    // 排除会移动的独立实体（AI机器人、车辆）——它们走独立实体保存路径
                     if (ps.GetComponent<_Game.Systems.AIBot.AIBot>() != null) continue;
                     if (ps.GetComponent<_Game.Systems.Vehicle.VehicleController>() != null) continue;
                     // 工作台/熔炉/电力设备等——虽然是实体但通过建造系统放置，走建筑路径保存
@@ -495,7 +513,18 @@ namespace _Game.Systems.SaveLoad
             var faction = FindObjectOfType<_Game.Systems.Threat.FactionSystem>();
             ws.factionDeltas = faction?.GetFactionDeltas() ?? new System.Collections.Generic.List<FactionDeltaSaveData>();
 
-            Debug.Log($"[SaveLoadManager] 📦 采集世界实体: 建筑={ws.buildings.Count}, 地面物品={ws.groundItems.Count}, 容器={ws.containers.Count}");
+            // AI 机器人
+            ws.aiBots = new System.Collections.Generic.List<AIBotSaveData>();
+            var allBots = FindObjectsOfType<_Game.Systems.AIBot.AIBot>();
+            foreach (var bot in allBots)
+            {
+                if (bot == null || bot.IsDead) continue;
+                var botData = bot.GetSaveData();
+                if (!string.IsNullOrEmpty(botData.guid))
+                    ws.aiBots.Add(botData);
+            }
+
+            Debug.Log($"[SaveLoadManager] 📦 采集世界实体: 建筑={ws.buildings.Count}, 地面物品={ws.groundItems.Count}, 容器={ws.containers.Count}, AI机器人={ws.aiBots.Count}");
 
             return ws;
         }
@@ -690,6 +719,67 @@ namespace _Game.Systems.SaveLoad
                 var faction = FindObjectOfType<_Game.Systems.Threat.FactionSystem>();
                 faction?.ApplyDeltas(world.factionDeltas);
             }
+
+            // 5. 恢复 AI 机器人（独立实体路径：不走建筑列表，避免重复创建）
+            if (world.aiBots != null && world.aiBots.Count > 0)
+            {
+                var buildableCatalog = Resources.Load<BuildableCatalog>("BuildableCatalog");
+#if UNITY_EDITOR
+                if (buildableCatalog == null)
+                    buildableCatalog = UnityEditor.AssetDatabase.LoadAssetAtPath<BuildableCatalog>(
+                        "Assets/_Game/Config/BuildableCatalog.asset");
+#endif
+                var buildController = PlayerRegistry.Get<_Game.Systems.Building.BuildModeController>();
+                int restoredBots = 0;
+
+                foreach (var botData in world.aiBots)
+                {
+                    if (string.IsNullOrEmpty(botData.guid) || string.IsNullOrEmpty(botData.buildableName))
+                        continue;
+
+                    // 查找 BuildableData
+                    BuildableData bd = null;
+                    if (buildableCatalog != null && buildableCatalog.buildables != null)
+                    {
+                        foreach (var b in buildableCatalog.buildables)
+                        {
+                            if (b != null && b.displayName == botData.buildableName) { bd = b; break; }
+                        }
+                    }
+                    if (bd == null)
+                    {
+                        Debug.LogWarning($"[SaveLoadManager] 🤖 恢复 AI 机器人跳过，catalog 中无: {botData.buildableName}");
+                        continue;
+                    }
+
+                    // 通过建造系统创建结构（PlaceStructureDirect 会检测 AI 并挂载组件）
+                    Vector3 pos = new Vector3(botData.posX, botData.posY, botData.posZ);
+                    GameObject go;
+                    if (buildController != null)
+                        go = buildController.PlaceStructureDirect(bd, pos);
+                    else
+                        continue;
+
+                    if (go == null) continue;
+
+                    // 设置旋转
+                    go.transform.rotation = Quaternion.Euler(0, botData.rotY, 0);
+
+                    // 覆盖 GUID
+                    var guid = go.GetComponent<PersistentGUID>();
+                    if (guid != null && !string.IsNullOrEmpty(botData.guid))
+                        guid.Initialize(botData.guid, "AIBot");
+
+                    // 恢复 AI 专属状态
+                    var bot = go.GetComponent<_Game.Systems.AIBot.AIBot>();
+                    if (bot != null)
+                    {
+                        bot.RestoreFromSave(botData, _itemCatalog);
+                        restoredBots++;
+                    }
+                }
+                Debug.Log($"[SaveLoadManager] 🤖 恢复 AI 机器人: {restoredBots}/{world.aiBots.Count}");
+            }
         }
 
         /// <summary> 恢复生产设备内部状态（Phase 4，在建筑和 GUID 注册之后） </summary>
@@ -748,6 +838,7 @@ namespace _Game.Systems.SaveLoad
         private void AutoSaveOnQuit()
         {
             if (IsLoading) return;
+            if (PlayerRegistry.Transform == null) return; // 主菜单场景无玩家，不保存
 
             // 同步保存（退出时不能异步）
             var saveData = new SaveData

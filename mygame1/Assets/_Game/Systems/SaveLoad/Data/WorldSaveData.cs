@@ -14,6 +14,7 @@ namespace _Game.Systems.SaveLoad
         public List<WorldItemSaveData> groundItems;
         public List<ContainerSaveRecord> containers;
         public List<FactionDeltaSaveData> factionDeltas;
+        public List<AIBotSaveData> aiBots;
 
         public object Clone()
         {
@@ -23,6 +24,7 @@ namespace _Game.Systems.SaveLoad
                 groundItems = CloneList(this.groundItems),
                 containers = CloneList(this.containers),
                 factionDeltas = CloneList(this.factionDeltas),
+                aiBots = CloneList(this.aiBots),
             };
         }
 

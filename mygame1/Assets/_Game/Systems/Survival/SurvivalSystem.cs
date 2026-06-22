@@ -51,6 +51,8 @@ namespace _Game.Systems.Survival
         public bool HasState(SurvivalStateType state) => survivalStates.ContainsKey(state) && survivalStates[state];
         public float EnvTemperature => currentEnvTemperature;
 
+        private void Awake() { ServiceLocator.Register(this); }
+
         private void Start()
         {
             AutoInitComponents();

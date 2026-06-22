@@ -153,21 +153,49 @@ namespace _Game.UI
 
         private void CreateCanvas()
         {
-            canvasObject = new GameObject("QuickItemBar_Canvas");
-            canvasObject.transform.SetParent(transform, false);
+            var existing = transform.Find("QuickItemBar_Canvas");
+            if (existing != null)
+            {
+                canvasObject = existing.gameObject;
+                FindSlotRefs();
+                RefreshAll();
+                return;
+            }
 
-            var canvas = canvasObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 90;
-
-            canvasObject.AddComponent<CanvasScaler>();
-            var gr = canvasObject.AddComponent<GraphicRaycaster>();
-            gr.blockingObjects = GraphicRaycaster.BlockingObjects.None;
+            var canvas = UGUIBuilder.CreateCanvas("QuickItemBar_Canvas", 90);
+            canvas.transform.SetParent(transform, false);
+            canvasObject = canvas.gameObject;
+            var gr = canvasObject.GetComponent<GraphicRaycaster>();
+            if (gr != null) gr.blockingObjects = GraphicRaycaster.BlockingObjects.None;
 
             CreateSlots();
             CreateArrows();
             CreateGlobalProgressBar();
             RefreshAll();
+        }
+
+        void FindSlotRefs()
+        {
+            slotImages = new Image[maxVisibleSlots];
+            slotCountTexts = new Text[maxVisibleSlots];
+            slotNameTexts = new Text[maxVisibleSlots];
+            slotBorders = new GameObject[maxVisibleSlots];
+            slotRects = new RectTransform[maxVisibleSlots];
+            var grid = canvasObject.transform.Find("SlotGrid");
+            if (grid == null) return;
+            for (int i = 0; i < maxVisibleSlots; i++)
+            {
+                var slot = grid.Find($"Slot_{i}");
+                if (slot == null) continue;
+                slotImages[i] = slot.GetComponent<Image>();
+                slotRects[i] = slot.GetComponent<RectTransform>();
+                slotCountTexts[i] = slot.Find("Count")?.GetComponent<Text>();
+                slotNameTexts[i] = slot.Find("ItemName")?.GetComponent<Text>();
+                slotBorders[i] = slot.Find("Border")?.gameObject;
+                if (slotBorders[i] != null) slotBorders[i].SetActive(false);
+            }
+            arrowLeftText = canvasObject.transform.Find("ArrowLeft")?.GetComponent<Text>();
+            arrowRightText = canvasObject.transform.Find("ArrowRight")?.GetComponent<Text>();
         }
 
         private void CreateSlots()
@@ -294,38 +322,16 @@ namespace _Game.UI
             float barWidth = maxVisibleSlots * slotSize + (maxVisibleSlots - 1) * spacing;
 
             // 左箭头
-            var leftGo = new GameObject("ArrowLeft", typeof(Text));
-            leftGo.transform.SetParent(canvasObject.transform, false);
-            var leftRt = leftGo.GetComponent<RectTransform>();
-            leftRt.anchorMin = new Vector2(0.5f, 0);
-            leftRt.anchorMax = new Vector2(0.5f, 0);
-            leftRt.pivot = new Vector2(1, 0.5f);
-            leftRt.sizeDelta = new Vector2(30, slotSize);
-            leftRt.anchoredPosition = new Vector2(-barWidth / 2 - 8, bottomMargin + slotSize / 2);
-
-            arrowLeftText = leftGo.GetComponent<Text>();
-            arrowLeftText.font = GetFont();
-            arrowLeftText.fontSize = 24;
-            arrowLeftText.alignment = TextAnchor.MiddleCenter;
-            arrowLeftText.color = arrowColor;
-            arrowLeftText.text = "<";
+            arrowLeftText = UGUIBuilder.CreateTextAnchored("ArrowLeft", canvasObject.transform,
+                "<", new Vector2(0.5f, 0), new Vector2(-barWidth/2 - 8, bottomMargin + slotSize/2),
+                30, slotSize, 24, FontStyle.Normal, TextAnchor.MiddleCenter, arrowColor);
+            arrowLeftText.rectTransform.pivot = new Vector2(1, 0.5f);
 
             // 右箭头
-            var rightGo = new GameObject("ArrowRight", typeof(Text));
-            rightGo.transform.SetParent(canvasObject.transform, false);
-            var rightRt = rightGo.GetComponent<RectTransform>();
-            rightRt.anchorMin = new Vector2(0.5f, 0);
-            rightRt.anchorMax = new Vector2(0.5f, 0);
-            rightRt.pivot = new Vector2(0, 0.5f);
-            rightRt.sizeDelta = new Vector2(30, slotSize);
-            rightRt.anchoredPosition = new Vector2(barWidth / 2 + 8, bottomMargin + slotSize / 2);
-
-            arrowRightText = rightGo.GetComponent<Text>();
-            arrowRightText.font = GetFont();
-            arrowRightText.fontSize = 24;
-            arrowRightText.alignment = TextAnchor.MiddleCenter;
-            arrowRightText.color = arrowColor;
-            arrowRightText.text = ">";
+            arrowRightText = UGUIBuilder.CreateTextAnchored("ArrowRight", canvasObject.transform,
+                ">", new Vector2(0.5f, 0), new Vector2(barWidth/2 + 8, bottomMargin + slotSize/2),
+                30, slotSize, 24, FontStyle.Normal, TextAnchor.MiddleCenter, arrowColor);
+            arrowRightText.rectTransform.pivot = new Vector2(0, 0.5f);
         }
 
         // ===== 中央全局进度条 =====
@@ -376,16 +382,13 @@ namespace _Game.UI
             nameRt.anchorMax = Vector2.one;
             nameRt.offsetMin = Vector2.zero;
             nameRt.offsetMax = Vector2.zero;
-            var nameTxt = name.GetComponent<Text>();
-            nameTxt.font = GetFont();
-            nameTxt.fontSize = 14;
-            nameTxt.alignment = TextAnchor.MiddleCenter;
-            nameTxt.color = Color.white;
-            nameTxt.text = "";
+            globalProgressNameTxt = UGUIBuilder.CreateTextAnchored("Name", panel.transform, "",
+                new Vector2(0.5f, 0.5f), Vector2.zero, 200, 36, 14, FontStyle.Normal, TextAnchor.MiddleCenter);
+            UGUIBuilder.Stretch(globalProgressNameTxt.rectTransform);
+            Destroy(name); // 清理旧对象
 
             globalProgressGo = go;
             globalProgressFill = fillImg;
-            globalProgressNameTxt = nameTxt;
             go.SetActive(false);
         }
 
@@ -632,7 +635,7 @@ namespace _Game.UI
         {
             Font font;
             try { font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { font = null; }
-            if (font == null) font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            if (font == null) font = UGUIBuilder.DefaultFont;
             return font;
         }
     }

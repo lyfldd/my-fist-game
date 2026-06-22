@@ -2,19 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Core;
 using _Game.Systems.AIBot;
-using _Game.Systems.Building;
 using _Game.Systems.Vehicle;
 
 namespace _Game.UI
 {
     /// <summary>
-    /// 左上角上下文 HUD：非驾驶时显示时间/天数，载具驾驶时显示车速/油量，AI机器人驾驶时显示武器名。
-    /// 挂载到场景任意 GameObject，Start 时自动注册事件订阅。
-    /// UGUI 模式下自动创建 Canvas Text 替代 OnGUI。
+    /// 左上角上下文 HUD：非驾驶时时间/天数，载具驾驶时车速/油量，AI驾驶时武器名
     /// </summary>
     public class TopLeftHUD : MonoBehaviour
     {
-        // --- UGUI ---
         private GameObject _canvasGo;
         private Text _mainText;
         private Text _weaponText, _hpText;
@@ -25,8 +21,7 @@ namespace _Game.UI
         private string _periodName = "";
 
         private VehicleController _vehicle;
-        private float _speedKmh;
-        private float _fuel;
+        private float _speedKmh, _fuel;
         private bool _isBoosting;
 
         private AIBotPilot _pilot;
@@ -40,76 +35,44 @@ namespace _Game.UI
             EventBus.Subscribe<VehicleExitedEvent>(OnVehicleExit);
             EventBus.Subscribe<AIBotPilotEnteredEvent>(OnPilotEnter);
             EventBus.Subscribe<AIBotPilotExitedEvent>(OnPilotExit);
-
-            if (UIModeConfig.UseUGUI)
-                CreateUGUI();
+            if (UIModeConfig.UseUGUI) CreateUI();
         }
 
-        void CreateUGUI()
+        void CreateUI()
         {
-            // 检查是否已有 TopLeftHUD_Canvas（避免重复创建）
-            _canvasGo = GameObject.Find("TopLeftHUD_Canvas");
-            if (_canvasGo == null)
+            var existing = transform.Find("TopLeftHUD_Canvas");
+            if (existing != null)
             {
-                _canvasGo = new GameObject("TopLeftHUD_Canvas", typeof(Canvas), typeof(CanvasScaler));
-                _canvasGo.transform.SetParent(transform, false);
-                var canvas = _canvasGo.GetComponent<Canvas>();
-                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                canvas.sortingOrder = 50;
-            }
-            else
-            {
-                // 已存在：清理旧的文本子对象，避免重复叠加
-                foreach (Transform child in _canvasGo.transform)
-                    Destroy(child.gameObject);
-                _canvasGo.transform.SetParent(transform, false);
-                var canvas = _canvasGo.GetComponent<Canvas>();
-                if (canvas != null)
-                {
-                    canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-                    canvas.sortingOrder = 50;
-                }
+                _canvasGo = existing.gameObject;
+                _mainText = existing.Find("MainText")?.GetComponent<Text>();
+                _mainRect = _mainText?.rectTransform;
+                _weaponText = existing.Find("WeaponText")?.GetComponent<Text>();
+                _weaponRect = _weaponText?.rectTransform;
+                _hpText = existing.Find("HPText")?.GetComponent<Text>();
+                _hpRect = _hpText?.rectTransform;
+                return;
             }
 
-            Font font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _canvasGo = UGUIBuilder.CreateCanvas("TopLeftHUD_Canvas", 50).gameObject;
+            _canvasGo.transform.SetParent(transform, false);
 
-            // 主文本（时间 或 车速/油量）
-            var mainGo = new GameObject("MainText");
-            mainGo.transform.SetParent(_canvasGo.transform, false);
-            _mainText = mainGo.AddComponent<Text>();
-            _mainText.font = font;
-            _mainText.fontSize = 18;
-            _mainText.alignment = TextAnchor.UpperLeft;
-            _mainText.raycastTarget = false;
+            _mainText = UGUIBuilder.CreateTextAnchored("MainText", _canvasGo.transform,
+                "", new Vector2(0, 1), new Vector2(10, -10), 350, 60, 18,
+                FontStyle.Normal, TextAnchor.UpperLeft);
             _mainText.supportRichText = true;
-            _mainRect = mainGo.GetComponent<RectTransform>();
-            _mainRect.anchorMin = new Vector2(0, 1);
-            _mainRect.anchorMax = new Vector2(0, 1);
-            _mainRect.pivot = new Vector2(0, 1);
-            _mainRect.anchoredPosition = new Vector2(10, -10);
-            _mainRect.sizeDelta = new Vector2(350, 60);
+            _mainRect = _mainText.rectTransform;
 
-            // 武器文本
-            _weaponText = CreateAuxText("WeaponText", font, out _weaponRect);
-            // HP 文本
-            _hpText = CreateAuxText("HPText", font, out _hpRect);
+            _weaponText = MakeAux("WeaponText", out _weaponRect);
+            _hpText = MakeAux("HPText", out _hpRect);
         }
 
-        Text CreateAuxText(string name, Font font, out RectTransform rect)
+        Text MakeAux(string name, out RectTransform rect)
         {
-            var go = new GameObject(name);
-            go.transform.SetParent(_canvasGo.transform, false);
-            var t = go.AddComponent<Text>();
-            t.font = font;
-            t.fontSize = 15;
-            t.alignment = TextAnchor.UpperLeft;
-            t.raycastTarget = false;
+            var t = UGUIBuilder.CreateTextAnchored(name, _canvasGo.transform,
+                "", new Vector2(0, 1), Vector2.zero, 350, 24, 15,
+                FontStyle.Normal, TextAnchor.UpperLeft);
             t.supportRichText = true;
-            rect = go.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0, 1);
-            rect.anchorMax = new Vector2(0, 1);
-            rect.pivot = new Vector2(0, 1);
-            rect.sizeDelta = new Vector2(350, 24);
+            rect = t.rectTransform;
             return t;
         }
 
@@ -125,111 +88,49 @@ namespace _Game.UI
 
         void Update()
         {
-            if (_vehicle != null)
-            {
-                _speedKmh = _vehicle.CurrentSpeedKmh;
-                _fuel = _vehicle.CurrentFuel;
-                _isBoosting = _vehicle.IsBoosting;
-            }
-
-            if (UIModeConfig.UseUGUI && _mainText != null)
-                RefreshUGUI();
+            if (_vehicle != null) { _speedKmh = _vehicle.CurrentSpeedKmh; _fuel = _vehicle.CurrentFuel; _isBoosting = _vehicle.IsBoosting; }
+            if (UIModeConfig.UseUGUI && _mainText != null) Refresh();
         }
 
-        void RefreshUGUI()
+        void Refresh()
         {
-            if (_vehicle != null)
-                RefreshVehicleInfoUGUI();
-            else
-                RefreshTimeInfoUGUI();
-
-            if (_pilot != null)
-                RefreshPilotWeaponUGUI();
-            else
-            {
-                _weaponText.text = "";
-                _hpText.text = "";
-            }
+            if (_vehicle != null) RefreshVehicle(); else RefreshTime();
+            if (_pilot != null) RefreshPilot(); else { _weaponText.text = ""; _hpText.text = ""; }
         }
 
-        void RefreshTimeInfoUGUI()
+        void RefreshTime()
         {
-            int hour = Mathf.FloorToInt(_currentHour);
-            int minute = Mathf.FloorToInt((_currentHour - hour) * 60f);
-            _mainText.text = $"<color=white>第{_currentDay}天  {hour:00}:{minute:00}  {_periodName}</color>";
+            int h = Mathf.FloorToInt(_currentHour);
+            int m = Mathf.FloorToInt((_currentHour - h) * 60f);
+            _mainText.text = $"<color=white>第{_currentDay}天  {h:00}:{m:00}  {_periodName}</color>";
         }
 
-        void RefreshVehicleInfoUGUI()
+        void RefreshVehicle()
         {
-            string boostLabel = _isBoosting ? " [SHIFT]" : "";
-            _mainText.text = $"<color=white>车速: {_speedKmh:F0} km/h{boostLabel}\n" +
-                             $"油量: {_fuel:F1} L</color>";
+            _mainText.text = $"<color=white>车速: {_speedKmh:F0} km/h{(_isBoosting ? " [SHIFT]" : "")}\n油量: {_fuel:F1} L</color>";
         }
 
-        void RefreshPilotWeaponUGUI()
+        void RefreshPilot()
         {
-            if (_pilot == null) return;
-            string weaponName = _pilot.GetManualWeaponName();
+            string wn = _pilot.GetManualWeaponName();
             float y = _vehicle != null ? -155f : -125f;
-
-            _weaponText.text = $"<color=#FFD700>当前武器: {weaponName}</color>";
+            _weaponText.text = $"<color=#FFD700>当前武器: {wn}</color>";
             _weaponRect.anchoredPosition = new Vector2(10, y);
-
             if (_pilotedBot != null)
             {
                 _hpText.text = $"<color=white>HP: {_pilotedBot.HP:F0}/{_pilotedBot.MaxHP:F0}</color>";
                 _hpRect.anchoredPosition = new Vector2(10, y - 22f);
             }
-            else
-            {
-                _hpText.text = "";
-            }
+            else _hpText.text = "";
         }
 
-        // ===== 事件回调 =====
+        void OnTimeChanged(TimeOfDayChanged e) { _currentHour = e.CurrentHour; _periodName = GetPeriodName(e.CurrentHour); }
+        void OnDayChanged(DayChanged e) => _currentDay = e.Day;
+        void OnVehicleEnter(VehicleEnteredEvent e) => _vehicle = e.Vehicle?.GetComponent<VehicleController>();
+        void OnVehicleExit(VehicleExitedEvent e) => _vehicle = null;
+        void OnPilotEnter(AIBotPilotEnteredEvent e) { _pilot = e.Bot?.GetComponent<AIBotPilot>(); _pilotedBot = e.Bot?.GetComponent<AIBot>(); }
+        void OnPilotExit(AIBotPilotExitedEvent e) { _pilot = null; _pilotedBot = null; }
 
-        void OnTimeChanged(TimeOfDayChanged evt)
-        {
-            _currentHour = evt.CurrentHour;
-            _periodName = GetPeriodName(evt.CurrentHour);
-        }
-
-        void OnDayChanged(DayChanged evt)
-        {
-            _currentDay = evt.Day;
-        }
-
-        void OnVehicleEnter(VehicleEnteredEvent evt)
-        {
-            _vehicle = evt.Vehicle != null ? evt.Vehicle.GetComponent<VehicleController>() : null;
-        }
-
-        void OnVehicleExit(VehicleExitedEvent evt)
-        {
-            _vehicle = null;
-        }
-
-        void OnPilotEnter(AIBotPilotEnteredEvent evt)
-        {
-            _pilot = evt.Bot != null ? evt.Bot.GetComponent<AIBotPilot>() : null;
-            _pilotedBot = evt.Bot != null ? evt.Bot.GetComponent<AIBot>() : null;
-        }
-
-        void OnPilotExit(AIBotPilotExitedEvent evt)
-        {
-            _pilot = null;
-            _pilotedBot = null;
-        }
-
-        string GetPeriodName(float hour)
-        {
-            if (hour >= 5f && hour < 8f) return "清晨";
-            if (hour >= 8f && hour < 12f) return "上午";
-            if (hour >= 12f && hour < 14f) return "中午";
-            if (hour >= 14f && hour < 17f) return "下午";
-            if (hour >= 17f && hour < 19f) return "黄昏";
-            if (hour >= 19f && hour < 21f) return "傍晚";
-            return "夜晚";
-        }
+        string GetPeriodName(float h) => h >= 5 && h < 8 ? "清晨" : h < 12 ? "上午" : h < 14 ? "中午" : h < 17 ? "下午" : h < 19 ? "黄昏" : h < 21 ? "傍晚" : "夜晚";
     }
 }

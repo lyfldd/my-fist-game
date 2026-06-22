@@ -41,6 +41,7 @@ namespace _Game.Systems.WorldContainer
         {
             if (!UIModeConfig.UseUGUI) { enabled = false; return; }
             Instance = this;
+            ServiceLocator.Register(this);
             _canvas = GetComponentInParent<Canvas>();
             gameObject.SetActive(false);
         }
@@ -97,19 +98,10 @@ namespace _Game.Systems.WorldContainer
             _titleBar.anchoredPosition = new Vector2(0, windowHeight * 0.5f - 15f);
             titleGo.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f, 1f);
 
-            // 标题文字（子对象）
-            var labelGo = new GameObject("TitleLabel", typeof(RectTransform));
-            var labelRt = labelGo.GetComponent<RectTransform>();
-            labelRt.SetParent(_titleBar, false);
-            labelRt.sizeDelta = new Vector2(windowWidth - 40f, 30f);
-            labelRt.anchoredPosition = new Vector2(-10f, 0);
-            var labelTxt = labelGo.AddComponent<Text>();
-            labelTxt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
-            labelTxt.text = "容器";
-            labelTxt.fontSize = 14;
-            labelTxt.color = Color.white;
-            labelTxt.alignment = TextAnchor.MiddleLeft;
-            _titleLabel = labelTxt;
+            // 标题文字
+            _titleLabel = UGUIBuilder.CreateTextAnchored("TitleLabel", _titleBar,
+                "容器", new Vector2(0, 0.5f), new Vector2(5, 0),
+                windowWidth - 40f, 30f, 14, FontStyle.Normal, TextAnchor.MiddleLeft);
 
             // 拖拽事件
             var dragTrigger = titleGo.AddComponent<EventTrigger>();
@@ -119,26 +111,11 @@ namespace _Game.Systems.WorldContainer
             dragTrigger.triggers.Add(entry);
 
             // 关闭按钮
-            var closeBtn = new GameObject("CloseBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            var closeBtn = UGUIBuilder.CreateButton("CloseBtn", _titleBar, "X",
+                new Color(0.8f, 0.2f, 0.2f, 1f), 24, 24, 14);
             var closeRt = closeBtn.GetComponent<RectTransform>();
-            closeRt.SetParent(_titleBar, false);
-            closeRt.sizeDelta = new Vector2(24f, 24f);
             closeRt.anchoredPosition = new Vector2(windowWidth * 0.5f - 16f, 0);
-            closeBtn.GetComponent<Image>().color = new Color(0.8f, 0.2f, 0.2f, 1f);
-
-            // 关闭按钮文字（子对象）
-            var closeLabel = new GameObject("XLabel", typeof(RectTransform));
-            closeLabel.transform.SetParent(closeRt, false);
-            var closeLabelRt = closeLabel.GetComponent<RectTransform>();
-            closeLabelRt.sizeDelta = new Vector2(24f, 24f);
-            var closeTxt = closeLabel.AddComponent<Text>();
-            closeTxt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
-            closeTxt.text = "X";
-            closeTxt.fontSize = 14;
-            closeTxt.color = Color.white;
-            closeTxt.alignment = TextAnchor.MiddleCenter;
-
-            closeBtn.GetComponent<Button>().onClick.AddListener(() => CloseWindow());
+            closeBtn.onClick.AddListener(() => CloseWindow());
 
             // 内容区域
             var contentGo = new GameObject("Content", typeof(RectTransform));
@@ -220,7 +197,7 @@ namespace _Game.Systems.WorldContainer
                 float nameH = overlayH * 0.55f;
                 var nameRt = MakeChildRect("Name", overlayRt, 0, 0, overlayW, nameH);
                 var nameTxt = nameRt.gameObject.AddComponent<Text>();
-                nameTxt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+                nameTxt.font = UGUIBuilder.DefaultFont;
                 nameTxt.text = p.itemData.itemName;
                 nameTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayW * 0.18f, 8f, 16f));
                 nameTxt.alignment = TextAnchor.MiddleCenter;
@@ -237,7 +214,7 @@ namespace _Game.Systems.WorldContainer
                     float cntH = overlayH * 0.35f;
                     var cntRt = MakeChildRect("Count", overlayRt, overlayW - cntW, -(overlayH - cntH), cntW, cntH);
                     var cntTxt = cntRt.gameObject.AddComponent<Text>();
-                    cntTxt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+                    cntTxt.font = UGUIBuilder.DefaultFont;
                     cntTxt.text = $"x{p.count}";
                     cntTxt.fontSize = Mathf.FloorToInt(Mathf.Clamp(overlayH * 0.25f, 8f, 14f));
                     cntTxt.alignment = TextAnchor.LowerRight;

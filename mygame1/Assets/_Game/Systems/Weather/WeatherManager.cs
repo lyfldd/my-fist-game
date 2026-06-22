@@ -60,6 +60,7 @@ namespace _Game.Systems.Weather
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.Register(this);
         }
 
         void Start()

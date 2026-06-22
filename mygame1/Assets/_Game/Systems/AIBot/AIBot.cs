@@ -234,13 +234,16 @@ namespace _Game.Systems.AIBot
             solarRechargeRate = 120f;
         }
 
+        private bool _restoredFromSave;
+
         void Start()
         {
             var pc = ServiceLocator.Get<PlayerCharacter>();
             if (pc != null) _player = pc.transform;
 
             _lastPosition = transform.position;
-            guardPosition = transform.position;
+            if (!_restoredFromSave)
+                guardPosition = transform.position;
         }
 
         void Update()
@@ -968,6 +971,181 @@ namespace _Game.Systems.AIBot
         public bool CanNavigate()
         {
             return _agent != null && _agent.enabled && _agent.isOnNavMesh && !IsShutdown;
+        }
+
+        // ============================================================
+        // 存档
+        // ============================================================
+
+        public SaveLoad.AIBotSaveData GetSaveData()
+        {
+            var data = new SaveLoad.AIBotSaveData();
+
+            var pguid = GetComponent<SaveLoad.PersistentGUID>();
+            data.guid = pguid != null ? pguid.Guid : "";
+            var buildable = GetComponent<AIBotBuildable>();
+            data.buildableName = buildable != null && buildable.buildableData != null
+                ? buildable.buildableData.displayName : "";
+            data.posX = transform.position.x;
+            data.posY = transform.position.y;
+            data.posZ = transform.position.z;
+            data.rotY = transform.eulerAngles.y;
+            data.hp = currentHP;
+            data.battery = batteryCurrent;
+            data.batteryMax = batteryMax;
+            data.uranium = uraniumCurrent;
+            data.uraniumMax = uraniumMax;
+            data.command = currentCommand.ToString();
+            data.energyMode = energyMode.ToString();
+            data.ecoModeEnabled = ecoModeEnabled;
+            data.burstModeEnabled = burstModeEnabled;
+            data.shieldCurrentHP = shieldCurrentHP;
+            data.shieldMaxHP = shieldMaxHP;
+            data.shieldStartupTimer = shieldStartupTimer;
+            data.shieldActive = shieldActive;
+            data.followDistance = followDistance;
+            data.speedSliderValue = speedSliderValue;
+            data.hasGuardPosition = currentCommand == AIBotCommand.Guard;
+            data.guardX = guardPosition.x;
+            data.guardY = guardPosition.y;
+            data.guardZ = guardPosition.z;
+            data.patrolRadius = patrolRadius;
+            data.patrolAutoRecallEnabled = patrolAutoRecallEnabled;
+            data.patrolAroundPlayer = patrolAroundPlayer;
+            data.patrolCenterX = patrolCenterPoint.x;
+            data.patrolCenterY = patrolCenterPoint.y;
+            data.patrolCenterZ = patrolCenterPoint.z;
+
+            // 武器
+            var combat = GetComponent<AIBotCombat>();
+            if (combat != null)
+            {
+                data.rightArm = combat.CurrentRightArm.ToString();
+                data.leftArm = combat.CurrentLeftArm.ToString();
+            }
+
+            // 聚变核心
+            data.fusionCores = new System.Collections.Generic.List<SaveLoad.FusionCoreSaveData>();
+            for (int i = 0; i < reactorSlots.Length; i++)
+            {
+                if (!reactorSlots[i].IsEmpty)
+                {
+                    data.fusionCores.Add(new SaveLoad.FusionCoreSaveData
+                    {
+                        itemName = reactorSlots[i].itemName,
+                        burnTime = reactorSlots[i].burnTime,
+                        burnRemaining = reactorSlots[i].burnRemaining,
+                        outputRate = reactorSlots[i].outputRate,
+                    });
+                }
+            }
+
+            // 背包
+            var inventory = GetComponent<AIBotInventory>();
+            data.inventorySlots = new System.Collections.Generic.List<SaveLoad.SlotSaveData>();
+            if (inventory != null)
+            {
+                var slots = inventory.GetAllSlots();
+                foreach (var slot in slots)
+                {
+                    data.inventorySlots.Add(new SaveLoad.SlotSaveData
+                    {
+                        itemName = slot.itemData != null ? slot.itemData.itemName : null,
+                        count = slot.count,
+                    });
+                }
+            }
+
+            return data;
+        }
+
+        public void RestoreFromSave(SaveLoad.AIBotSaveData data, SaveLoad.ItemCatalog itemCatalog)
+        {
+            if (data == null) return;
+
+            _restoredFromSave = true;
+
+            currentHP = data.hp;
+            batteryMax = data.batteryMax;
+            batteryCurrent = data.battery;
+            uraniumMax = data.uraniumMax;
+            uraniumCurrent = data.uranium;
+            shieldCurrentHP = data.shieldCurrentHP;
+            shieldMaxHP = data.shieldMaxHP;
+            shieldStartupTimer = data.shieldStartupTimer;
+            shieldActive = data.shieldActive;
+
+            // 能量模式
+            System.Enum.TryParse(data.energyMode, out energyMode);
+            ecoModeEnabled = data.ecoModeEnabled;
+            burstModeEnabled = data.burstModeEnabled;
+
+            // 指令
+            System.Enum.TryParse(data.command, out AIBotCommand cmd);
+            SetCommand(cmd);
+            followDistance = data.followDistance;
+            speedSliderValue = data.speedSliderValue;
+
+            // 驻守/巡逻
+            if (data.hasGuardPosition)
+                guardPosition = new Vector3(data.guardX, data.guardY, data.guardZ);
+            patrolRadius = data.patrolRadius;
+            patrolAutoRecallEnabled = data.patrolAutoRecallEnabled;
+            patrolAroundPlayer = data.patrolAroundPlayer;
+            patrolCenterPoint = new Vector3(data.patrolCenterX, data.patrolCenterY, data.patrolCenterZ);
+
+            // 武器
+            var combat = GetComponent<AIBotCombat>();
+            if (combat != null)
+            {
+                System.Enum.TryParse(data.rightArm, out RightArmWeapon raw);
+                System.Enum.TryParse(data.leftArm, out LeftArmWeapon law);
+                if (raw != RightArmWeapon.None) combat.EquipRightArm(raw);
+                else combat.UnequipRightArm();
+                if (law != LeftArmWeapon.None) combat.EquipLeftArm(law);
+                else combat.UnequipLeftArm();
+            }
+
+            // 聚变核心
+            if (data.fusionCores != null)
+            {
+                for (int i = 0; i < data.fusionCores.Count && i < reactorSlots.Length; i++)
+                {
+                    var fc = data.fusionCores[i];
+                    reactorSlots[i] = new FusionCoreSlot
+                    {
+                        itemName = fc.itemName,
+                        burnTime = fc.burnTime,
+                        burnRemaining = fc.burnRemaining,
+                        outputRate = fc.outputRate,
+                    };
+                }
+            }
+
+            // 背包
+            var inventory = GetComponent<AIBotInventory>();
+            if (inventory != null && data.inventorySlots != null && itemCatalog != null)
+            {
+                var slots = inventory.GetAllSlots();
+                for (int i = 0; i < data.inventorySlots.Count && i < slots.Count; i++)
+                {
+                    var sd = data.inventorySlots[i];
+                    if (!string.IsNullOrEmpty(sd.itemName))
+                    {
+                        slots[i].itemData = itemCatalog.Find(sd.itemName);
+                        slots[i].count = sd.count;
+                    }
+                    else
+                    {
+                        slots[i].itemData = null;
+                        slots[i].count = 0;
+                    }
+                }
+            }
+
+            // NavMeshAgent 速度同步
+            if (_agent != null && _agent.enabled)
+                _agent.speed = moveSpeed * speedSliderValue * SpeedMultiplier;
         }
     }
 }

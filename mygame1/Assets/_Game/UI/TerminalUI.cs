@@ -73,7 +73,7 @@ namespace _Game.UI
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             _canvasGo = new GameObject("TerminalUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             _canvasGo.transform.SetParent(transform, false);

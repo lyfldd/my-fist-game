@@ -2,21 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Core;
 using _Game.Systems.Audio;
-using _Game.Systems.Building;
 
 namespace _Game.UI
 {
     /// <summary>
-    /// 左上角噪声等级显示，放在时间下方。驾驶时自动下移避免与车速重叠。
-    /// UGUI 模式下自动创建 Canvas Text 替代 OnGUI。
+    /// 左上角噪声等级显示
     /// </summary>
     public class DecibelHUD : MonoBehaviour
     {
-        // --- UGUI ---
         private GameObject _canvasGo;
         private Text _noiseText;
         private RectTransform _noiseRect;
-
         private Transform _player;
         private float _noiseLevel;
         private bool _inVehicle;
@@ -27,32 +23,22 @@ namespace _Game.UI
             if (playerObj != null) _player = playerObj.transform;
             EventBus.Subscribe<VehicleEnteredEvent>(_ => _inVehicle = true);
             EventBus.Subscribe<VehicleExitedEvent>(_ => _inVehicle = false);
-
-            if (UIModeConfig.UseUGUI)
-                CreateUGUI();
+            if (UIModeConfig.UseUGUI) CreateUI();
         }
 
-        void CreateUGUI()
+        void CreateUI()
         {
-            _canvasGo = new GameObject("DecibelHUD_Canvas", typeof(Canvas), typeof(CanvasScaler));
-            _canvasGo.transform.SetParent(transform, false);
-            var canvas = _canvasGo.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 50;
+            var existing = transform.Find("DecibelHUD_Canvas");
+            if (existing != null) { _canvasGo = existing.gameObject; _noiseText = existing.Find("NoiseText")?.GetComponent<Text>(); _noiseRect = _noiseText?.rectTransform; _noiseText.text = "噪声: 安静  (0%)"; return; }
 
-            var textGo = new GameObject("NoiseText");
-            textGo.transform.SetParent(_canvasGo.transform, false);
-            _noiseText = textGo.AddComponent<Text>();
-            _noiseText.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
-            _noiseText.fontSize = 16;
-            _noiseText.alignment = TextAnchor.UpperLeft;
-            _noiseText.raycastTarget = false;
+            var canvas = UGUIBuilder.CreateCanvas("DecibelHUD_Canvas", 50);
+            canvas.transform.SetParent(transform, false);
+            _canvasGo = canvas.gameObject;
 
-            _noiseRect = textGo.GetComponent<RectTransform>();
-            _noiseRect.anchorMin = new Vector2(0, 1);
-            _noiseRect.anchorMax = new Vector2(0, 1);
-            _noiseRect.pivot = new Vector2(0, 1);
-            _noiseRect.sizeDelta = new Vector2(300, 24);
+            _noiseText = UGUIBuilder.CreateTextAnchored("NoiseText", _canvasGo.transform,
+                "", new Vector2(0, 1), Vector2.zero, 300, 24, 16,
+                FontStyle.Normal, TextAnchor.UpperLeft);
+            _noiseRect = _noiseText.rectTransform;
         }
 
         void OnDestroy()
@@ -65,25 +51,20 @@ namespace _Game.UI
         {
             if (_player == null || DecibelSystem.Instance == null) return;
             _noiseLevel = DecibelSystem.Instance.GetAmbientNoiseLevel(_player.position);
-
-            if (UIModeConfig.UseUGUI && _noiseText != null)
-                RefreshUGUI();
+            if (UIModeConfig.UseUGUI && _noiseText != null) Refresh();
         }
 
-        /// <summary> 6 级噪声 → (label, color) </summary>
         static void DecodeNoiseLevel(float level, out string label, out Color color)
         {
-            // 走路3m(4%) 跑步8m(10%) 近战命中15m(19%) 建造20~25m(25~31%)
-            // 车辆30m(37%) 手枪50m(63%) 步枪80m(100%)
-            if (level < 0.05f)       { label = "安静";      color = new Color(0.3f, 0.8f, 0.3f); }   // 绿
-            else if (level < 0.15f)  { label = "细微声响";  color = new Color(0.6f, 0.8f, 0.2f); }   // 黄绿
+            if (level < 0.05f)       { label = "安静";      color = new Color(0.3f, 0.8f, 0.3f); }
+            else if (level < 0.15f)  { label = "细微声响";  color = new Color(0.6f, 0.8f, 0.2f); }
             else if (level < 0.35f)  { label = "轻微声响";  color = Color.yellow; }
-            else if (level < 0.55f)  { label = "嘈杂";      color = new Color(1f, 0.5f, 0f); }       // 橙
-            else if (level < 0.80f)  { label = "喧闹";      color = new Color(1f, 0.25f, 0f); }      // 橙红
+            else if (level < 0.55f)  { label = "嘈杂";      color = new Color(1f, 0.5f, 0f); }
+            else if (level < 0.80f)  { label = "喧闹";      color = new Color(1f, 0.25f, 0f); }
             else                     { label = "震耳欲聋";  color = Color.red; }
         }
 
-        void RefreshUGUI()
+        void Refresh()
         {
             DecodeNoiseLevel(_noiseLevel, out var label, out var color);
             float y = _inVehicle ? 75f : 45f;
@@ -91,6 +72,5 @@ namespace _Game.UI
             _noiseText.color = color;
             _noiseRect.anchoredPosition = new Vector2(10, -y);
         }
-
     }
 }

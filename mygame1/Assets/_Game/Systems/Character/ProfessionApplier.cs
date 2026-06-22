@@ -14,7 +14,8 @@ namespace _Game.Systems.Character
     {
         public void ApplyStartingGear(CharacterTemplate template)
         {
-            if (template == null) return;
+            if (template == null) { Debug.LogWarning("[ProfessionApplier] template is null"); return; }
+            Debug.Log($"[ProfessionApplier] ApplyStartingGear 开始: {template.templateName}, startWithAIBot={template.startWithAIBot}, BotBuildable={template.startingAIBotBuildable != null}");
 
             var inv = GetComponent<Inv>();
             if (inv == null)

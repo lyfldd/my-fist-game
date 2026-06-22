@@ -33,10 +33,20 @@ namespace _Game.Systems.Character
             if (pilotLock == null)
                 gameObject.AddComponent<_Game.Systems.AIBot.AIBotPilotInputLock>();
 
-            // 尝试加载 CharacterData（空 fallback 由 GameBootstrap 兜底，避免空壳覆盖真实数据）
+            // 尝试加载 CharacterData
             if (characterData == null)
             {
                 characterData = Resources.Load<CharacterData>("DefaultCharacter");
+#if UNITY_EDITOR
+                if (characterData == null)
+                    characterData = UnityEditor.AssetDatabase.LoadAssetAtPath<CharacterData>(
+                        "Assets/_Game/Config/Character/DefaultCharacter.asset");
+#endif
+            }
+            if (characterData == null)
+            {
+                characterData = ScriptableObject.CreateInstance<CharacterData>();
+                Debug.LogWarning("[PlayerCharacter] CharacterData 未找到，已创建空模板");
             }
 
             _inventory = GetComponent<Inventory.Inventory>();

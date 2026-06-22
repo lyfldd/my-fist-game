@@ -73,7 +73,7 @@ namespace _Game.UI
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             // Canvas
             _canvasGo = new GameObject("PowerSourceUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

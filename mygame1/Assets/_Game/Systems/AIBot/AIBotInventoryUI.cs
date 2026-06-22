@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Config;
 using _Game.Core;
+using _Game.UI;
 using System.Collections.Generic;
 
 namespace _Game.Systems.AIBot
@@ -98,7 +99,7 @@ namespace _Game.Systems.AIBot
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
             float panelW = 380f, panelH = 380f;
 
             _canvasGo = new GameObject("AIBotInventoryUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

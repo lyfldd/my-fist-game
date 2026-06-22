@@ -22,6 +22,10 @@ namespace _Game.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
+            // 主菜单场景没有玩家，跳过初始化
+            var sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (sceneName == "MainMenu") return;
+
             var player = GameObject.FindWithTag("Player")
                       ?? GameObject.Find("player")
                       ?? GameObject.Find("Player");
@@ -47,8 +51,24 @@ namespace _Game.Core
                 col.height = 2f;
                 col.radius = 0.3f;
             }
-            if (player.GetComponent<Animator>() == null)
-                player.AddComponent<Animator>();
+            // Animator — 模型子对象已有则不再添加
+            if (player.GetComponentInChildren<Animator>() == null)
+            {
+                var anim = player.AddComponent<Animator>();
+                var ctrl = Resources.Load<RuntimeAnimatorController>("Player");
+                Avatar avatar = null;
+#if UNITY_EDITOR
+                if (ctrl == null)
+                    ctrl = UnityEditor.AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(
+                        "Assets/_Game/Config/Models/Characters/Player/Player.controller");
+                var modelAssets = UnityEditor.AssetDatabase.LoadAllAssetsAtPath(
+                    "Assets/_Game/Config/Models/Characters/Player/Player_Rigged.fbx");
+                foreach (var a in modelAssets)
+                { if (a is Avatar av) { avatar = av; break; } }
+#endif
+                if (ctrl != null) anim.runtimeAnimatorController = ctrl;
+                if (avatar != null) anim.avatar = avatar;
+            }
 
             // 按依赖顺序添加组件
             AddIfMissing(player, "_Game.Systems.Player.PlayerController");
@@ -61,11 +81,17 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponAiming");
             AddIfMissing(player, "_Game.Systems.Weapon.WeaponHolder");
             AddIfMissing(player, "_Game.Systems.Weapon.SpreadVisualizer");
+            // ═══ HUD UI 组件（Canvas 结构由 PreconfigureUI 工具预建）═══
+            AddIfMissing(player, "_Game.UI.SurvivalHUD");
+            AddIfMissing(player, "_Game.UI.QuickItemBar");
             AddIfMissing(player, "_Game.UI.CrosshairUI");
+            AddIfMissing(player, "_Game.UI.DecibelHUD");
+            AddIfMissing(player, "_Game.UI.WeatherHUD");
+            AddIfMissing(player, "_Game.UI.TopLeftHUD");
+            // ═══ 系统 UI（非 HUD，有独立逻辑）═══
             AddIfMissing(player, "_Game.Systems.Building.BuildMenuUI");
             AddIfMissing(player, "_Game.Systems.Building.GhostPreview");
             AddIfMissing(player, "_Game.Systems.Crafting.CraftingUI");
-            // ProductionDeviceUI 是单例，由场景中的设备负责创建，不在 Player 上复刻
             AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchManager");
             AddIfMissing(player, "_Game.Systems.Crafting.ChemicalResearchUI");
             AddIfMissing(player, "_Game.Systems.PlayerInput.MouseGroundProjector");
@@ -252,7 +278,10 @@ namespace _Game.Core
             var type = System.Type.GetType(fullTypeName + ", Assembly-CSharp");
             if (type == null) return;
             if (go.GetComponent(type) == null)
+            {
                 go.AddComponent(type);
+                Debug.LogWarning($"[GameBootstrap] ⚠️ {type.Name} 未预置在 Player 上，已运行时补救。请运行 Tools → Preconfigure Player 固化。");
+            }
         }
     }
 }

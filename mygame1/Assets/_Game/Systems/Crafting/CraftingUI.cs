@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Config;
 using _Game.Core;
+using _Game.UI;
 
 namespace _Game.Systems.Crafting
 {
@@ -89,6 +90,7 @@ namespace _Game.Systems.Crafting
                 Destroy(this); return;
             }
             _instance = this;
+            ServiceLocator.Register(this);
             _craftingSystem = CraftingSystem.Instance ?? ServiceLocator.Get<CraftingSystem>();
         }
 
@@ -146,7 +148,7 @@ namespace _Game.Systems.Crafting
 
         void CreateUGUI()
         {
-            _font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            _font = UGUIBuilder.DefaultFont;
 
             // Canvas
             _canvasGo = new GameObject("CraftingUI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));

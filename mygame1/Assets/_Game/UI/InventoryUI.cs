@@ -73,7 +73,7 @@ namespace _Game.UI
             _inventory = ServiceLocator.Get<Inv>();
 
             // 确保 EventSystem 存在（拖拽必需）
-            if (ServiceLocator.Get<UnityEngine.EventSystems.EventSystem>() == null)
+            if (UnityEngine.Object.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
             {
                 var esGo = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem));
                 esGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
@@ -1058,7 +1058,7 @@ namespace _Game.UI
             rt.sizeDelta = new Vector2(w, h);
             rt.anchoredPosition = new Vector2(x, y);
             var txt = go.AddComponent<Text>();
-            txt.font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            txt.font = UGUIBuilder.DefaultFont;
             txt.raycastTarget = false;
             return txt;
         }
@@ -2592,7 +2592,7 @@ namespace _Game.UI
         {
             Font font;
             try { font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { font = null; }
-            if (font == null) font = Font.CreateDynamicFontFromOSFont("Arial", 14);
+            if (font == null) font = UGUIBuilder.DefaultFont;
             return font;
         }
     }
