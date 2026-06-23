@@ -23,6 +23,11 @@ namespace _Game.Systems.Inventory
         /// <summary> 幽灵格来源武器槽（KnifeBelt / SidearmBelt）</summary>
         public EquipSlot ghostSourceSlot;
 
+        /// <summary> 前置A2：当前耐久（0=满耐久/无耐久系统）</summary>
+        public float itemDurability;
+        /// <summary> 前置A2：已修理次数（0=未修理过）</summary>
+        public int repairCount;
+
         public PlacedItem(ItemData itemData, int count, int gridX, int gridY)
         {
             this.instanceId = 0; // 由 Inventory 分配
@@ -33,6 +38,8 @@ namespace _Game.Systems.Inventory
             this.rotated = false;
             this.isGhost = false;
             this.ghostSourceSlot = EquipSlot.None;
+            this.itemDurability = 0f;
+            this.repairCount = 0;
         }
 
         /// <summary> 创建幽灵占位格（腰带武器槽容量占用）</summary>

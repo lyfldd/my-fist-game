@@ -502,6 +502,8 @@ namespace _Game.Systems.SaveLoad
                     posX = wi.transform.position.x,
                     posY = wi.transform.position.y,
                     posZ = wi.transform.position.z,
+                    itemDurability = wi.itemDurability,   // 前置A2
+                    repairCount = wi.repairCount,          // 前置A2
                 });
             }
 
@@ -693,6 +695,8 @@ namespace _Game.Systems.SaveLoad
                     wi.itemData = itemData;
                     wi.count = wis.count;
                     wi.instanceId = wis.instanceId;
+                    wi.itemDurability = wis.itemDurability;   // 前置A2
+                    wi.repairCount = wis.repairCount;          // 前置A2
 
                     if (wis.instanceId > maxId) maxId = wis.instanceId;
                 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using _Game.Core;
 using _Game.Config;
+using _Game.Systems.Durability;
 using _Game.Systems.Inventory;
 
 namespace _Game.UI
@@ -41,6 +42,8 @@ namespace _Game.UI
         private int selectedIndex = -1;
         private GameObject[] slotBorders;
         private RectTransform[] slotRects;
+        private Image[] _durBars;        // 前置K：快捷栏耐久条
+        private int[] _slotInstanceIds;    // 前置K：每格对应的 instanceId
 
         // 使用进度（中央全局UI）
         private GameObject globalProgressGo;
@@ -69,6 +72,7 @@ namespace _Game.UI
 
             CreateCanvas();
             EventBus.Subscribe<InventoryChanged>(OnInventoryChanged);
+            EventBus.Subscribe<DurabilityChangedEvent>(OnDurabilityChanged);  // 前置K
         }
 
         void OnEnable()
@@ -87,6 +91,7 @@ namespace _Game.UI
         private void OnDestroy()
         {
             EventBus.Unsubscribe<InventoryChanged>(OnInventoryChanged);
+            EventBus.Unsubscribe<DurabilityChangedEvent>(OnDurabilityChanged);
         }
 
         private void Update()
@@ -193,6 +198,12 @@ namespace _Game.UI
                 slotNameTexts[i] = slot.Find("ItemName")?.GetComponent<Text>();
                 slotBorders[i] = slot.Find("Border")?.gameObject;
                 if (slotBorders[i] != null) slotBorders[i].SetActive(false);
+                // 前置K：找预建的耐久条
+                var durBar = slot.Find("DurBar");
+                var durFill = durBar != null ? durBar.Find("DurFill")?.GetComponent<Image>() : null;
+                if (_durBars == null) _durBars = new Image[maxVisibleSlots];
+                _durBars[i] = durFill;
+                if (_slotInstanceIds == null) _slotInstanceIds = new int[maxVisibleSlots];
             }
             arrowLeftText = canvasObject.transform.Find("ArrowLeft")?.GetComponent<Text>();
             arrowRightText = canvasObject.transform.Find("ArrowRight")?.GetComponent<Text>();
@@ -288,6 +299,13 @@ namespace _Game.UI
                 countText.color = Color.yellow;
                 countText.text = "";
                 slotCountTexts[i] = countText;
+
+                // 前置K：耐久条（底部3px）
+                var durFill = UGUIBuilder.CreateDurabilityBar($"Dur_{i}", slotObj.transform, slotSize - 4);
+                durFill.rectTransform.parent.gameObject.SetActive(false);
+                if (_durBars == null) _durBars = new Image[maxVisibleSlots];
+                _durBars[i] = durFill;
+                _slotInstanceIds = new int[maxVisibleSlots];
 
                 // 格子 RectTransform（用于鼠标点击检测）
                 slotRects[i] = (RectTransform)slotObj.transform;
@@ -565,6 +583,18 @@ namespace _Game.UI
                     img.color = occupiedColor;
                     txt.text = "x" + item.count;
                     nameTxt.text = item.itemData.itemName;
+
+                    // 前置K：耐久条
+                    _slotInstanceIds[i] = item.instanceId;
+                    if (_durBars != null && _durBars[i] != null)
+                    {
+                        bool hasDur = item.itemData.hasDurability;
+                        float ratio = item.itemData.maxDurability > 0f
+                            ? item.itemDurability / item.itemData.maxDurability : 1f;
+                        bool show = hasDur && ratio < 1f;
+                        _durBars[i].rectTransform.parent.gameObject.SetActive(show);
+                        if (show) UGUIBuilder.SetDurabilityFill(_durBars[i], ratio);
+                    }
                 }
                 else
                 {
@@ -572,6 +602,9 @@ namespace _Game.UI
                     img.color = emptyColor;
                     txt.text = "";
                     nameTxt.text = "";
+                    _slotInstanceIds[i] = 0;
+                    if (_durBars != null && _durBars[i] != null)
+                        _durBars[i].rectTransform.parent.gameObject.SetActive(false);
                 }
             }
 
@@ -583,6 +616,22 @@ namespace _Game.UI
             }
             if (globalProgressGo != null) globalProgressGo.SetActive(false);
             SetSelected(-1);
+        }
+
+        // 前置K：快捷栏耐久条局部刷新
+        void OnDurabilityChanged(DurabilityChangedEvent evt)
+        {
+            if (_slotInstanceIds == null || _durBars == null) return;
+            for (int i = 0; i < maxVisibleSlots; i++)
+            {
+                if (_slotInstanceIds[i] == evt.InstanceId)
+                {
+                    bool show = evt.Ratio < 1f;
+                    _durBars[i].rectTransform.parent.gameObject.SetActive(show);
+                    if (show) UGUIBuilder.SetDurabilityFill(_durBars[i], evt.Ratio);
+                    return;
+                }
+            }
         }
 
         private void OnInventoryChanged(InventoryChanged evt)

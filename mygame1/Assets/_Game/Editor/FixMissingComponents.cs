@@ -46,7 +46,6 @@ public class FixMissingComponents
         AddIfMissing(player, "_Game.Systems.Weapon.WeaponSwitcher");
         AddIfMissing(player, "_Game.Systems.Character.ProfessionApplier");
         AddIfMissing(player, "_Game.Systems.Vehicle.VehicleInputLock");
-        AddIfMissing(player, "_Game.Systems.ItemUsage.ItemUsageSystem");
         AddIfMissing(player, "_Game.Systems.Inventory.InventoryTest");
 
         // ── InputRouter：挂到 Managers 上 ──

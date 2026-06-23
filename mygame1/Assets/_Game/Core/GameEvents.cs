@@ -220,7 +220,7 @@ namespace _Game.Core
     }
 
     /// <summary>
-    /// 物品被使用（QuickItemBar 发布，ItemUsageSystem 处理）
+    /// 物品被使用（QuickItemBar 发布，SurvivalSystem 处理生存效果）
     /// </summary>
     public readonly struct ItemUsedEvent
     {
@@ -870,4 +870,48 @@ namespace _Game.Core
 
     /// <summary> Phase 4 全部实体 Instantiate + GUID 注册完毕 </summary>
     public readonly struct WorldEntitiesRestored { }
+
+    // ============================================================
+    // 耐久系统事件
+    // ============================================================
+
+    /// <summary> 物品耐久变化（instanceId 定位，供 UI/性能系统响应）</summary>
+    public readonly struct DurabilityChangedEvent
+    {
+        public int InstanceId { get; }
+        public ItemData ItemData { get; }
+        public float Ratio { get; }
+        public DurabilityChangedEvent(int instanceId, ItemData itemData, float ratio)
+        {
+            InstanceId = instanceId; ItemData = itemData; Ratio = ratio;
+        }
+    }
+
+    /// <summary> 物品损坏（耐久归零）</summary>
+    public readonly struct ItemBrokenEvent
+    {
+        public int InstanceId { get; }
+        public ItemData ItemData { get; }
+        public EquipSlot EquipSlot { get; }
+        public ItemBrokenEvent(int instanceId, ItemData itemData, EquipSlot slot)
+        {
+            InstanceId = instanceId; ItemData = itemData; EquipSlot = slot;
+        }
+    }
+
+    /// <summary> 物品修理完成</summary>
+    public readonly struct ItemRepairedEvent
+    {
+        public int InstanceId { get; }
+        public ItemData ItemData { get; }
+        public int RepairCount { get; }
+        public float NewMaxDurability { get; }
+        public float CurrentDurability { get; }
+        public ItemRepairedEvent(int instanceId, ItemData itemData, int repairCount,
+            float newMax, float current)
+        {
+            InstanceId = instanceId; ItemData = itemData; RepairCount = repairCount;
+            NewMaxDurability = newMax; CurrentDurability = current;
+        }
+    }
 }

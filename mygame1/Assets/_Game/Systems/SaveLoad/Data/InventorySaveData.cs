@@ -71,6 +71,8 @@ namespace _Game.Systems.SaveLoad
         public bool rotated;
         public bool isGhost;
         public string ghostSourceSlot;   // EquipSlot 名
+        public float itemDurability;     // 前置A2：当前耐久（0=满耐久/无耐久系统）
+        public int repairCount;          // 前置A2：已修理次数
 
         public object Clone()
         {
@@ -83,6 +85,8 @@ namespace _Game.Systems.SaveLoad
                 rotated = this.rotated,
                 isGhost = this.isGhost,
                 ghostSourceSlot = this.ghostSourceSlot,
+                itemDurability = this.itemDurability,
+                repairCount = this.repairCount,
             };
         }
     }

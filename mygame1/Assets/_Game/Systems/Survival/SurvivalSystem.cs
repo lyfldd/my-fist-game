@@ -268,9 +268,14 @@ namespace _Game.Systems.Survival
                 _lastEatTime = UnityEngine.Time.time;
             }
 
-            // 药品冷却记录
+            // 药品冷却记录 + 医疗技能加成
             if (item.foodType == "Medicine")
+            {
                 _medCooldowns[item.itemName] = UnityEngine.Time.time + 30f;
+                int medLevel = playerCharacter != null ? playerCharacter.GetSkillLevel(SkillType.医疗生存) : 0;
+                if (medLevel > 0)
+                    foodMultiplier *= (1f + medLevel * 0.15f); // 每级 +15% 治疗效果
+            }
 
             foreach (var eff in item.itemEffects)
                 ApplyItemEffect(eff, foodMultiplier);
@@ -312,10 +317,26 @@ namespace _Game.Systems.Survival
             currentEnvTemperature = temp;
         }
 
-        /// <summary> 承受外部伤害（经过护甲减免）</summary>
+        /// <summary> 承受外部伤害（经过护甲减免 + 耐久磨损）</summary>
         public void TakeDamage(float rawDamage, string reason)
         {
-            // 使用缓存护甲，不再 Find Inventory
+            // 耐久 v1.0：护甲分担磨损
+            if (_cachedArmor > 0f)
+            {
+                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
+                if (inv != null)
+                {
+                    var armorIds = inv.GetEquippedArmorInstanceIds();
+                    _Game.Systems.Durability.DurabilitySystem.Instance?.DistributeArmorWear(
+                        armorIds, rawDamage);
+                    // 磨损后重算护甲值（更新 _cachedArmor）
+                    float newArmor = inv.GetTotalArmor();
+                    if (System.Math.Abs(newArmor - _cachedArmor) > 0.01f)
+                        _cachedArmor = newArmor;
+                }
+            }
+
+            // 减伤（使用更新后的有效护甲值）
             float multiplier = 100f / (100f + _cachedArmor);
             float actualDamage = rawDamage * multiplier;
 

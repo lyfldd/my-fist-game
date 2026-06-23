@@ -148,6 +148,9 @@ namespace _Game.Editor
                 CreateSlotText(slot.transform, "Count", slotSize - 4, 14, 11, TextAnchor.LowerCenter,
                     new Vector2(0.5f, 0), new Vector2(slotSize / 2f, 2), Color.yellow, "");
 
+                // 前置K：耐久条（底部3px）
+                CreateDurabilityBar(slot.transform, "DurBar", slotSize - 4, 3);
+
                 CreateBorder(slot.transform, slotSize);
             }
 
@@ -324,6 +327,38 @@ namespace _Game.Editor
 
             if (count > 0) Debug.Log($"[PreconfigureUI] 🧹 清理了 {count} 个孤立 UI 对象");
             return count;
+        }
+
+        // 前置K：创建耐久条（编辑时预建，与 UGUIBuilder.CreateDurabilityBar 结构一致）
+        static void CreateDurabilityBar(Transform parent, string name, float slotW, float barH)
+        {
+            var barGo = new GameObject(name, typeof(RectTransform));
+            barGo.transform.SetParent(parent, false);
+            var barRt = barGo.GetComponent<RectTransform>();
+            barRt.anchorMin = new Vector2(0, 0);
+            barRt.anchorMax = new Vector2(1, 0);
+            barRt.pivot = new Vector2(0.5f, 0);
+            barRt.anchoredPosition = new Vector2(0, 2);
+            barRt.sizeDelta = new Vector2(-4, barH);
+
+            var bgGo = new GameObject("DurBG", typeof(RectTransform), typeof(Image));
+            bgGo.transform.SetParent(barGo.transform, false);
+            bgGo.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
+            // Stretch
+            var bgRt = bgGo.GetComponent<RectTransform>();
+            bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
+            bgRt.offsetMin = Vector2.zero; bgRt.offsetMax = Vector2.zero;
+
+            var fillGo = new GameObject("DurFill", typeof(RectTransform), typeof(Image));
+            fillGo.transform.SetParent(barGo.transform, false);
+            fillGo.GetComponent<Image>().color = Color.green;
+            var fillRt = fillGo.GetComponent<RectTransform>();
+            fillRt.anchorMin = Vector2.zero;
+            fillRt.anchorMax = Vector2.one;
+            fillRt.pivot = new Vector2(0, 0.5f);
+            fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
+
+            barGo.SetActive(false); // 默认隐藏，RefreshAll 时按需显示
         }
 
         // ═══════════════════════════════════════════

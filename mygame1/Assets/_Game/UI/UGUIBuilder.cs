@@ -252,5 +252,54 @@ namespace _Game.UI
         {
             rt.sizeDelta = new Vector2(w, h);
         }
+
+        // ═══════════════════════════════════════════
+        // Durability Bar (前置K)
+        // ═══════════════════════════════════════════
+
+        /// <summary>
+        /// 在指定容器底部创建耐久条（4px高），返回 fill Image 供后续 SetDurabilityFill 更新。
+        /// </summary>
+        public static Image CreateDurabilityBar(string name, Transform parent, float parentWidth)
+        {
+            float barH = 4f;
+            var barGo = new GameObject(name, typeof(RectTransform));
+            barGo.transform.SetParent(parent, false);
+            var barRt = barGo.GetComponent<RectTransform>();
+            barRt.anchorMin = new Vector2(0, 0);
+            barRt.anchorMax = new Vector2(1, 0);
+            barRt.pivot = new Vector2(0.5f, 0);
+            barRt.anchoredPosition = new Vector2(0, 0);
+            barRt.sizeDelta = new Vector2(0, barH);
+
+            var bgGo = new GameObject("DurBG", typeof(RectTransform), typeof(Image));
+            bgGo.transform.SetParent(barGo.transform, false);
+            var bgImg = bgGo.GetComponent<Image>();
+            bgImg.color = new Color(0, 0, 0, 0.5f);
+            Stretch(bgGo.GetComponent<RectTransform>());
+
+            var fillGo = new GameObject("DurFill", typeof(RectTransform), typeof(Image));
+            fillGo.transform.SetParent(barGo.transform, false);
+            var fill = fillGo.GetComponent<Image>();
+            fill.color = Color.green;
+            var fillRt = fillGo.GetComponent<RectTransform>();
+            fillRt.anchorMin = Vector2.zero;
+            fillRt.anchorMax = Vector2.one;
+            fillRt.pivot = new Vector2(0, 0.5f);
+            fillRt.offsetMin = Vector2.zero;
+            fillRt.offsetMax = Vector2.zero;
+
+            return fill;
+        }
+
+        /// <summary>更新耐久条的填充比例和颜色</summary>
+        public static void SetDurabilityFill(Image fill, float ratio)
+        {
+            fill.rectTransform.anchorMax = new Vector2(Mathf.Clamp01(ratio), 1);
+            fill.color = ratio > 0.7f ? new Color(0.2f, 0.8f, 0.2f)
+                       : ratio > 0.3f ? new Color(0.8f, 0.8f, 0.1f)
+                       : ratio > 0f   ? new Color(0.8f, 0.15f, 0.15f)
+                       : Color.black;
+        }
     }
 }

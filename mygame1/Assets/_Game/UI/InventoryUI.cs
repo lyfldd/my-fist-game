@@ -5,6 +5,7 @@ using _Game.Core;
 using _Game.Config;
 using _Game.Systems.Inventory;
 using _Game.Systems.Character;
+using _Game.Systems.Durability;
 using Inv = _Game.Systems.Inventory.Inventory;
 using System.Collections.Generic;
 
@@ -62,6 +63,9 @@ namespace _Game.UI
         // 容器折叠状态
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
 
+        // 前置K：装备槽耐久条
+        private Dictionary<EquipSlot, Image> _durBars = new Dictionary<EquipSlot, Image>();
+
         void Awake()
         {
             ServiceLocator.Register(this);
@@ -113,6 +117,7 @@ namespace _Game.UI
             EventBus.Subscribe<InventoryChanged>(OnInventoryChanged);
             EventBus.Subscribe<InventoryViewChangedEvent>(OnViewChanged);
             EventBus.Subscribe<CharacterStatsChanged>(OnCharacterStatsChanged);
+            EventBus.Subscribe<DurabilityChangedEvent>(OnDurabilityChanged);  // 前置K
         }
 
         void OnEnable()
@@ -555,6 +560,12 @@ namespace _Game.UI
             txt.resizeTextForBestFit = true;
             txt.resizeTextMinSize = fontSize - 3;
             txt.resizeTextMaxSize = fontSize;
+
+            // 前置K：装备槽耐久条
+            var durFill = UGUIBuilder.CreateDurabilityBar($"Dur_{slot}", rt, w);
+            _durBars[slot] = durFill;
+            // 初始状态：隐藏（未装备或满耐久不显示）
+            durFill.rectTransform.parent.gameObject.SetActive(false);
 
             if (locked) return;
 
@@ -1759,6 +1770,23 @@ namespace _Game.UI
         {
             if (overviewPanel != null && overviewPanel.activeSelf && _currentTab == "角色")
                 ShowOverview();
+        }
+
+        // 前置K：装备槽耐久条刷新
+        void OnDurabilityChanged(DurabilityChangedEvent evt)
+        {
+            if (_inventory == null) return;
+            foreach (var kv in _durBars)
+            {
+                int id = _inventory.GetEquippedInstanceId(kv.Key);
+                if (id == evt.InstanceId)
+                {
+                    bool show = evt.Ratio < 1f;
+                    kv.Value.rectTransform.parent.gameObject.SetActive(show);
+                    if (show) UGUIBuilder.SetDurabilityFill(kv.Value, evt.Ratio);
+                    return;
+                }
+            }
         }
 
         // ===== 角色面板 =====

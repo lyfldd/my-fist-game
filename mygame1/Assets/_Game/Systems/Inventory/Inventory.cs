@@ -28,6 +28,7 @@ namespace _Game.Systems.Inventory
 
         [Header("当前装备")]
         public Dictionary<EquipSlot, ItemData> equipped = new Dictionary<EquipSlot, ItemData>();
+        private Dictionary<EquipSlot, int> _equippedInstanceIds = new();  // 前置A：装备槽→instanceId
 
         [Header("容器列表（调试用）")]
         public List<InventoryContainer> containers = new List<InventoryContainer>();
@@ -191,7 +192,7 @@ namespace _Game.Systems.Inventory
         /// 穿上装备到指定槽位。武器类物品按 targetSlot 装备；非武器忽略 targetSlot。
         /// 返回 true 表示装备成功。
         /// </summary>
-        public bool EquipItem(ItemData item, EquipSlot targetSlot)
+        public bool EquipItem(ItemData item, EquipSlot targetSlot, int instanceId = 0)
         {
             if (item == null || item.equipSlot == EquipSlot.None) return false;
 
@@ -212,6 +213,7 @@ namespace _Game.Systems.Inventory
 
             UnequipSlot(slot);
             equipped[slot] = item;
+            if (instanceId > 0) _equippedInstanceIds[slot] = instanceId;  // 前置A
 
             if (IsWeaponSlot(slot))
             {
@@ -246,10 +248,10 @@ namespace _Game.Systems.Inventory
         /// <summary>
         /// 穿上装备到 item 自身 equipSlot
         /// </summary>
-        public bool EquipItem(ItemData item)
+        public bool EquipItem(ItemData item, int instanceId = 0)
         {
             if (item == null) return false;
-            return EquipItem(item, item.equipSlot);
+            return EquipItem(item, item.equipSlot, instanceId);
         }
 
         /// <summary> 检查腰带是否有足够空间容纳武器槽的幽灵格（考虑同槽旧武器会被卸下）</summary>
@@ -314,6 +316,40 @@ namespace _Game.Systems.Inventory
             return null;
         }
 
+        /// <summary> 前置A：获取指定装备槽的物品 instanceId（供耐久系统用）</summary>
+        public int GetEquippedInstanceId(EquipSlot slot)
+        {
+            return _equippedInstanceIds.TryGetValue(slot, out var id) ? id : 0;
+        }
+
+        /// <summary> 耐久 v1.0：按 instanceId 查找 PlacedItem 引用（遍历所有容器）</summary>
+        public PlacedItem? FindPlacedItem(int instanceId)
+        {
+            if (instanceId <= 0) return null;
+            foreach (var c in containers)
+                for (int i = 0; i < c.placedItems.Count; i++)
+                    if (!c.placedItems[i].isGhost && c.placedItems[i].instanceId == instanceId)
+                        return c.placedItems[i];
+            return null;
+        }
+
+        /// <summary> 耐久 v1.0：修改 instanceId 对应的物品耐久（负值=扣除）</summary>
+        public void ModifyDurability(int instanceId, float delta)
+        {
+            if (instanceId <= 0) return;
+            foreach (var c in containers)
+                for (int i = 0; i < c.placedItems.Count; i++)
+                {
+                    if (c.placedItems[i].instanceId == instanceId)
+                    {
+                        var p = c.placedItems[i];
+                        p.itemDurability = Mathf.Max(0f, p.itemDurability + delta);
+                        c.placedItems[i] = p;  // struct 替换
+                        return;
+                    }
+                }
+        }
+
         /// <summary>
         /// 脱下某装备位的物品，返回脱下的物品（失败返回 null）
         /// </summary>
@@ -327,6 +363,7 @@ namespace _Game.Systems.Inventory
                 // ===== 武器槽分支：移除腰带ghost + 发布武器卸下事件 =====
                 RemoveBeltGhosts(slot);
                 equipped.Remove(slot);
+                _equippedInstanceIds.Remove(slot);  // 前置A
                 EventBus.Publish(new WeaponUnequippedEvent(slot));
             }
             else
@@ -364,6 +401,7 @@ namespace _Game.Systems.Inventory
                 }
 
                 equipped.Remove(slot);
+                _equippedInstanceIds.Remove(slot);  // 前置A
 
                 // ===== 腰带拆除级联：自动卸下小刀/手枪 =====
                 if (slot == EquipSlot.Belt)
@@ -447,8 +485,34 @@ namespace _Game.Systems.Inventory
         {
             float total = 0;
             foreach (var kv in equipped)
-                if (kv.Value != null) total += kv.Value.armorValue;
+            {
+                if (kv.Value == null) continue;
+                // 耐久 v1.0：护甲耐久衰减影响有效护甲值
+                if (kv.Value.hasDurability && _equippedInstanceIds.TryGetValue(kv.Key, out var id))
+                {
+                    float ratio = _Game.Systems.Durability.DurabilitySystem.Instance?.GetRatio(id) ?? 1f;
+                    if (ratio <= 0f) continue;  // 损坏护甲=0
+                    total += kv.Value.armorValue * ratio;
+                }
+                else
+                {
+                    total += kv.Value.armorValue;
+                }
+            }
             return total;
+        }
+
+        /// <summary> 耐久 v1.0：获取所有已装备护甲（有耐久）的 instanceId 列表 </summary>
+        public int[] GetEquippedArmorInstanceIds()
+        {
+            var ids = new System.Collections.Generic.List<int>();
+            foreach (var kv in equipped)
+            {
+                if (kv.Value != null && kv.Value.hasDurability
+                    && _equippedInstanceIds.TryGetValue(kv.Key, out var id) && id > 0)
+                    ids.Add(id);
+            }
+            return ids.ToArray();
         }
 
         public float GetTotalWarmth()
@@ -772,6 +836,8 @@ namespace _Game.Systems.Inventory
                         rotated = item.rotated,
                         isGhost = item.isGhost,
                         ghostSourceSlot = item.isGhost ? item.ghostSourceSlot.ToString() : null,
+                        itemDurability = item.itemDurability,   // 前置A2
+                        repairCount = item.repairCount,          // 前置A2
                     });
                 }
                 inv.containers.Add(csd);
@@ -858,6 +924,8 @@ namespace _Game.Systems.Inventory
                                 gridY = s.gridY,
                                 isGhost = true,
                                 ghostSourceSlot = gs,
+                                itemDurability = s.itemDurability,   // 前置A2
+                                repairCount = s.repairCount,          // 前置A2
                             });
                         }
                     }
@@ -874,6 +942,8 @@ namespace _Game.Systems.Inventory
                                 gridX = s.gridX,
                                 gridY = s.gridY,
                                 rotated = s.rotated,
+                                itemDurability = s.itemDurability,   // 前置A2
+                                repairCount = s.repairCount,          // 前置A2
                             });
                         }
                         else

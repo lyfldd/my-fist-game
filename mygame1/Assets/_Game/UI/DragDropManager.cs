@@ -422,7 +422,7 @@ namespace _Game.UI
                     var slotRt = FindEquipSlotRecursive(canvas.transform, slotName);
                     if (slotRt != null && RectTransformUtility.RectangleContainsScreenPoint(slotRt, screenPos, canvas.worldCamera))
                     {
-                        if (_inventory.EquipItem(itemData, ws))
+                        if (_inventory.EquipItem(itemData, ws, _dragItem.Value.instanceId))
                         {
                             _dragSource.RemoveItemAt(_dragItem.Value.gridX, _dragItem.Value.gridY, _dragItem.Value.count);
                             return;
@@ -437,7 +437,7 @@ namespace _Game.UI
             var itemSlotRt = FindEquipSlotRecursive(canvas.transform, itemSlotName);
             if (itemSlotRt != null && RectTransformUtility.RectangleContainsScreenPoint(itemSlotRt, screenPos, canvas.worldCamera))
             {
-                if (_inventory.EquipItem(itemData))
+                if (_inventory.EquipItem(itemData, _dragItem.Value.instanceId))
                 {
                     _dragSource.RemoveItemAt(_dragItem.Value.gridX, _dragItem.Value.gridY, _dragItem.Value.count);
                     return;
@@ -547,7 +547,7 @@ namespace _Game.UI
                                || (target == null && Inv.IsWeaponSlot(itemData.equipSlot));
                 if (matchEquip)
                 {
-                    if (_inventory.EquipItem(itemData, cr.equipSlot))
+                    if (_inventory.EquipItem(itemData, cr.equipSlot, _dragItem.Value.instanceId))
                     {
                         _dragSource.RemoveItemAt(pd.gridX, pd.gridY, count);
                         return;

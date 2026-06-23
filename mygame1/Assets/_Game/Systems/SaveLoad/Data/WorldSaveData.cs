@@ -65,6 +65,8 @@ namespace _Game.Systems.SaveLoad
         public string itemName;
         public int count;
         public float posX, posY, posZ;
+        public float itemDurability;       // 前置A2：地面物品耐久
+        public int repairCount;            // 前置A2：修理次数
 
         public object Clone()
         {
@@ -72,6 +74,8 @@ namespace _Game.Systems.SaveLoad
             {
                 instanceId = this.instanceId, itemName = this.itemName,
                 count = this.count, posX = this.posX, posY = this.posY, posZ = this.posZ,
+                itemDurability = this.itemDurability,
+                repairCount = this.repairCount,
             };
         }
     }

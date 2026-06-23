@@ -3,6 +3,7 @@ using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Character;
 using _Game.Systems.Combat;
+using _Game.Systems.Durability;
 
 namespace _Game.Systems.Weapon
 {
@@ -31,11 +32,27 @@ namespace _Game.Systems.Weapon
         private float _currentSpread;
         private bool _lastFrameFiring;
 
-        // 弹药系统
-        private int _currentMag;
+        // 弹药系统 — 按槽位保存弹匣余量，防止切武器复制弹药
+        private System.Collections.Generic.Dictionary<EquipSlot, int> _magState = new();
+        private int _lastReloadTaken;  // 记录本次换弹实际扣了多少发（供 FinishReload 发布事件）
         private bool _isReloading;
         private float _reloadTimer;
         private Inventory.Inventory _inventory;
+        private int CurrentMag
+        {
+            get
+            {
+                if (_switcher == null) return 0;
+                var slot = _switcher.ActiveSlot;
+                if (!_magState.TryGetValue(slot, out var mag))
+                {
+                    mag = _switcher.ActiveWeapon != null ? _switcher.ActiveWeapon.magazineSize : 0;
+                    _magState[slot] = mag;
+                }
+                return mag;
+            }
+            set => _magState[_switcher.ActiveSlot] = value;
+        }
         public bool IsReloading => _isReloading;
 
         private ItemData _lastWeapon; // 跟踪武器切换，避免 OnEnable 不触发时扩散/弹匣未初始化
@@ -61,7 +78,7 @@ namespace _Game.Systems.Weapon
             if (weapon != null)
             {
                 _currentSpread = weapon.baseSpread;
-                _currentMag = weapon.magazineSize;
+                // CurrentMag 属性按槽位懒初始化，首次访问自动填满弹匣
             }
             InputRouter.BindMouse(0, InputPriority.Gameplay, OnFireButton, this);
         }
@@ -95,7 +112,7 @@ namespace _Game.Systems.Weapon
             {
                 _lastWeapon = weapon;
                 _currentSpread = weapon.baseSpread;
-                _currentMag = weapon.magazineSize;
+                // 弹匣余量由 CurrentMag 属性按槽位持久化，不再每次切换回满
                 _isReloading = false;
                 _fireTimer = 0f;
             }
@@ -157,7 +174,7 @@ namespace _Game.Systems.Weapon
             if (_isReloading) return;
 
             // 弹药检查：有弹药需求且弹匣为空 → 自动换弹
-            if (!string.IsNullOrEmpty(weapon.ammoItemName) && _currentMag <= 0)
+            if (!string.IsNullOrEmpty(weapon.ammoItemName) && CurrentMag <= 0)
             {
                 int inInv = CountAmmoInInventory(weapon.ammoItemName);
                 StartReload(weapon);
@@ -170,13 +187,35 @@ namespace _Game.Systems.Weapon
 
             // 扣弹匣
             if (!string.IsNullOrEmpty(weapon.ammoItemName))
-                _currentMag--;
+                CurrentMag--;
+
+            // 耐久 v1.0：射击消耗武器耐久
+            if (weapon.hasDurability && _inventory != null)
+            {
+                int weaponId = _inventory.GetEquippedInstanceId(_switcher.ActiveSlot);
+                if (weaponId > 0)
+                {
+                    float matFactor = Durability.DurabilitySystem.GetMaterialFactor(weapon.itemMaterial);
+                    float qualityFactor = weapon.quality == ItemQuality.Professional ? 0.8f
+                                        : weapon.quality == ItemQuality.Scavenged ? 1.2f : 1f;
+                    Durability.DurabilitySystem.Instance?.ConsumeDurability(weaponId,
+                        GameConstants.DURABILITY_WEAPON_PER_SHOT * matFactor * qualityFactor);
+                }
+            }
 
             Vector3 aimDir = _aiming != null ? _aiming.AimDirection : transform.forward;
 
-            // 散射：枪械专精每级减少 GUN_SKILL_SPREAD_REDUCTION
+            // 散射：枪械专精每级减少 GUN_SKILL_SPREAD_REDUCTION + 低耐久惩罚
             int gunLevel = _playerCharacter != null ? _playerCharacter.GetSkillLevel(SkillType.枪械专精) : 0;
             float effectiveSpread = _currentSpread * (1f - gunLevel * GameConstants.GUN_SKILL_SPREAD_REDUCTION);
+            // 耐久 v1.0：低耐久散射惩罚
+            if (weapon.hasDurability && _inventory != null)
+            {
+                int weaponId = _inventory.GetEquippedInstanceId(_switcher.ActiveSlot);
+                float durRatio = Durability.DurabilitySystem.Instance?.GetRatio(weaponId) ?? 1f;
+                if (durRatio < 0.3f)
+                    effectiveSpread += (1f - durRatio) / 0.3f * 5f;  // 0%耐久 +5°散射
+            }
             Vector3 spreadDir = GetSpreadDirection(aimDir, effectiveSpread * 0.5f);
 
             // 射线检测（实际从枪口发出）
@@ -233,10 +272,11 @@ namespace _Game.Systems.Weapon
                 return;
             }
 
-            int need = weapon.magazineSize - _currentMag;
+            int need = weapon.magazineSize - CurrentMag;
             int take = Mathf.Min(need, inInventory);
             _inventory.RemoveItemByName(weapon.ammoItemName, take);
-            _currentMag += take;
+            CurrentMag += take;
+            _lastReloadTaken = take;  // 记录实际扣除数，供 FinishReload 发布
 
             _isReloading = true;
             _reloadTimer = weapon.reloadTime;
@@ -246,7 +286,7 @@ namespace _Game.Systems.Weapon
         {
             _isReloading = false;
             EventBus.Publish(new ItemReloadedEvent(weapon, weapon.ammoItemName,
-                weapon.magazineSize - _currentMag));
+                _lastReloadTaken));
         }
 
         int CountAmmoInInventory(string ammoItemName)
@@ -292,19 +332,13 @@ namespace _Game.Systems.Weapon
         /// <summary> 获取指定武器槽的当前弹夹子弹数（供存档系统采集） </summary>
         public int GetCurrentMag(EquipSlot slot)
         {
-            // 当前只追踪活跃武器的一个 _currentMag
-            var switcher = GetComponent<_Game.Systems.Weapon.WeaponSwitcher>();
-            if (switcher != null && switcher.ActiveSlot == slot)
-                return _currentMag;
-            return 0;
+            return _magState.TryGetValue(slot, out var mag) ? mag : 0;
         }
 
         /// <summary> 设置指定武器槽的当前弹夹子弹数（供存档系统恢复） </summary>
         public void SetCurrentMag(EquipSlot slot, int ammo)
         {
-            var switcher = GetComponent<_Game.Systems.Weapon.WeaponSwitcher>();
-            if (switcher != null && switcher.ActiveSlot == slot)
-                _currentMag = ammo;
+            _magState[slot] = ammo;
         }
     }
 }

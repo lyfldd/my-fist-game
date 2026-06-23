@@ -3,6 +3,7 @@ using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Audio;
 using _Game.Systems.Character;
+using _Game.Systems.Durability;
 using _Game.Systems.Weapon;
 
 namespace _Game.Systems.Combat
@@ -56,6 +57,22 @@ namespace _Game.Systems.Combat
             float cooldown = hasMeleeWeapon ? weapon.fireRate : emptyHandCooldown;
 
             _cooldownTimer = cooldown;
+
+            // 耐久 v1.0：近战消耗武器耐久
+            if (hasMeleeWeapon && weapon.hasDurability)
+            {
+                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
+                if (inv != null)
+                {
+                    int weaponId = inv.GetEquippedInstanceId(_switcher.ActiveSlot);
+                    if (weaponId > 0)
+                    {
+                        float matFactor = DurabilitySystem.GetMaterialFactor(weapon.itemMaterial);
+                        DurabilitySystem.Instance?.ConsumeDurability(weaponId,
+                            GameConstants.DURABILITY_MELEE_PER_HIT * matFactor);
+                    }
+                }
+            }
 
             int str = _player != null ? _player.Strength : 5;
             int meleeLevel = _player != null ? _player.GetSkillLevel(SkillType.近战专精) : 0;

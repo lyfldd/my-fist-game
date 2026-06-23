@@ -15,6 +15,8 @@ namespace _Game.Systems.WorldContainer
 
         public ItemData itemData;
         public int count = 1;
+        public float itemDurability;  // 前置A2：地面物品耐久（0=满耐久/无耐久）
+        public int repairCount;       // 前置A2：修理次数
 
         [Header("外观")]
         public float itemScale = GameConstants.WORLD_ITEM_SCALE;  // 地面显示大小

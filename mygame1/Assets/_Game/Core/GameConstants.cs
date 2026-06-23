@@ -543,6 +543,14 @@ namespace _Game.Core
         public const float STRENGTH_CARRY_WEIGHT_BONUS = 5f;
 
         // ============================================================
+        // DURABILITY SYSTEM (前置 I / 耐久 v1.0)
+        // ============================================================
+        public const float DURABILITY_TOOL_EFFICIENCY_MIN = 0.5f;     // 0%耐久工具最低效率
+        public const float DURABILITY_WEAPON_PER_SHOT = 1f;           // 开一枪基础耐久消耗
+        public const float DURABILITY_ARMOR_PER_DAMAGE = 0.05f;       // 每点伤害扣护甲耐久系数
+        public const float DURABILITY_MELEE_PER_HIT = 1f;             // 近战一击基础耐久消耗
+
+        // ============================================================
         // WEATHER SYSTEM
         // ============================================================
 

@@ -30,6 +30,7 @@ namespace _Game.Config
         public ItemQuality quality = ItemQuality.Scavenged;
         public bool hasDurability;          // TODO: 耐久系统 — 武器/护甲/工具消耗耐久
         public float maxDurability = 100f;
+        public ItemMaterial itemMaterial = ItemMaterial.Default;  // 前置B：材质标签
 
         [Header("用途标签")]
         public ItemUsageTag[] usageTags;

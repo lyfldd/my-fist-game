@@ -162,6 +162,15 @@ namespace _Game.Systems.Building
             while (elapsed < duration)
             {
                 float dt = UnityEngine.Time.deltaTime;
+
+                // 前置 I：工具效率影响建造速度
+                if (activeBuildable.requiredTool != null && _inventory != null)
+                {
+                    int toolId = _inventory.GetEquippedInstanceId(EquipSlot.RightHand);
+                    float eff = _Game.Systems.Durability.DurabilitySystem.Instance?.GetToolEfficiency(toolId) ?? 1f;
+                    dt *= eff;
+                }
+
                 elapsed += dt;
                 BuildProgress = Mathf.Clamp01(elapsed / duration);
 
@@ -188,7 +197,10 @@ namespace _Game.Systems.Building
         {
             // 1. 扣除材料（DevTools 自由建造模式跳过）
             if (!_Game.UI.DevTools.FreeBuildEnabled)
+            {
                 DeductMaterials();
+                // 前置A TODO：工具耐久消耗 → DurabilitySystem.Instance?.ConsumeDurability(toolInstanceId, ...)
+            }
 
             // 2. 获取放置位置
             Vector3 placePos = _ghostPreview != null

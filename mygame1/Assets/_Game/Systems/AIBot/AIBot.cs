@@ -1052,6 +1052,8 @@ namespace _Game.Systems.AIBot
                     {
                         itemName = slot.itemData != null ? slot.itemData.itemName : null,
                         count = slot.count,
+                        itemDurability = 0f,   // 前置A2：AIBotInventorySlot 无耐久追踪，默认0
+                        repairCount = 0,
                     });
                 }
             }
