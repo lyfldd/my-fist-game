@@ -23,9 +23,14 @@ MonoBehaviour:
   quality: 1
   hasDurability: 1
   maxDurability: 100
+  maxRepairs: 8
+  itemMaterial: 0
   usageTags: 
   isWorkstation: 0
   workstationTier: 0
+  electronicDeviceType: 0
+  attachmentSlot: 0
+  hostSlots: 
   equipSlot: 3
   storageWidth: 3
   storageHeight: 2
@@ -56,6 +61,9 @@ MonoBehaviour:
   foodType: 
   fuelValue: 0
   healAmount: 0
+  energyValue: 0
+  repairValue: 0
+  fusionCoreSize: 0
   isFirearm: 0
   weaponDamage: 10
   weaponRange: 50
@@ -67,6 +75,7 @@ MonoBehaviour:
   magazineSize: 0
   range: 50
   ammoItemName: 
+  ammoItemData: {fileID: 0}
   gunshotSoundType: 
   muzzleFlashType: 
   reloadTime: 1.5

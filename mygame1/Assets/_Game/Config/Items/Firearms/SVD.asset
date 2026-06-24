@@ -21,8 +21,8 @@ MonoBehaviour:
   maxStack: 1
   weight: 5
   quality: 0
-  hasDurability: 1
-  maxDurability: 350
+  hasDurability: 0
+  maxDurability: 100
   maxRepairs: 8
   itemMaterial: 0
   usageTags: 
@@ -31,7 +31,7 @@ MonoBehaviour:
   electronicDeviceType: 0
   attachmentSlot: 0
   hostSlots: 
-  equipSlot: 8
+  equipSlot: 0
   storageWidth: 0
   storageHeight: 0
   armorValue: 0
@@ -47,18 +47,18 @@ MonoBehaviour:
   energyValue: 0
   repairValue: 0
   fusionCoreSize: 0
-  isFirearm: 1
-  weaponDamage: 100
+  isFirearm: 0
+  weaponDamage: 10
   weaponRange: 50
-  fireRate: 1.5
-  baseSpread: 0.5
-  maxSpread: 3
+  fireRate: 0.5
+  baseSpread: 2
+  maxSpread: 15
   spreadRecovery: 8
-  spreadPerShot: 0.5
-  magazineSize: 10
+  spreadPerShot: 1.5
+  magazineSize: 0
   range: 50
-  ammoItemName: "7.62mm\u6B65\u67AA\u5F39"
+  ammoItemName: 
   ammoItemData: {fileID: 0}
   gunshotSoundType: 
   muzzleFlashType: 
-  reloadTime: 3
+  reloadTime: 1.5

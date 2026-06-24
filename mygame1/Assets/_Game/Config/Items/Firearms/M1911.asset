@@ -21,8 +21,8 @@ MonoBehaviour:
   maxStack: 1
   weight: 1.5
   quality: 0
-  hasDurability: 1
-  maxDurability: 150
+  hasDurability: 0
+  maxDurability: 100
   maxRepairs: 8
   itemMaterial: 0
   usageTags: 
@@ -31,7 +31,7 @@ MonoBehaviour:
   electronicDeviceType: 0
   attachmentSlot: 0
   hostSlots: 
-  equipSlot: 11
+  equipSlot: 0
   storageWidth: 0
   storageHeight: 0
   armorValue: 0
@@ -47,17 +47,17 @@ MonoBehaviour:
   energyValue: 0
   repairValue: 0
   fusionCoreSize: 0
-  isFirearm: 1
-  weaponDamage: 45
+  isFirearm: 0
+  weaponDamage: 10
   weaponRange: 50
-  fireRate: 0.4
+  fireRate: 0.5
   baseSpread: 2
-  maxSpread: 10
-  spreadRecovery: 6
-  spreadPerShot: 2
-  magazineSize: 7
+  maxSpread: 15
+  spreadRecovery: 8
+  spreadPerShot: 1.5
+  magazineSize: 0
   range: 50
-  ammoItemName: .45 ACP
+  ammoItemName: 
   ammoItemData: {fileID: 0}
   gunshotSoundType: 
   muzzleFlashType: 

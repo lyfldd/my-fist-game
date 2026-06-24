@@ -213,11 +213,11 @@ public static class CreateProductionDevices
     // ── 武器组装台: ×3 ──
     static void CreateWeaponAssembly() => Create("WeaponAssembly", "武器组装台", WorkstationTier.Machining, 15f, 1, false,
         recipes: new[] {
-            RM("M1911", 1, 15f, ("SteelIngot", 6), ("WoodPlank", 3), ("AdvancedParts", 3)),
             RM("AK47", 1, 18f, ("SteelIngot", 9), ("WoodPlank", 3), ("AdvancedParts", 3)),
+            RM("M16A1", 1, 16f, ("SteelIngot", 8), ("WoodPlank", 3), ("AdvancedParts", 2)),
             RM("Remington870", 1, 20f, ("SteelIngot", 6), ("WoodPlank", 3), ("AdvancedParts", 3), ("Gear", 2)),
             RM("SVD", 1, 25f, ("TitaniumAlloy", 6), ("SteelPipe", 6), ("AdvancedParts", 6)),
-            RM("BulletproofVest", 1, 15f, ("ClothRoll", 6), ("SteelIngot", 6), ("AdvancedParts", 3)),
+            RM("Uzi", 1, 14f, ("SteelIngot", 6), ("WoodPlank", 2), ("AdvancedParts", 2)),
         });
 
     // ── 终局设备: ×2（稀有材料不宜3倍）──

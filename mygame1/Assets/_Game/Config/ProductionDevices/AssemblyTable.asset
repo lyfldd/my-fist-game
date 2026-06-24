@@ -35,7 +35,7 @@ MonoBehaviour:
       count: 2
     - itemData: {fileID: 11400000, guid: 7e0d6740cbf9b1747aaab20e6500afc8, type: 2}
       count: 2
-    output: {fileID: 0}
+    output: {fileID: 11400000, guid: b89c30d5c7b8fb948bb0ce418f27ca5c, type: 2}
     outputCount: 2
     baseTime: 8
   - recipeId: 

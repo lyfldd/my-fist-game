@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0946ddcba871320458dd84c140608dd5, type: 3}
   m_Name: ItemGraph
   m_EditorClassIdentifier: 
-  buildTimestamp: 2026-06-24 23:57:09
+  buildTimestamp: 2026-06-25 00:02:32
   recipeCountAtBuild: 295
   nodes:
   - itemName: ".22\u5C0F\u53E3\u5F84"
@@ -2334,6 +2334,25 @@ MonoBehaviour:
     consumerCount: 0
     autoAssignedStation: 4
     isRawMaterial: 0
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u673A\u68B0\u4F20\u52A8\u7EC4\u4EF6"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
     isDeadEnd: 1
     sources: 
     obtainActions: 
@@ -6903,6 +6922,6 @@ MonoBehaviour:
     sourceDescriptions: []
     requiredSystems: []
     allSystemsReady: 1
-  rawMaterialCount: 75
-  deadEndCount: 160
+  rawMaterialCount: 76
+  deadEndCount: 161
   coreMaterialCount: 16
