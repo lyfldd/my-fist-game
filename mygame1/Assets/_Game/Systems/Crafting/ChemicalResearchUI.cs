@@ -32,7 +32,6 @@ namespace _Game.Systems.Crafting
         private GameObject _canvasGo;
         private Font _font;
         private GameObject _panelGo;
-        private Text _titleText;
         private GameObject _tabBar;
         private List<Button> _tabBtns = new List<Button>();
         private RectTransform _rowContent;
@@ -89,9 +88,9 @@ namespace _Game.Systems.Crafting
             if (UIModeConfig.UseUGUI && _isVisible) RefreshUGUI();
         }
 
-        public void Close() { _isVisible = false; if (_canvasGo != null) _canvasGo.SetActive(false); }
+        public void Close() { _isVisible = false; if (_canvasGo != null) _canvasGo.SetActive(false); UIPanelManager.Instance?.Close("chemicalResearch"); }
         bool HandleEsc() { if (!_isVisible) return false; Close(); return true; }
-        void OnResearchOpened(ResearchStationOpenedEvent evt) { _isVisible = true; if (UIModeConfig.UseUGUI && _canvasGo != null) _canvasGo.SetActive(true); }
+        void OnResearchOpened(ResearchStationOpenedEvent evt) { _isVisible = true; if (UIModeConfig.UseUGUI && _canvasGo != null) _canvasGo.SetActive(true); UIPanelManager.Instance?.Open("chemicalResearch", onClose: Close); }
 
         // ============================================================
         // UGUI — 创建与刷新
@@ -117,28 +116,8 @@ namespace _Game.Systems.Crafting
             pr.sizeDelta = new Vector2(panelWidth, 400);
             _panelGo.GetComponent<Image>().color = new Color(0.06f, 0.06f, 0.08f, 0.95f);
 
-            // 标题行
-            var titleGo = new GameObject("TitleBar", typeof(RectTransform));
-            titleGo.transform.SetParent(_panelGo.transform, false);
-            var tr = titleGo.GetComponent<RectTransform>();
-            tr.anchorMin = new Vector2(0, 1); tr.anchorMax = new Vector2(1, 1);
-            tr.pivot = new Vector2(0, 1); tr.sizeDelta = new Vector2(0, 28);
-            tr.anchoredPosition = new Vector2(padding, -padding);
-
-            _titleText = UguiMakeText("Title", 18, FontStyle.Bold, TextAnchor.MiddleLeft, 300, 28);
-            _titleText.transform.SetParent(titleGo.transform, false);
-            _titleText.GetComponent<RectTransform>().anchorMin = Vector2.zero;
-            _titleText.GetComponent<RectTransform>().anchorMax = new Vector2(0, 1);
-            _titleText.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 0);
-            _titleText.color = new Color(0.6f, 1f, 0.6f);
-            _titleText.text = "研究中心";
-
-            var closeBtn = UguiMakeSmallBtn("CloseBtn", "✕", new Color(0.5f, 0.2f, 0.2f), 30, 24);
-            closeBtn.transform.SetParent(titleGo.transform, false);
-            var cbr = closeBtn.GetComponent<RectTransform>();
-            cbr.anchorMin = new Vector2(1, 0.5f); cbr.anchorMax = new Vector2(1, 0.5f);
-            cbr.pivot = new Vector2(1, 0.5f); cbr.anchoredPosition = Vector2.zero;
-            closeBtn.onClick.AddListener(() => Close());
+            // 标题栏（由UIPanelManager统一管理）
+            UIPanelManager.AddPanelTitleBar(_panelGo, "化学研究", "chemicalResearch", onClose: Close);
 
             // 分隔线
             var line = new GameObject("Line", typeof(Image));

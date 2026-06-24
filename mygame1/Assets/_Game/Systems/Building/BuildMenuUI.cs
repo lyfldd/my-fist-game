@@ -171,6 +171,8 @@ namespace _Game.Systems.Building
             if (UIModeConfig.UseUGUI && _canvasGo != null)
                 _canvasGo.SetActive(true);
 
+            UIPanelManager.Instance?.Open("buildMenu", onClose: Hide);
+
             for (int i = 0; i < maxVisibleSlots; i++)
             {
                 int idx = i;
@@ -207,7 +209,14 @@ namespace _Game.Systems.Building
             _isVisible = false;
             IsVisible = false;
             if (_canvasGo != null) _canvasGo.SetActive(false);
+            UIPanelManager.Instance?.Close("buildMenu");
             InputRouter.UnbindAll(this);
+        }
+
+        /// <summary> 关闭建造菜单（标题栏关闭按钮回调） </summary>
+        private void Hide()
+        {
+            EventBus.Publish(new BuildModeExitedEvent());
         }
 
         bool HandleNumberKey(int slotIndex)
@@ -242,6 +251,9 @@ namespace _Game.Systems.Building
             var bpRect = _bottomPanel.GetComponent<RectTransform>();
             bpRect.anchorMin = new Vector2(0.5f, 0); bpRect.anchorMax = new Vector2(0.5f, 0);
             bpRect.pivot = new Vector2(0.5f, 0); bpRect.sizeDelta = new Vector2(900, 160);
+
+            // 标题栏（由UIPanelManager统一管理）
+            UIPanelManager.AddPanelTitleBar(_bottomPanel, "建造菜单", "buildMenu", onClose: Hide);
 
             // --- 标题/翻页文字 ---
             _pageInfoText = UguiMakeText("PageInfo", 13, FontStyle.Bold, TextAnchor.MiddleCenter, 600, 22);

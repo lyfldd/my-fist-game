@@ -26,7 +26,6 @@ namespace _Game.Systems.AIBot
         // ============================================================
         private GameObject _canvasGo, _mainPanelGo;
         private Font _font;
-        private Text _titleText;
         private RectTransform _mainContent;
 
         // HP/Shield
@@ -83,6 +82,7 @@ namespace _Game.Systems.AIBot
             _instance._visible = true;
             _instance._lastVisible = true;
             if (_instance._canvasGo != null) _instance._canvasGo.SetActive(UIModeConfig.UseUGUI);
+            UIPanelManager.Instance?.Open("aiBot", onClose: Hide);
             _instance.MarkDirty();
         }
 
@@ -93,6 +93,7 @@ namespace _Game.Systems.AIBot
                 _instance._visible = false;
                 _instance._lastVisible = false;
                 if (_instance._canvasGo != null) _instance._canvasGo.SetActive(false);
+                UIPanelManager.Instance?.Close("aiBot");
             }
         }
 
@@ -160,25 +161,8 @@ namespace _Game.Systems.AIBot
             UguiSetCenter(_mainPanelGo.GetComponent<RectTransform>(), pw, ph);
             _mainPanelGo.GetComponent<Image>().color = new Color(0.05f, 0.05f, 0.08f, 0.93f);
 
-            // 标题（拖拽区域）
-            var titleBar = new GameObject("TitleBar", typeof(RectTransform), typeof(Image));
-            titleBar.transform.SetParent(_mainPanelGo.transform, false);
-            var tbr = titleBar.GetComponent<RectTransform>();
-            tbr.anchorMin = new Vector2(0, 1); tbr.anchorMax = new Vector2(1, 1);
-            tbr.pivot = new Vector2(0.5f, 1); tbr.sizeDelta = new Vector2(0, 28);
-            titleBar.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.15f);
-
-            _titleText = UguiMakeText("Title", 16, FontStyle.Bold, TextAnchor.MiddleCenter, pw, 28);
-            _titleText.transform.SetParent(titleBar.transform, false);
-            _titleText.text = "AI机器人 (拖拽标题移动)";
-            UguiSetStretch(_titleText.GetComponent<RectTransform>());
-
-            var closeBtn = UguiMakeSmallBtn("CloseBtn", "✕", new Color(0.8f, 0.2f, 0.2f), 28, 22);
-            closeBtn.transform.SetParent(titleBar.transform, false);
-            var cbr = closeBtn.GetComponent<RectTransform>();
-            cbr.anchorMin = new Vector2(1, 0.5f); cbr.anchorMax = new Vector2(1, 0.5f);
-            cbr.pivot = new Vector2(1, 0.5f); cbr.anchoredPosition = new Vector2(-8, 0);
-            closeBtn.onClick.AddListener(() => Hide());
+            // 标题栏（由UIPanelManager统一管理）
+            UIPanelManager.AddPanelTitleBar(_mainPanelGo, "AI机器人", "aiBot", onClose: Hide);
 
             // 滚动内容区
             var scrollGo = new GameObject("Scroll", typeof(Image), typeof(ScrollRect));

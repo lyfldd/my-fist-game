@@ -23,13 +23,11 @@ namespace _Game.Systems.WorldContainer
         public float cellGap = 4f;
 
         private RectTransform _windowRt;
-        private RectTransform _titleBar;
         private RectTransform _contentArea;
         private InventoryContainer _container;
         private WorldContainer _worldContainer;
         private Canvas _canvas;
         private bool _isOpen;
-        private Text _titleLabel;
 
         // 双击/拾取检测
         private float _lastClickTime;
@@ -56,13 +54,10 @@ namespace _Game.Systems.WorldContainer
             if (_windowRt == null)
                 CreateWindow();
 
-            // 更新标题
-            if (_titleLabel != null)
-                _titleLabel.text = title;
-
             RefreshGrid();
             gameObject.SetActive(true);
             _isOpen = true;
+            UIPanelManager.Instance?.Open("container", onClose: Hide);
         }
 
         /// <summary> 关闭窗口 </summary>
@@ -77,6 +72,13 @@ namespace _Game.Systems.WorldContainer
 
             _worldContainer = null;
             _container = null;
+            UIPanelManager.Instance?.Close("container");
+        }
+
+        /// <summary> 关闭容器窗口（标题栏关闭按钮回调） </summary>
+        private void Hide()
+        {
+            CloseWindow();
         }
 
         void CreateWindow()
@@ -90,32 +92,8 @@ namespace _Game.Systems.WorldContainer
             var bg = go.GetComponent<Image>();
             bg.color = new Color(0.15f, 0.15f, 0.15f, 0.95f);
 
-            // 标题栏（可拖拽）
-            var titleGo = new GameObject("TitleBar", typeof(RectTransform), typeof(Image));
-            _titleBar = titleGo.GetComponent<RectTransform>();
-            _titleBar.SetParent(_windowRt, false);
-            _titleBar.sizeDelta = new Vector2(windowWidth, 30f);
-            _titleBar.anchoredPosition = new Vector2(0, windowHeight * 0.5f - 15f);
-            titleGo.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f, 1f);
-
-            // 标题文字
-            _titleLabel = UGUIBuilder.CreateTextAnchored("TitleLabel", _titleBar,
-                "容器", new Vector2(0, 0.5f), new Vector2(5, 0),
-                windowWidth - 40f, 30f, 14, FontStyle.Normal, TextAnchor.MiddleLeft);
-
-            // 拖拽事件
-            var dragTrigger = titleGo.AddComponent<EventTrigger>();
-            var entry = new EventTrigger.Entry();
-            entry.eventID = EventTriggerType.Drag;
-            entry.callback.AddListener((data) => OnDrag((PointerEventData)data));
-            dragTrigger.triggers.Add(entry);
-
-            // 关闭按钮
-            var closeBtn = UGUIBuilder.CreateButton("CloseBtn", _titleBar, "X",
-                new Color(0.8f, 0.2f, 0.2f, 1f), 24, 24, 14);
-            var closeRt = closeBtn.GetComponent<RectTransform>();
-            closeRt.anchoredPosition = new Vector2(windowWidth * 0.5f - 16f, 0);
-            closeBtn.onClick.AddListener(() => CloseWindow());
+            // 标题栏（由UIPanelManager统一管理）
+            UIPanelManager.AddPanelTitleBar(go, "容器", "container", onClose: Hide);
 
             // 内容区域
             var contentGo = new GameObject("Content", typeof(RectTransform));
