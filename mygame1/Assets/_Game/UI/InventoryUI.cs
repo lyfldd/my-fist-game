@@ -110,8 +110,8 @@ namespace _Game.UI
             EnsurePanelsExist();
 
             // 查找其他 UI 对象
-            _survivalHUDGo = GameObject.Find("SurvivalHUD_Canvas") ?? GameObject.Find("SurvivalHUD");
-            _quickItemBarGo = GameObject.Find("QuickItemBar_Canvas") ?? GameObject.Find("QuickItemBar");
+            _survivalHUDGo = transform.Find("SurvivalHUD_Canvas")?.gameObject ?? GameObject.Find("SurvivalHUD");
+            _quickItemBarGo = transform.Find("QuickItemBar_Canvas")?.gameObject ?? GameObject.Find("QuickItemBar");
 
             // 禁用 ScrollRect（与物品拖拽冲突）
             if (overviewPanel != null)
@@ -2526,17 +2526,13 @@ namespace _Game.UI
 
         void SetOtherUIVisible(bool visible)
         {
+            // HUD 都在 Player 下的子节点，用 transform.Find 找
             if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
             if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
-            // 角落 HUD
-            var tl = GameObject.Find("TopLeftHUD_Canvas") ?? transform.Find("TopLeftHUD_Canvas")?.gameObject;
-            if (tl != null) tl.SetActive(visible);
-            var db = GameObject.Find("DecibelHUD_Canvas") ?? transform.Find("DecibelHUD_Canvas")?.gameObject;
-            if (db != null) db.SetActive(visible);
-            var wh = GameObject.Find("WeatherHUD_Canvas") ?? transform.Find("WeatherHUD_Canvas")?.gameObject;
-            if (wh != null) wh.SetActive(visible);
-            var ch = GameObject.Find("CrosshairCanvas") ?? transform.Find("CrosshairCanvas")?.gameObject;
-            if (ch != null) ch.SetActive(visible);
+            var tl = transform.Find("TopLeftHUD_Canvas"); if (tl != null) tl.gameObject.SetActive(visible);
+            var db = transform.Find("DecibelHUD_Canvas"); if (db != null) db.gameObject.SetActive(visible);
+            var wh = transform.Find("WeatherHUD_Canvas"); if (wh != null) wh.gameObject.SetActive(visible);
+            var ch = transform.Find("CrosshairCanvas"); if (ch != null) ch.gameObject.SetActive(visible);
         }
 
         // ===== 固定布局辅助方法 =====
