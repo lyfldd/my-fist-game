@@ -2528,6 +2528,15 @@ namespace _Game.UI
         {
             if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
             if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
+            // 角落 HUD
+            var tl = GameObject.Find("TopLeftHUD_Canvas") ?? transform.Find("TopLeftHUD_Canvas")?.gameObject;
+            if (tl != null) tl.SetActive(visible);
+            var db = GameObject.Find("DecibelHUD_Canvas") ?? transform.Find("DecibelHUD_Canvas")?.gameObject;
+            if (db != null) db.SetActive(visible);
+            var wh = GameObject.Find("WeatherHUD_Canvas") ?? transform.Find("WeatherHUD_Canvas")?.gameObject;
+            if (wh != null) wh.SetActive(visible);
+            var ch = GameObject.Find("CrosshairCanvas") ?? transform.Find("CrosshairCanvas")?.gameObject;
+            if (ch != null) ch.SetActive(visible);
         }
 
         // ===== 固定布局辅助方法 =====
