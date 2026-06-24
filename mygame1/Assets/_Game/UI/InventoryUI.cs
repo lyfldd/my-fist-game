@@ -63,8 +63,7 @@ namespace _Game.UI
         // 容器折叠状态
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
         private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
-        private bool _showOverviewPending;
-        private GameObject _itemDetailPanel; // 右键物品详情浮窗
+        private GameObject _itemDetailPanel;
         private Text _detailText;
 
 
@@ -327,18 +326,8 @@ namespace _Game.UI
 
         public void ShowOverview()
         {
-            if (_showOverviewPending) return;
-            _showOverviewPending = true;
-            if (gameObject.activeInHierarchy)
-                StartCoroutine(ShowOverviewCoroutine());
-            else
-                ShowOverviewInternal();
-        }
-
-        System.Collections.IEnumerator ShowOverviewCoroutine()
-        {
-            yield return null;
-            _showOverviewPending = false;
+            if (_lastShowOverviewFrame == Time.frameCount) return;
+            _lastShowOverviewFrame = Time.frameCount;
             ShowOverviewInternal();
         }
 
@@ -2493,9 +2482,11 @@ namespace _Game.UI
 
         void ClearContainer(GameObject container)
         {
-            // 用 Destroy（非 Immediate），让 UGUI 事件系统在帧末安全清理
             foreach (Transform child in container.transform)
-                Destroy(child.gameObject);
+            {
+                child.gameObject.SetActive(false); // 立即隐藏防残影
+                Destroy(child.gameObject);         // 帧末安全销毁
+            }
         }
 
         void RefreshOverview()
