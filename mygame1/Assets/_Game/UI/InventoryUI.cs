@@ -591,35 +591,31 @@ namespace _Game.UI
             float leftX = m;
             float rightX = leftX + leftW + sp;
 
-            // ── 左面板 ──
-            var leftPanel = MakeRect("LeftPanel", scrollContent, leftX, -m, leftW, ph - m * 2);
-            var lpImg = leftPanel.gameObject.AddComponent<Image>();
-            lpImg.color = new Color(0.05f, 0.05f, 0.08f, 0.6f);
-            lpImg.raycastTarget = false;
+            // ── 左右面板（预建 StaticShell 存在则跳过） ──
+            if (shell == null)
+            {
+                var leftPanel = MakeRect("LeftPanel", scrollContent, leftX, -m, leftW, ph - m * 2);
+                var lpImg = leftPanel.gameObject.AddComponent<Image>();
+                lpImg.color = new Color(0.05f, 0.05f, 0.08f, 0.6f);
+                lpImg.raycastTarget = false;
+                float ly = -m; float innerW = leftW - m * 2;
+                DrawWeaponSlots(leftPanel, innerW, ref ly, ph * 0.33f, view, m);
+                ly -= sp;
+                var dollRt = MakeRect("PaperDoll", leftPanel, m, ly, innerW, ph * 0.42f);
+                CreatePaperDoll(dollRt.transform, view, innerW, ph * 0.42f);
+                ly -= ph * 0.42f + sp;
+                DrawStatsPanel(leftPanel, view, innerW, ref ly, ph * 0.15f, m);
+            }
 
-            float ly = -m;
-            float innerW = leftW - m * 2;
-
-            // 武器槽 — 2×2 方格，放在装备区上面
-            float weaponH = ph * 0.33f;
-            DrawWeaponSlots(leftPanel, innerW, ref ly, weaponH, view, m);
-            ly -= sp;
-
-            // 纸娃娃装备区
-            float dollH = ph * 0.42f;
-            var dollRt = MakeRect("PaperDoll", leftPanel, m, ly, innerW, dollH);
-            CreatePaperDoll(dollRt.transform, view, innerW, dollH);
-            ly -= dollH + sp;
-
-            // 属性面板
-            float statsH = ph * 0.15f;
-            DrawStatsPanel(leftPanel, view, innerW, ref ly, statsH, m);
-
-            // ── 右面板：折叠容器列表 ──
-            var rightPanel = MakeRect("RightPanel", scrollContent, rightX, -m, rightW, ph - m * 2);
-            var rpImg = rightPanel.gameObject.AddComponent<Image>();
-            rpImg.color = new Color(0.06f, 0.06f, 0.09f, 0.6f);
-            rpImg.raycastTarget = false;
+            var rightPanel = shell != null
+                ? shell.Find("RightPanel") as RectTransform
+                : MakeRect("RightPanel", scrollContent, rightX, -m, rightW, ph - m * 2);
+            if (shell == null)
+            {
+                var rpImg = rightPanel.gameObject.AddComponent<Image>();
+                rpImg.color = new Color(0.06f, 0.06f, 0.09f, 0.6f);
+                rpImg.raycastTarget = false;
+            }
 
             // 所有装备容器的显示顺序
             var containerSlots = new EquipSlot[] {

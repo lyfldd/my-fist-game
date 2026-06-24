@@ -670,15 +670,12 @@ namespace _Game.Systems.Crafting
             foreach (var r in _recipes) if (r != null && seen.Add(r.category)) _availableCategories.Add(r.category);
             _availableCategories.Sort((a, b) => string.Compare(GetCategoryLabel(a), GetCategoryLabel(b), System.StringComparison.Ordinal));
 
-            // UGUI: 重建分类按钮
+            // UGUI: 更新分类按钮（复用，不销毁重建）
             if (UIModeConfig.UseUGUI && _categoryBar != null)
             {
-                foreach (var b in _categoryBtns) { if (b != null) Destroy(b.gameObject); }
-                _categoryBtns.Clear();
-                // 第一个子物体是"全部"按钮（索引0），保持不变
-                // 从索引1开始清除旧的分类按钮
                 for (int i = _categoryBar.transform.childCount - 1; i >= 1; i--)
                     Destroy(_categoryBar.transform.GetChild(i).gameObject);
+                _categoryBtns.Clear();
 
                 foreach (var cat in _availableCategories)
                 {
