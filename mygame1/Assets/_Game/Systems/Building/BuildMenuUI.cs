@@ -445,9 +445,6 @@ namespace _Game.Systems.Building
 
         void RebuildTabs()
         {
-            foreach (var b in _tabBtns) { if (b != null) Destroy(b.gameObject); }
-            _tabBtns.Clear();
-
             if (_tabContent == null) return;
 
             var orderedCats = new BuildableCategory[]
@@ -471,12 +468,25 @@ namespace _Game.Systems.Building
             int tabCount = _currentTabs.Count;
             if (tabCount == 0) return;
 
-            // 创建全部标签（ScrollRect 自动裁剪可见部分）
+            // 复用已有按钮
+            while (_tabBtns.Count > tabCount) { Destroy(_tabBtns[_tabBtns.Count - 1].gameObject); _tabBtns.RemoveAt(_tabBtns.Count - 1); }
+
             for (int tabIdx = 0; tabIdx < tabCount; tabIdx++)
             {
                 var (cat, _) = _currentTabs[tabIdx];
                 string label = GetCategoryName(cat);
-                int count = catalog.GetByCategory(cat).Length;
+
+                if (tabIdx < _tabBtns.Count)
+                {
+                    var btn = _tabBtns[tabIdx];
+                    if (btn != null)
+                    {
+                        btn.GetComponent<Image>().color = _selectedTab == tabIdx ? selectedButtonColor : normalButtonColor;
+                        var lt = btn.transform.Find("Label")?.GetComponent<Text>();
+                        if (lt != null) lt.text = label;
+                        continue;
+                    }
+                }
 
                 var go = new GameObject($"Tab_{tabIdx}", typeof(Image), typeof(UnityEngine.UI.Button));
                 go.transform.SetParent(_tabContent.transform, false);
