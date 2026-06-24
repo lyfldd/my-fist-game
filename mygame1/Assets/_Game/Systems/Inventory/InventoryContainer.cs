@@ -6,8 +6,7 @@ using _Game.Core;
 namespace _Game.Systems.Inventory
 {
     /// <summary>
-    /// 单个存储容器（口袋、腰带、胸挂、背包等）
-    /// 独立管理自己的网格和物品列表
+    /// 单个存储容器 — 对内委托给 GridInventory2D，对外 API 不变。
     /// </summary>
     [System.Serializable]
     public class InventoryContainer
@@ -24,234 +23,155 @@ namespace _Game.Systems.Inventory
         [Header("物品列表")]
         public List<PlacedItem> placedItems = new List<PlacedItem>();
 
-        // ===== 属性 =====
+        [System.NonSerialized] GridInventory2D _grid;
+        [System.NonSerialized] bool _gridDirty;
 
-        public int TotalCells => gridWidth * gridHeight;
+        GridInventory2D EnsureGrid()
+        {
+            if (_grid != null && !_gridDirty) return _grid;
+            _grid = new GridInventory2D(gridWidth, gridHeight);
+            // 从 placedItems 迁移
+            foreach (var p in placedItems)
+                if (p.itemData != null)
+                    _grid.Place(p.itemData, p.count, p.gridX, p.gridY, p.rotated,
+                        p.instanceId, p.itemDurability, p.repairCount);
+            _gridDirty = false;
+            return _grid;
+        }
 
-        /// <summary> 获取 (x,y) 位置的物品（没有则返回 null）</summary>
+        void SyncPlacedItems()
+        {
+            placedItems.Clear();
+            var g = EnsureGrid();
+            foreach (var s in g.SlotList)
+            {
+                if (s.isGhost) { placedItems.Add(PlacedItem.Ghost(s.x, s.y, s.ghostSourceSlot)); continue; }
+                placedItems.Add(new PlacedItem(s.itemData, s.count, s.x, s.y)
+                {
+                    instanceId = s.instanceId, rotated = s.rotated,
+                    itemDurability = s.itemDurability, repairCount = s.repairCount,
+                });
+            }
+            _gridDirty = false;
+        }
+
+        /// <summary> 调整网格尺寸，溢出物品返回列表 </summary>
+        public List<PlacedItem> Resize(int newW, int newH)
+        {
+            gridWidth = newW; gridHeight = newH;
+            var overflow = EnsureGrid().Resize(newW, newH);
+            var result = new List<PlacedItem>();
+            foreach (var s in overflow)
+                result.Add(new PlacedItem(s.itemData, s.count, 0, 0)
+                {
+                    instanceId = s.instanceId, rotated = s.rotated,
+                    itemDurability = s.itemDurability, repairCount = s.repairCount,
+                });
+            return result;
+        }
+
+        /// <summary> 外部直接读写 placedItems 后需调此方法标记脏 </summary>
+        public void MarkDirty() { _gridDirty = true; }
+
+        // ===== 属性 ===
+
         public PlacedItem? GetItemAt(int x, int y)
         {
-            foreach (var p in placedItems)
-            {
-                if (x >= p.gridX && x < p.gridX + p.GridWidth &&
-                    y >= p.gridY && y < p.gridY + p.GridHeight)
-                    return p;
-            }
+            var s = EnsureGrid().GetSlotAt(x, y);
+            if (s.HasValue && s.Value.itemData != null && !s.Value.isGhost)
+                return new PlacedItem(s.Value.itemData, s.Value.count, s.Value.x, s.Value.y)
+                {
+                    instanceId = s.Value.instanceId, rotated = s.Value.rotated,
+                    itemDurability = s.Value.itemDurability, repairCount = s.Value.repairCount,
+                };
             return null;
         }
+
+        public int TotalCells => gridWidth * gridHeight;
 
         public int UsedCells
         {
             get
             {
                 int cells = 0;
-                foreach (var item in placedItems)
-                    cells += item.GridWidth * item.GridHeight;
+                foreach (var s in EnsureGrid().SlotList)
+                    if (!s.isGhost) cells += s.w * s.h;
                 return cells;
             }
         }
 
-        public float CurrentWeight
-        {
-            get
-            {
-                float total = 0f;
-                foreach (var item in placedItems)
-                    total += item.TotalWeight;
-                return total;
-            }
-        }
+        public float CurrentWeight => EnsureGrid().TotalWeight;
 
-        // ===== 网格检测 =====
+        // ===== 网格检测 ===
 
         public bool IsSpaceFree(int x, int y, int w, int h)
-        {
-            if (x < 0 || y < 0) return false;
-            if (x + w > gridWidth || y + h > gridHeight) return false;
+            => EnsureGrid().CanPlace(x, y, w, h);
 
-            foreach (var item in placedItems)
-            {
-                if (x < item.gridX + item.GridWidth &&
-                    x + w > item.gridX &&
-                    y < item.gridY + item.GridHeight &&
-                    y + h > item.gridY)
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary> 移动物品到新位置（同容器内）</summary>
-        public void MoveItem(int fromX, int fromY, int toX, int toY, bool rotated)
-        {
-            for (int i = 0; i < placedItems.Count; i++)
-            {
-                var p = placedItems[i];
-                if (p.gridX == fromX && p.gridY == fromY && p.itemData != null)
-                {
-                    p.gridX = toX; p.gridY = toY; p.rotated = rotated;
-                    placedItems[i] = p;
-                    return;
-                }
-            }
-        }
-
-        /// <summary> 检测空间是否空闲，排除指定原位置的物品（用于原地旋转）</summary>
         public bool IsSpaceFreeFor(int x, int y, int w, int h, int excludeX, int excludeY, int excludeW, int excludeH)
         {
-            if (x < 0 || y < 0) return false;
-            if (x + w > gridWidth || y + h > gridHeight) return false;
-
-            foreach (var item in placedItems)
-            {
-                if (item.gridX == excludeX && item.gridY == excludeY) continue;
-
-                if (x < item.gridX + item.GridWidth &&
-                    x + w > item.gridX &&
-                    y < item.gridY + item.GridHeight &&
-                    y + h > item.gridY)
-                    return false;
-            }
-            return true;
+            // 找到排除位置的 slotId
+            int excludeId = 0;
+            var s = EnsureGrid().GetSlotAt(excludeX, excludeY);
+            if (s.HasValue) excludeId = s.Value.slotId;
+            return EnsureGrid().CanPlace(x, y, w, h, excludeId);
         }
 
-        public bool FindSpace(int w, int h, out int outX, out int outY)
+        public bool FindSpace(int w, int h, out int ox, out int oy)
+            => EnsureGrid().FindSpace(w, h, out ox, out oy);
+
+        public void MoveItem(int fromX, int fromY, int toX, int toY, bool rotated)
         {
-            for (int y = 0; y <= gridHeight - h; y++)
-            {
-                for (int x = 0; x <= gridWidth - w; x++)
-                {
-                    if (IsSpaceFree(x, y, w, h))
-                    {
-                        outX = x;
-                        outY = y;
-                        return true;
-                    }
-                }
-            }
-            outX = outY = 0;
-            return false;
+            var s = EnsureGrid().GetSlotAt(fromX, fromY);
+            if (s.HasValue) EnsureGrid().Move(s.Value.slotId, toX, toY);
         }
 
-        // ===== 增删操作 =====
+        // ===== 增删 ===
 
-        /// <summary> 添加物品，返回实际添加数量 </summary>
         public int AddItem(ItemData item, int count, float overloadWeight)
         {
             if (item == null || count <= 0) return 0;
-
-            // 超载检查（由外部 Inventory 统一检查，这里留一个安全兜底）
-            if (CurrentWeight + count * item.weight > overloadWeight)
-                return 0;
-
-            int remaining = count;
-
-            // 堆叠已有的同类型 1x1 物品
-            if (item.maxStack > 1)
-            {
-                for (int i = 0; i < placedItems.Count && remaining > 0; i++)
-                {
-                    var p = placedItems[i];
-                    if (p.itemData == item && p.count < item.maxStack)
-                    {
-                        int canAdd = item.maxStack - p.count;
-                        int toAdd = Mathf.Min(canAdd, remaining);
-
-                        float newWeight = CurrentWeight + toAdd * item.weight;
-                        if (newWeight > overloadWeight)
-                        {
-                            toAdd = Mathf.FloorToInt((overloadWeight - (CurrentWeight - p.TotalWeight + p.count * item.weight)) / item.weight);
-                            if (toAdd <= 0) break;
-                        }
-
-                        p.count += toAdd;
-                        placedItems[i] = p;
-                        remaining -= toAdd;
-                    }
-                }
-            }
-
-            // 找空位放新物品
-            while (remaining > 0)
-            {
-                int perStack = Mathf.Min(remaining, item.maxStack);
-
-                if (!FindSpace(item.gridWidth, item.gridHeight, out int fx, out int fy))
-                    break;
-
-                float weightAdd = perStack * item.weight;
-                if (CurrentWeight + weightAdd > overloadWeight)
-                {
-                    perStack = Mathf.FloorToInt((overloadWeight - CurrentWeight) / item.weight);
-                    if (perStack <= 0) break;
-                }
-
-                var placed = new PlacedItem(item, perStack, fx, fy);
-                placedItems.Add(placed);
-                remaining -= perStack;
-            }
-
-            return count - remaining;
+            if (CurrentWeight + count * item.weight > overloadWeight) return 0;
+            return EnsureGrid().TryAdd(item, count, overloadWeight);
         }
 
-        /// <summary> 移除物品，返回是否成功 </summary>
         public bool RemoveItem(ItemData item, int count)
         {
             if (item == null || count <= 0) return false;
-
             int remaining = count;
-            for (int i = placedItems.Count - 1; i >= 0 && remaining > 0; i--)
+            foreach (var s in EnsureGrid().SlotList)
             {
-                var p = placedItems[i];
-                if (p.itemData == item)
+                if (s.isGhost || s.itemData != item) continue;
+                int take = Mathf.Min(s.count, remaining);
+                if (take < s.count)
                 {
-                    if (p.count > remaining)
-                    {
-                        p.count -= remaining;
-                        placedItems[i] = p;
-                        remaining = 0;
-                    }
-                    else
-                    {
-                        remaining -= p.count;
-                        placedItems.RemoveAt(i);
-                    }
+                    var slot = s; slot.count -= take;
+                    EnsureGrid().SlotDict[slot.slotId] = slot;
                 }
+                else EnsureGrid().Remove(s.slotId);
+                remaining -= take;
+                if (remaining <= 0) break;
             }
-
             return count - remaining > 0;
         }
 
-        /// <summary> 按格子坐标精确移除指定数量的物品（用于拖拽，防止同类型误扣）</summary>
         public bool RemoveItemAt(int gridX, int gridY, int count)
         {
-            for (int i = 0; i < placedItems.Count; i++)
+            var s = EnsureGrid().GetSlotAt(gridX, gridY);
+            if (!s.HasValue || s.Value.itemData == null) return false;
+            if (s.Value.count > count)
             {
-                var p = placedItems[i];
-                if (p.gridX == gridX && p.gridY == gridY && p.itemData != null)
-                {
-                    if (p.count > count)
-                    {
-                        p.count -= count;
-                        placedItems[i] = p;
-                    }
-                    else
-                    {
-                        placedItems.RemoveAt(i);
-                    }
-                    return true;
-                }
+                var slot = s.Value; slot.count -= count;
+                EnsureGrid().SlotDict[slot.slotId] = slot;
             }
-            return false;
+            else EnsureGrid().Remove(s.Value.slotId);
+            return true;
         }
 
         public int GetItemCount(ItemData item)
         {
             int total = 0;
-            foreach (var p in placedItems)
-            {
-                if (p.itemData == item)
-                    total += p.count;
-            }
+            foreach (var s in EnsureGrid().SlotList)
+                if (s.itemData == item) total += s.count;
             return total;
         }
     }
