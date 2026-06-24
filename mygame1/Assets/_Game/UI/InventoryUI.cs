@@ -543,6 +543,22 @@ namespace _Game.UI
             y -= gridAreaH + 8f;
         }
 
+        void UpdateStaticShellDoll(InventoryViewData view)
+        {
+            var shell = overviewGridContainer.transform.parent.Find("StaticShell");
+            if (shell == null) return;
+            string[] names = { "头部", "胸挂", "上衣", "防弹衣", "腰带", "裤子", "背包" };
+            EquipSlot[] slots = { EquipSlot.Head, EquipSlot.Vest, EquipSlot.Tops, EquipSlot.BodyArmor, EquipSlot.Belt, EquipSlot.Pants, EquipSlot.Backpack };
+            for (int i = 0; i < 7; i++)
+            {
+                var doll = shell.Find($"LeftPanel/DollBg/Doll_{names[i]}");
+                if (doll == null) continue;
+                var label = doll.Find("Label")?.GetComponent<Text>();
+                if (label != null)
+                    label.text = GetEquipName(view, slots[i], $"{names[i]}: 空");
+            }
+        }
+
         ItemData FindItemData(string itemName)
         {
             if (_inventory == null) return null;
@@ -602,6 +618,12 @@ namespace _Game.UI
             var rightPanel = shell != null
                 ? shell.Find("RightPanel") as RectTransform
                 : MakeRect("RightPanel", scrollContent, rightX, -m, rightW, ph - m * 2);
+            if (shell != null)
+            {
+                ClearContainer(rightPanel.gameObject);
+                // 更新纸娃娃装备槽文字
+                UpdateStaticShellDoll(view);
+            }
             if (shell == null)
             {
                 var rpImg = rightPanel.gameObject.AddComponent<Image>();
