@@ -33,6 +33,9 @@ namespace _Game.Systems.Inventory
         [Header("容器列表（调试用）")]
         public List<InventoryContainer> containers = new List<InventoryContainer>();
 
+        /// <summary> 新网格容器（逐步替换 containers） </summary>
+        private Dictionary<EquipSlot, GridInventory2D> _grids;
+
         /// <summary> PlacedItem 实例 ID 自增计数器（存档系统用） </summary>
         private int _nextItemInstanceId = 1;
 
@@ -1042,6 +1045,111 @@ namespace _Game.Systems.Inventory
         {
             var ws = GetComponent<_Game.Systems.Weapon.WeaponShooting>();
             if (ws != null) ws.SetCurrentMag(weaponSlot, ammo);
+        }
+
+        // ═══════════════════════════════════════════
+        // GridInventory2D 迁移 API（渐进替换 containers）
+        // ═══════════════════════════════════════════
+
+        /// <summary> 首次访问时延迟初始化网格 </summary>
+        void EnsureGridsInit()
+        {
+            if (_grids != null) return;
+            _grids = new Dictionary<EquipSlot, GridInventory2D>();
+            foreach (var c in containers)
+            {
+                if (c.equipSlot == EquipSlot.None) continue;
+                var grid = new GridInventory2D(c.gridWidth, c.gridHeight);
+                _grids[c.equipSlot] = grid;
+                // 把现有 placedItems 迁移到新网格
+                for (int i = c.placedItems.Count - 1; i >= 0; i--)
+                {
+                    var p = c.placedItems[i];
+                    if (p.itemData == null) continue;
+                    grid.Place(p.itemData, p.count, p.gridX, p.gridY, p.rotated,
+                        p.instanceId, p.itemDurability, p.repairCount);
+                }
+            }
+        }
+
+        public GridInventory2D GetGrid(EquipSlot slot)
+        {
+            EnsureGridsInit();
+            return _grids.TryGetValue(slot, out var g) ? g : null;
+        }
+
+        public ContainerView BuildView()
+        {
+            EnsureGridsInit();
+            var views = new List<ContainerView>();
+            foreach (var kv in _grids)
+            {
+                var slot = kv.Key;
+                var grid = kv.Value;
+                var c = GetContainer(slot);
+                string id = c != null ? c.containerName : slot.ToString();
+                float maxW = EffectiveMaxWeight;
+                views.Add(ContainerView.FromGrid(id, slot, grid, maxW));
+            }
+            // 返回第一个容器的视图（调用方按需选容器）
+            return views.Count > 0 ? views[0] : default;
+        }
+
+        /// <summary> 遍历所有容器网格中的所有物品（替代遍历 placedItems） </summary>
+        public IEnumerable<GridSlot> AllGridSlots()
+        {
+            EnsureGridsInit();
+            foreach (var kv in _grids)
+                foreach (var s in kv.Value.AllSlots())
+                    yield return s;
+        }
+
+        /// <summary> 在新网格中查找指定 instanceId 的物品 </summary>
+        public GridSlot? FindGridSlot(int instanceId)
+        {
+            EnsureGridsInit();
+            foreach (var kv in _grids)
+                foreach (var s in kv.Value.AllSlots())
+                    if (s.instanceId == instanceId) return s;
+            return null;
+        }
+
+        /// <summary> 公开 API：按 instanceId 移除物品（供 WeaponAttachmentHandler） </summary>
+        public bool RemoveByInstanceId(int instanceId)
+        {
+            if (instanceId <= 0) return false;
+            EnsureGridsInit();
+            foreach (var grid in _grids.Values)
+                foreach (var s in grid.SlotList)
+                    if (s.instanceId == instanceId)
+                    {
+                        grid.Remove(s.slotId);
+                        return true;
+                    }
+            // fallback: old containers
+            foreach (var c in containers)
+                for (int i = c.placedItems.Count - 1; i >= 0; i--)
+                    if (c.placedItems[i].instanceId == instanceId)
+                    {
+                        c.placedItems.RemoveAt(i);
+                        return true;
+                    }
+            return false;
+        }
+
+        /// <summary> 在新网格中修改耐久 </summary>
+        public void ModifyGridDurability(int instanceId, float delta)
+        {
+            EnsureGridsInit();
+            foreach (var grid in _grids.Values)
+                foreach (var s in grid.SlotList)
+                    if (s.instanceId == instanceId)
+                    {
+                        var slot = s;
+                        slot.itemDurability += delta;
+                        grid.SlotDict[slot.slotId] = slot;
+                        return;
+                    }
         }
     }
 }
