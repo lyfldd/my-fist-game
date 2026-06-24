@@ -17,7 +17,7 @@ namespace _Game.UI
     /// - V = 循环切换容器（胸挂→上衣→腰带→裤子→背包→循环）
     /// - ESC = 关闭所有面板
     /// </summary>
-    public class InventoryUI : UIPanel
+    public class InventoryUI : MonoBehaviour
     {
         [Header("总览面板（Tab）")]
         public GameObject overviewPanel;            // 总览面板
@@ -186,7 +186,6 @@ namespace _Game.UI
         {
             var mgr = UIPanelManager.Instance;
             if (mgr != null && mgr.Count > 0) { mgr.CloseTopPanel(); return true; }
-            // fallback 旧行为
             bool anyOpen = false;
             if (overviewPanel != null && overviewPanel.activeSelf)
             { overviewPanel.SetActive(false); SetOtherUIVisible(true); anyOpen = true; }
@@ -200,22 +199,22 @@ namespace _Game.UI
         {
             if (overviewPanel == null) return false;
             ExitBuildModeIfActive();
-
-            if (quickPanel != null && quickPanel.activeSelf)
-                quickPanel.SetActive(false);
+            if (quickPanel != null && quickPanel.activeSelf) quickPanel.SetActive(false);
 
             bool wasActive = overviewPanel.activeSelf;
             if (!wasActive)
             {
-                if (UIPanelManager.Instance != null) Open();
+                overviewPanel.SetActive(true);
                 SetOtherUIVisible(false);
                 ShowOverview();
+                this.OpenAsPanel("backpack");
             }
             else
             {
-                if (UIPanelManager.Instance != null) Close();
+                overviewPanel.SetActive(false);
                 SetOtherUIVisible(true);
                 if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
+                this.CloseAsPanel();
             }
             return true;
         }
