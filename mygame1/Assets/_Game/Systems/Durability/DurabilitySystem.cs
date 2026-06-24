@@ -34,41 +34,59 @@ namespace _Game.Systems.Durability
         {
             var inv = ServiceLocator.Get<Inv>();
             if (inv == null) return 1f;
+            // 优先新网格
+            var gs = inv.FindGridSlot(instanceId);
+            if (gs.HasValue && gs.Value.itemData != null && gs.Value.itemData.hasDurability)
+            {
+                float cur = gs.Value.itemDurability;
+                float max = gs.Value.itemData.maxDurability;
+                if (cur <= 0f && max > 0f) return 1f;
+                return max > 0f ? Mathf.Clamp01(cur / max) : 1f;
+            }
+            // fallback 旧容器
             var p = inv.FindPlacedItem(instanceId);
-            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability)
-                return 1f;
-            // itemDurability==0 且 hasDurability==true → 视为满耐久（首次初始化）
-            float cur = p.Value.itemDurability;
-            float max = p.Value.itemData.maxDurability;
-            if (cur <= 0f && max > 0f) return 1f;
-            return max > 0f ? Mathf.Clamp01(cur / max) : 1f;
+            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability) return 1f;
+            float cur2 = p.Value.itemDurability;
+            float max2 = p.Value.itemData.maxDurability;
+            if (cur2 <= 0f && max2 > 0f) return 1f;
+            return max2 > 0f ? Mathf.Clamp01(cur2 / max2) : 1f;
         }
 
-        /// <summary> 消耗物品耐久。负值=磨损，正值=修复。自动发布 DurabilityChangedEvent </summary>
+        /// <summary> 消耗物品耐久。优先用新网格，fallback 旧容器。 </summary>
         public void ConsumeDurability(int instanceId, float amount)
         {
             if (instanceId <= 0 || amount <= 0f) return;
             var inv = ServiceLocator.Get<Inv>();
             if (inv == null) return;
 
-            var p = inv.FindPlacedItem(instanceId);
-            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability)
+            // 优先新网格
+            var gs = inv.FindGridSlot(instanceId);
+            if (gs.HasValue && gs.Value.itemData != null && gs.Value.itemData.hasDurability)
+            {
+                float max = gs.Value.itemData.maxDurability;
+                float cur = gs.Value.itemDurability;
+                if (cur <= 0f) cur = max;
+                inv.ModifyGridDurability(instanceId, -amount);
+                float newRatio = GetRatio(instanceId);
+                EventBus.Publish(new DurabilityChangedEvent(instanceId, gs.Value.itemData, newRatio));
+                if (newRatio <= 0f)
+                {
+                    EquipSlot slot = inv.GetSlotByInstanceId(instanceId);
+                    EventBus.Publish(new ItemBrokenEvent(instanceId, gs.Value.itemData, slot));
+                }
                 return;
+            }
 
-            float max = p.Value.itemData.maxDurability;
-            float cur = p.Value.itemDurability;
-
-            // 首次消耗：初始化为满耐久
-            if (cur <= 0f) cur = max;
-
+            // fallback 旧容器
+            var p = inv.FindPlacedItem(instanceId);
+            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability) return;
+            float max2 = p.Value.itemData.maxDurability;
+            float cur2 = p.Value.itemDurability;
+            if (cur2 <= 0f) cur2 = max2;
             inv.ModifyDurability(instanceId, -amount);
-
-            // 查新值
-            float newRatio = GetRatio(instanceId);
-            EventBus.Publish(new DurabilityChangedEvent(instanceId, p.Value.itemData, newRatio));
-
-            // 损坏事件 — 反向查槽位，让订阅者知道哪个装备槽的物品坏了
-            if (newRatio <= 0f)
+            float nr = GetRatio(instanceId);
+            EventBus.Publish(new DurabilityChangedEvent(instanceId, p.Value.itemData, nr));
+            if (nr <= 0f)
             {
                 EquipSlot slot = inv.GetSlotByInstanceId(instanceId);
                 EventBus.Publish(new ItemBrokenEvent(instanceId, p.Value.itemData, slot));

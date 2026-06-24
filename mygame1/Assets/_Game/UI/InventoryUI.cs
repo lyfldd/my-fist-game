@@ -430,6 +430,121 @@ namespace _Game.UI
             ShowOverview();
         }
 
+        // ═══ GridInventory2D 渲染路径 ═══
+
+        /// <summary> 用 SlotData 渲染单个容器网格（O(slots)，替代 O(w×h) 遍历） </summary>
+        void DrawContainerFromView(RectTransform parent, ContainerView view, float panelW, ref float y)
+        {
+            float cellSize = 44f, spacing = 3f;
+            float headerH = 24f;
+            bool hasEquip = true;
+
+            // 折叠头部
+            var container = _inventory?.GetContainer(view.equipSlot);
+            string label = container != null ? container.containerName : view.id;
+            var headerRt = MakeRect($"Hdr_{view.id}", parent, 0, y, panelW, headerH);
+            var headerImg = headerRt.gameObject.AddComponent<Image>();
+            headerImg.color = hasEquip ? new Color(0.12f, 0.18f, 0.14f, 0.9f) : new Color(0.08f, 0.08f, 0.1f, 0.85f);
+
+            var info = AddLabel(headerRt, $"{label}  {view.usedSlots}/{view.totalSlots}");
+            info.fontSize = 12;
+            info.color = view.usedSlots >= view.totalSlots ? new Color(1f, 0.5f, 0f) : Color.white;
+
+            y -= headerH + 4f;
+
+            bool isCollapsed = _containerCollapsed.ContainsKey(view.equipSlot) && _containerCollapsed[view.equipSlot];
+            if (isCollapsed) return;
+
+            float gridAreaH = view.height * cellSize + (view.height - 1) * spacing;
+            float gridAreaW = view.width * cellSize + (view.width - 1) * spacing;
+
+            var gridBg = MakeRect($"Grid_{view.id}", parent, 4, y, panelW - 8, gridAreaH + 4f);
+            var gridBgImg = gridBg.gameObject.AddComponent<Image>();
+            gridBgImg.color = new Color(0.04f, 0.04f, 0.06f, 0.4f);
+            gridBgImg.raycastTarget = false;
+
+            // O(slots): 直接遍历物品列表，不双重循环
+            foreach (var slot in view.slots)
+            {
+                if (slot.isGhost) continue;
+                int cx = slot.x, cy = slot.y;
+                float cellX = 2f + cx * (cellSize + spacing);
+                float cellY = y - 2f - cy * (cellSize + spacing);
+                float ow = slot.w * cellSize + (slot.w - 1) * spacing;
+                float oh = slot.h * cellSize + (slot.h - 1) * spacing;
+
+                // 物品覆盖层
+                var overlayRt = MakeRect($"OV_{slot.itemName}", parent, cellX, cellY, ow, oh);
+                overlayRt.SetAsLastSibling();
+                var oImg = overlayRt.gameObject.AddComponent<Image>();
+                oImg.color = new Color(0.18f, 0.3f, 0.2f, 0.85f);
+                oImg.raycastTarget = true;
+
+                // 名称
+                var nameRt = MakeRect("IName", overlayRt, 0, 0, ow, oh * 0.6f);
+                var nTxt = nameRt.gameObject.AddComponent<Text>();
+                nTxt.font = UGUIBuilder.DefaultFont;
+                nTxt.text = slot.itemName;
+                nTxt.fontSize = 11;
+                nTxt.color = Color.white;
+                nTxt.fontStyle = FontStyle.Bold;
+                nTxt.alignment = TextAnchor.UpperCenter;
+                nTxt.raycastTarget = false;
+
+                // 数量
+                var cRt = MakeRect("ICnt", overlayRt, ow - 24f, -(oh - 18f), 20f, 16f);
+                var cTxt = cRt.gameObject.AddComponent<Text>();
+                cTxt.font = UGUIBuilder.DefaultFont;
+                cTxt.text = "x" + slot.count;
+                cTxt.fontSize = 10;
+                cTxt.color = new Color(1f, 0.85f, 0.3f);
+                cTxt.fontStyle = FontStyle.Bold;
+                cTxt.alignment = TextAnchor.LowerRight;
+                cTxt.raycastTarget = false;
+
+                // 拖拽处理器
+                var drag = overlayRt.gameObject.AddComponent<ItemDragHandler>();
+                var placedItem = new PlacedItem(slot.itemData != null ? FindItemData(slot.itemName) : null, slot.count, slot.x, slot.y);
+                drag.Setup(placedItem, GetContainer(view.equipSlot), slot.x, slot.y, overlayRt);
+
+                // 注册到 DragDropManager
+                for (int sy = 0; sy < slot.h; sy++)
+                    for (int sx = 0; sx < slot.w; sx++)
+                    {
+                        float cx2 = 2f + (slot.x + sx) * (cellSize + spacing);
+                        float cy2 = y - 2f - (slot.y + sy) * (cellSize + spacing);
+                        var cellRt = MakeRect($"C_{view.id}_{slot.x + sx}_{slot.y + sy}",
+                            parent, cx2, cy2, cellSize, cellSize);
+                        var cellImg = cellRt.gameObject.AddComponent<Image>();
+                        cellImg.color = new Color(0.15f, 0.3f, 0.2f, 0.9f);
+                        cellImg.raycastTarget = true;
+                        var c = GetContainer(view.equipSlot);
+                        if (c != null && DragDropManager.Instance != null)
+                            DragDropManager.Instance.RegisterCellRect(cellRt, c, slot.x + sx, slot.y + sy);
+                    }
+
+                // 耐久条
+                if (slot.durabilityRatio < 1f)
+                {
+                    var durFill = UGUIBuilder.CreateDurabilityBar($"Dur_{slot.slotId}", overlayRt, ow - 4);
+                    UGUIBuilder.SetDurabilityFill(durFill, slot.durabilityRatio);
+                    durFill.rectTransform.parent.gameObject.SetActive(true);
+                }
+            }
+
+            y -= gridAreaH + 8f;
+        }
+
+        ItemData FindItemData(string itemName)
+        {
+            if (_inventory == null) return null;
+            foreach (var c in _inventory.containers)
+                foreach (var p in c.placedItems)
+                    if (p.itemData != null && p.itemData.itemName == itemName)
+                        return p.itemData;
+            return null;
+        }
+
         void ShowEquipTabContent()
         {
             if (_inventory == null || overviewGridContainer == null) return;

@@ -142,6 +142,8 @@ namespace _Game.Systems.WorldContainer
                             gridY = pi.gridY,
                             rotated = pi.rotated,
                             isGhost = pi.isGhost,
+                            itemDurability = pi.itemDurability,
+                            repairCount = pi.repairCount,
                         });
                     }
                 }
