@@ -172,16 +172,9 @@ namespace _Game.Systems.Crafting
             _panelGo.AddComponent<Image>().color = new Color(0.08f, 0.08f, 0.08f, 0.92f);
             UguiSetCenter(_panelGo.GetComponent<RectTransform>(), 640, 420);
 
-            // --- 标题 ---
-            _titleText = UguiMakeText("TitleText", 18, FontStyle.Bold, TextAnchor.MiddleLeft, 480, 28);
-            UguiAttach(_titleText, _panelGo, 14, -14, 0, 1);
-
-            // --- 关闭按钮 ---
-            var closeGo = new GameObject("CloseBtn", typeof(Image), typeof(Button));
-            UguiAttach(closeGo, _panelGo, -50, -14, 1, 1);
-            closeGo.GetComponent<RectTransform>().sizeDelta = new Vector2(40, 28);
-            closeGo.GetComponent<Image>().color = new Color(0.5f, 0.2f, 0.2f);
-            closeGo.GetComponent<Button>().onClick.AddListener(() => { Close(); });
+            // --- 标题栏（拖拽+关闭按钮） ---
+            UIPanelManager.AddPanelTitleBar(_panelGo, "合成面板", "crafting", onClose: Close);
+            _titleText = _panelGo.transform.Find("TitleBar/Label")?.GetComponent<Text>();
             UguiMakeBtnLabel(closeGo, "✕", 14);
 
 
@@ -625,15 +618,14 @@ namespace _Game.Systems.Crafting
             _isVisible = true;
             if (UIModeConfig.UseUGUI && _canvasGo != null)
                 _canvasGo.SetActive(true);
+            UIPanelManager.Instance?.Open("crafting", onClose: Close);
             RefreshRecipes();
             MarkDirty();
         }
 
         void OnStationClosed(WorkstationClosedEvent evt)
         {
-            _isVisible = false;
-            _selectedRecipe = null;
-            if (_canvasGo != null) _canvasGo.SetActive(false);
+            UIPanelManager.Instance?.Close("crafting");
         }
 
         void CloseOtherUIs()
