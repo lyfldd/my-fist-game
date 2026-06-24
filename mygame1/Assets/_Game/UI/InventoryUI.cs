@@ -201,6 +201,8 @@ namespace _Game.UI
             bool wasActive = overviewPanel.activeSelf;
             if (!wasActive)
             {
+                // 关闭所有其他面板
+                UIPanelManager.Instance?.CloseAll();
                 overviewPanel.SetActive(true);
                 SetOtherUIVisible(false);
                 ShowOverview();
