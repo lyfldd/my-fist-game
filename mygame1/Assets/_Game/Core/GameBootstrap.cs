@@ -285,6 +285,9 @@ namespace _Game.Core
             // SceneIsolationManager — 场景切换生命周期管理
             if (go.GetComponent<_Game.Core.SceneIsolation.SceneIsolationManager>() == null)
                 go.AddComponent<_Game.Core.SceneIsolation.SceneIsolationManager>();
+            // UIPanelManager — 面板栈管理 + ESC逐层关闭
+            if (go.GetComponent<UIPanelManager>() == null)
+                go.AddComponent<UIPanelManager>();
         }
 
         static void EnsureSceneContext(string sceneName)

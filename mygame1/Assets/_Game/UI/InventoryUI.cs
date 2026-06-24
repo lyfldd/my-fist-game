@@ -17,7 +17,7 @@ namespace _Game.UI
     /// - V = 循环切换容器（胸挂→上衣→腰带→裤子→背包→循环）
     /// - ESC = 关闭所有面板
     /// </summary>
-    public class InventoryUI : MonoBehaviour
+    public class InventoryUI : UIPanel
     {
         [Header("总览面板（Tab）")]
         public GameObject overviewPanel;            // 总览面板
@@ -184,14 +184,11 @@ namespace _Game.UI
 
         bool HandleEsc()
         {
-            bool anyOpen = false;
-            if (overviewPanel != null && overviewPanel.activeSelf)
-            { overviewPanel.SetActive(false); SetOtherUIVisible(true); anyOpen = true; }
-            if (quickPanel != null && quickPanel.activeSelf)
-            { quickPanel.SetActive(false); anyOpen = true; }
-            if (anyOpen)
+            // 委托给 UIPanelManager 栈管理
+            var mgr = UIPanelManager.Instance;
+            if (mgr != null && mgr.Count > 0)
             {
-                if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
+                mgr.CloseTopPanel();
                 return true;
             }
             return false;
@@ -199,25 +196,23 @@ namespace _Game.UI
 
         bool HandleTab()
         {
-            if (overviewPanel == null)
-            {
-                Debug.LogWarning("[InventoryUI] HandleTab: overviewPanel 为 null，无法打开背包。请检查 EnsurePanelsExist 是否已执行。");
-                return false;
-            }
-
-            // 打开背包时关闭建造模式
+            if (overviewPanel == null) return false;
             ExitBuildModeIfActive();
 
             if (quickPanel != null && quickPanel.activeSelf)
                 quickPanel.SetActive(false);
 
             bool wasActive = overviewPanel.activeSelf;
-            overviewPanel.SetActive(!wasActive);
-            SetOtherUIVisible(wasActive);
             if (!wasActive)
+            {
+                Open(); // UIPanelManager 入栈
                 ShowOverview();
-            else if (DragDropManager.Instance != null)
-                DragDropManager.Instance.DeselectItem();
+            }
+            else
+            {
+                Close(); // UIPanelManager 出栈
+                if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
+            }
             return true;
         }
 
