@@ -2872,7 +2872,16 @@ namespace _Game.UI
 
             UIPanelManager.Instance?.Open("itemDetail", parentId: "backpack", onClose: HideItemDetail);
 
-            var vlg = _itemDetailPanel.AddComponent<VerticalLayoutGroup>();
+            // 顶部标题栏 + 关闭按钮
+            UIPanelManager.AddPanelTitleBar(_itemDetailPanel, "物品详情", "itemDetail", onClose: HideItemDetail);
+
+            _itemDetailContent = new GameObject("Content", typeof(RectTransform));
+            _itemDetailContent.transform.SetParent(_itemDetailPanel.transform, false);
+            var crt2 = _itemDetailContent.GetComponent<RectTransform>();
+            crt2.anchorMin = Vector2.zero; crt2.anchorMax = Vector2.one;
+            crt2.offsetMin = new Vector2(0, 0); crt2.offsetMax = new Vector2(0, -34);
+
+            var vlg = _itemDetailContent.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(10, 10, 10, 8);
             vlg.spacing = 3;
             vlg.childAlignment = TextAnchor.UpperLeft;
@@ -2932,21 +2941,13 @@ namespace _Game.UI
                 }
             }
 
-            // 关闭按钮
-            var closeBtn = UGUIBuilder.CreateButton("DetailClose", _itemDetailPanel.transform, "关闭",
-                new Color(0.3f, 0.3f, 0.3f), 60, 24);
-            closeBtn.onClick.AddListener(HideItemDetail);
-            var brt = closeBtn.GetComponent<RectTransform>();
-            brt.sizeDelta = new Vector2(60, 24);
 
-            // 点击背包其他地方也关闭
-            StartCoroutine(DetailAutoClose());
         }
 
         Text AddDetailText(string msg, int size, Color c)
         {
             var go = new GameObject("DT", typeof(Text));
-            go.transform.SetParent(_itemDetailPanel.transform, false);
+            go.transform.SetParent((_itemDetailContent ?? _itemDetailPanel).transform, false);
             var t = go.GetComponent<Text>();
             t.font = UGUIBuilder.DefaultFont;
             t.text = msg;
