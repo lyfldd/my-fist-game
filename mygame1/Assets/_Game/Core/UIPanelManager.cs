@@ -4,17 +4,22 @@ using UnityEngine;
 namespace _Game.Core
 {
     /// <summary>
-    /// UI 面板管理器 — 全局单例（DontDestroyOnLoad）。
-    /// 栈管理所有打开的面板，ESC 逐层关闭。
+    /// UI 面板管理器 — 全局单例。按 id 管理面板栈，ESC 逐层关闭。
+    /// 所有面板通过 Open(id, onClose) / Close(id) 操作，不自己创建代理。
     /// </summary>
     public class UIPanelManager : MonoBehaviour
     {
         public static UIPanelManager Instance { get; private set; }
 
-        readonly Stack<UIPanel> _stack = new();
+        class PanelEntry
+        {
+            public string id;
+            public string parentId;
+            public System.Action onClose;
+        }
+
+        readonly List<PanelEntry> _stack = new();
         public int Count => _stack.Count;
-        public event System.Action<UIPanel> OnPanelOpened;
-        public event System.Action<UIPanel> OnPanelClosed;
 
         void Awake()
         {
@@ -29,125 +34,61 @@ namespace _Game.Core
         bool HandleEsc()
         {
             if (_stack.Count == 0) return false;
-            CloseTopPanel();
+            CloseTop();
             return true;
         }
 
-        /// <summary> 打开面板。子面板需 parentPanel 非空且已在栈中。 </summary>
-        public void OpenPanel(UIPanel panel)
+        /// <summary> 打开面板。parentId 非空时校验父面板已在栈中。 </summary>
+        public void Open(string id, string parentId = null, System.Action onClose = null)
         {
-            if (panel == null) return;
+            if (string.IsNullOrEmpty(id)) return;
             // 子面板校验
-            if (panel.parentPanel != null && !IsPanelOpen(panel.parentPanel))
+            if (!string.IsNullOrEmpty(parentId) && !IsOpen(parentId))
             {
-                Debug.LogWarning($"[UIPanelManager] 子面板 {panel.panelId} 的父面板未打开，拒绝");
+                Debug.LogWarning($"[UIPanelManager] 子面板 {id} 的父面板 {parentId} 未打开，拒绝");
                 return;
             }
-            if (IsPanelOpen(panel)) return;
+            // 已打开则忽略
+            if (IsOpen(id)) return;
 
-            _stack.Push(panel);
-            panel.OnOpen();
-            OnPanelOpened?.Invoke(panel);
+            _stack.Add(new PanelEntry { id = id, parentId = parentId, onClose = onClose });
         }
 
-        public void ClosePanel(UIPanel panel)
+        public void Close(string id)
         {
-            if (panel == null || !IsPanelOpen(panel)) return;
-            // 先关所有子面板
-            var toClose = new List<UIPanel>();
-            foreach (var p in _stack)
-                if (p.parentPanel == panel) toClose.Add(p);
-            foreach (var p in toClose) ClosePanel(p);
+            // 先关所有以本面板为父的子面板
+            for (int i = _stack.Count - 1; i >= 0; i--)
+                if (_stack[i].parentId == id) Close(_stack[i].id);
 
-            // 从栈中移除
-            var temp = new Stack<UIPanel>();
-            while (_stack.Count > 0)
+            for (int i = _stack.Count - 1; i >= 0; i--)
             {
-                var p = _stack.Pop();
-                if (p != panel) temp.Push(p);
+                if (_stack[i].id == id)
+                {
+                    var cb = _stack[i].onClose;
+                    _stack.RemoveAt(i);
+                    cb?.Invoke();
+                    return;
+                }
             }
-            while (temp.Count > 0) _stack.Push(temp.Pop());
-
-            panel.OnClose();
-            OnPanelClosed?.Invoke(panel);
         }
 
-        public void CloseTopPanel()
+        public void CloseTop()
         {
             if (_stack.Count == 0) return;
-            var top = _stack.Peek();
-            ClosePanel(top);
+            Close(_stack[_stack.Count - 1].id);
         }
 
         public void CloseAll()
         {
-            while (_stack.Count > 0) CloseTopPanel();
+            while (_stack.Count > 0) CloseTop();
         }
 
-        public bool IsPanelOpen(UIPanel panel)
+        public bool IsOpen(string id)
         {
-            foreach (var p in _stack) if (p == panel) return true;
+            foreach (var e in _stack) if (e.id == id) return true;
             return false;
         }
 
-        public UIPanel TopPanel => _stack.Count > 0 ? _stack.Peek() : null;
-    }
-
-    /// <summary> 面板基类 — 所有可打开的面板继承此组件 </summary>
-    public abstract class UIPanel : MonoBehaviour
-    {
-        public string panelId;
-        public UIPanel parentPanel;
-        public bool isDraggable = true;
-        public GameObject titleBar;
-        public GameObject closeButton;
-
-        public virtual void OnOpen() => gameObject.SetActive(true);
-        public virtual void OnClose() => gameObject.SetActive(false);
-
-        public void Open() => UIPanelManager.Instance?.OpenPanel(this);
-        public void Close() => UIPanelManager.Instance?.ClosePanel(this);
-    }
-
-    /// <summary> 轻量面板注册 — 不强制继承 UIPanel 的组件用此辅助类 </summary>
-    public class PanelEntry
-    {
-        public System.Action onOpen;
-        public System.Action onClose;
-        public string panelId;
-        public PanelEntry parent;
-    }
-
-    public static class UIPanelManagerExtensions
-    {
-        /// <summary> 将任意 MonoBehaviour 注册为面板（不继承 UIPanel） </summary>
-        public static void OpenAsPanel(this MonoBehaviour mb, string panelId, System.Action onOpen = null, System.Action onClose = null)
-        {
-            var mgr = UIPanelManager.Instance;
-            if (mgr == null) return;
-            var proxy = mb.GetComponent<UIPanelProxy>() ?? mb.gameObject.AddComponent<UIPanelProxy>();
-            proxy._panelId = panelId;
-            proxy._onOpen = onOpen;
-            proxy._onClose = onClose;
-            mgr.OpenPanel(proxy);
-        }
-
-        public static void CloseAsPanel(this MonoBehaviour mb)
-        {
-            var proxy = mb.GetComponent<UIPanelProxy>();
-            if (proxy != null) UIPanelManager.Instance?.ClosePanel(proxy);
-        }
-    }
-
-    /// <summary> 面板代理 — 给不想继承 UIPanel 的组件用 </summary>
-    public class UIPanelProxy : UIPanel
-    {
-        [System.NonSerialized] public string _panelId;
-        [System.NonSerialized] public System.Action _onOpen;
-        [System.NonSerialized] public System.Action _onClose;
-
-        void Start() { panelId = _panelId; }
-        public override void OnOpen() { _onOpen?.Invoke(); }
-        public override void OnClose() { _onClose?.Invoke(); }
+        public string TopId => _stack.Count > 0 ? _stack[_stack.Count - 1].id : null;
     }
 }

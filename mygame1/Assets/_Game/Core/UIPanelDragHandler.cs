@@ -14,9 +14,8 @@ namespace _Game.Core
 
         void Awake()
         {
-            // 找面板的 RectTransform（标题栏的父级）
-            var panel = GetComponentInParent<UIPanel>();
-            _panelRect = panel != null ? panel.GetComponent<RectTransform>() : transform.parent as RectTransform;
+            // 标题栏的父级 = 面板的 RectTransform
+            _panelRect = transform.parent as RectTransform;
         }
 
         public void OnPointerDown(PointerEventData eventData)
