@@ -185,7 +185,7 @@ namespace _Game.UI
         bool HandleEsc()
         {
             var mgr = UIPanelManager.Instance;
-            if (mgr != null && mgr.Count > 0) { mgr.CloseTopPanel(); return true; }
+            if (mgr != null && mgr.Count > 0) { mgr.CloseTop(); return true; }
             // fallback
             if (overviewPanel != null && overviewPanel.activeSelf) { overviewPanel.SetActive(false); SetOtherUIVisible(true); return true; }
             if (quickPanel != null && quickPanel.activeSelf) { quickPanel.SetActive(false); return true; }
