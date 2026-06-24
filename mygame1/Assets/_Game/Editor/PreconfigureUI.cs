@@ -215,7 +215,7 @@ namespace _Game.Editor
                 var shell = new GameObject("StaticShell", typeof(RectTransform));
                 shell.transform.SetParent(panel.transform, false);
                 StretchRT(shell.GetComponent<RectTransform>());
-                BuildStaticShell(shell, 700);
+                BuildStaticShell(shell.transform, 700);
 
                 // GridContainer: 动态网格内容（每次刷新重建）
                 var grid = new GameObject("GridContainer", typeof(RectTransform));
