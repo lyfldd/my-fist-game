@@ -187,7 +187,7 @@ namespace _Game.UI
             var mgr = UIPanelManager.Instance;
             if (mgr != null && mgr.Count > 0) { mgr.CloseTopPanel(); return true; }
             // fallback
-            if (overviewPanel != null && overviewPanel.activeSelf) { this.CloseAsPanel(); return true; }
+            if (overviewPanel != null && overviewPanel.activeSelf) { overviewPanel.SetActive(false); SetOtherUIVisible(true); return true; }
             if (quickPanel != null && quickPanel.activeSelf) { quickPanel.SetActive(false); return true; }
             return false;
         }
@@ -204,13 +204,20 @@ namespace _Game.UI
                 overviewPanel.SetActive(true);
                 SetOtherUIVisible(false);
                 ShowOverview();
-                this.OpenAsPanel("backpack",
-                    null,
-                    () => { overviewPanel.SetActive(false); SetOtherUIVisible(true); });
+                var proxyGo = new GameObject("__BackpackProxy__");
+                proxyGo.transform.SetParent(transform, false);
+                var proxy = proxyGo.AddComponent<UIPanelProxy>();
+                proxy._panelId = "backpack";
+                proxy._onClose = () => { overviewPanel.SetActive(false); SetOtherUIVisible(true); };
+                UIPanelManager.Instance?.OpenPanel(proxy);
             }
             else
             {
-                this.CloseAsPanel(); // 会触发 onClose 回调
+                // 清理代理
+                var p = transform.Find("__BackpackProxy__");
+                if (p != null) { var pr = p.GetComponent<UIPanelProxy>(); if (pr != null) UIPanelManager.Instance?.ClosePanel(pr); Destroy(p.gameObject); }
+                overviewPanel.SetActive(false);
+                SetOtherUIVisible(true);
                 if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
             }
             return true;
@@ -2827,8 +2834,13 @@ namespace _Game.UI
             rt.anchoredPosition = Vector2.zero;
             rt.SetAsLastSibling();
 
-            // 注册为背包子面板
-            this.OpenAsPanel("itemDetail", null, HideItemDetail);
+            // 用独立代理 GO，避免和背包的 UIPanelProxy 冲突
+            var proxyGo = new GameObject("__ItemDetailProxy__");
+            proxyGo.transform.SetParent(transform, false);
+            var proxy = proxyGo.AddComponent<UIPanelProxy>();
+            proxy._panelId = "itemDetail";
+            proxy._onClose = HideItemDetail;
+            UIPanelManager.Instance?.OpenPanel(proxy);
 
             var vlg = _itemDetailPanel.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(10, 10, 10, 8);
@@ -2912,7 +2924,9 @@ namespace _Game.UI
 
         void HideItemDetail()
         {
-            this.CloseAsPanel();
+            // 清理代理
+            var proxy = transform.Find("__ItemDetailProxy__");
+            if (proxy != null) Destroy(proxy.gameObject);
             if (_itemDetailPanel != null) { Destroy(_itemDetailPanel); _itemDetailPanel = null; }
         }
     }
