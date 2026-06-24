@@ -186,13 +186,10 @@ namespace _Game.UI
         {
             var mgr = UIPanelManager.Instance;
             if (mgr != null && mgr.Count > 0) { mgr.CloseTopPanel(); return true; }
-            bool anyOpen = false;
-            if (overviewPanel != null && overviewPanel.activeSelf)
-            { overviewPanel.SetActive(false); SetOtherUIVisible(true); anyOpen = true; }
-            if (quickPanel != null && quickPanel.activeSelf)
-            { quickPanel.SetActive(false); anyOpen = true; }
-            if (anyOpen && DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
-            return anyOpen;
+            // fallback
+            if (overviewPanel != null && overviewPanel.activeSelf) { this.CloseAsPanel(); return true; }
+            if (quickPanel != null && quickPanel.activeSelf) { quickPanel.SetActive(false); return true; }
+            return false;
         }
 
         bool HandleTab()
@@ -207,14 +204,14 @@ namespace _Game.UI
                 overviewPanel.SetActive(true);
                 SetOtherUIVisible(false);
                 ShowOverview();
-                this.OpenAsPanel("backpack");
+                this.OpenAsPanel("backpack",
+                    null,
+                    () => { overviewPanel.SetActive(false); SetOtherUIVisible(true); });
             }
             else
             {
-                overviewPanel.SetActive(false);
-                SetOtherUIVisible(true);
+                this.CloseAsPanel(); // 会触发 onClose 回调
                 if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
-                this.CloseAsPanel();
             }
             return true;
         }
@@ -2831,7 +2828,7 @@ namespace _Game.UI
             rt.SetAsLastSibling();
 
             // 注册为背包子面板
-            this.OpenAsPanel("itemDetail");
+            this.OpenAsPanel("itemDetail", null, HideItemDetail);
 
             var vlg = _itemDetailPanel.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(10, 10, 10, 8);
