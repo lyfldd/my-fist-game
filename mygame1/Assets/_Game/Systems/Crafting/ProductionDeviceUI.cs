@@ -155,6 +155,7 @@ namespace _Game.Systems.Crafting
             _lastRecipeIdx = -2;
             _isVisible = true;
             if (UIModeConfig.UseUGUI && _canvasGo != null) _canvasGo.SetActive(true);
+            UIPanelManager.Instance?.Open("productionDevice", onClose: Close);
             ScanNearbyDevices();
             MarkDirty(); // 首次打开时渲染 UI
         }
@@ -184,6 +185,7 @@ namespace _Game.Systems.Crafting
 
         void Close()
         {
+            UIPanelManager.Instance?.Close("productionDevice");
             _isVisible = false;
             _currentDevice = null;
             _deviceData = null;
@@ -242,13 +244,8 @@ namespace _Game.Systems.Crafting
             UguiSetCenter(_panelGo.GetComponent<RectTransform>(), panelWidth, panelHeight);
             _panelGo.GetComponent<Image>().color = bgColor;
 
-            // 标题
-            _titleText = UguiMakeText("Title", 18, FontStyle.Bold, TextAnchor.MiddleLeft, 300, 28);
-            UguiAttach(_titleText, _panelGo, padding, -padding, 0, 1);
-
-            var closeBtn = UguiMakeSmallBtn("CloseBtn", "✕", new Color(0.5f, 0.2f, 0.2f), 40, 28);
-            UguiAttach(closeBtn, _panelGo, -60, -padding, 1, 1);
-            closeBtn.onClick.AddListener(() => Close());
+            UIPanelManager.AddPanelTitleBar(_panelGo, "生产设备", "productionDevice", onClose: Close);
+            _titleText = _panelGo.transform.Find("TitleBar/Label")?.GetComponent<Text>();
 
             var line = new GameObject("Line", typeof(Image));
             UguiAttach(line, _panelGo, padding, -padding - 32, 0, 1);
