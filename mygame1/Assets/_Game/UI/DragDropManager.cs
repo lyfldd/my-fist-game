@@ -357,6 +357,7 @@ namespace _Game.UI
         {
             if (!SelectedItem.HasValue || SelectedContainer == null) return;
             var cellRt = FindCellRect(SelectedContainer, SelectedCellX, SelectedCellY);
+            Debug.Log($"[DDM] RefreshBorder selContainer=true cellRt={cellRt != null} regions={_cellRegions.Count}");
             if (cellRt != null)
                 ShowSelectionBorder(cellRt, cellRt.sizeDelta.x, cellRt.sizeDelta.y);
         }
