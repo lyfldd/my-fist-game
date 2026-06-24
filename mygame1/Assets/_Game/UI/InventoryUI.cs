@@ -372,7 +372,7 @@ namespace _Game.UI
 
         void CreateTopTabBar(Transform root)
         {
-            var bar = new GameObject("TopTabBar", typeof(Image), typeof(RectTransform));
+            var bar = new GameObject("TopTabBar", typeof(Image));
             bar.transform.SetParent(root, false);
             var barImg = bar.GetComponent<Image>();
             barImg.color = new Color(0.1f, 0.1f, 0.15f, 0.9f);
@@ -2514,18 +2514,17 @@ namespace _Game.UI
 
         void SetOtherUIVisible(bool visible)
         {
-            // 背包打开时隐藏所有非背包 UI，背包关闭时恢复
             if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
             if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
-            // 其他系统UI
+            // 关组件 enabled 而不是关 GameObject（组件在 Player 上，关 Player 会杀全局）
             var crafting = ServiceLocator.Get<_Game.Systems.Crafting.CraftingUI>();
-            if (crafting != null) crafting.gameObject.SetActive(visible);
+            if (crafting != null) crafting.enabled = visible;
             var buildMenu = GetComponent<_Game.Systems.Building.BuildMenuUI>();
-            if (buildMenu != null) buildMenu.gameObject.SetActive(visible);
+            if (buildMenu != null) buildMenu.enabled = visible;
             var prodUI = ServiceLocator.Get<_Game.Systems.Crafting.ProductionDeviceUI>();
-            if (prodUI != null) prodUI.gameObject.SetActive(visible);
+            if (prodUI != null) prodUI.enabled = visible;
             var chemUI = ServiceLocator.Get<_Game.Systems.Crafting.ChemicalResearchUI>();
-            if (chemUI != null) chemUI.gameObject.SetActive(visible);
+            if (chemUI != null) chemUI.enabled = visible;
         }
 
         // ===== 固定布局辅助方法 =====
