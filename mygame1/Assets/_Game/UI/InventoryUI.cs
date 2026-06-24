@@ -2526,13 +2526,12 @@ namespace _Game.UI
 
         void SetOtherUIVisible(bool visible)
         {
-            // HUD 都在 Player 下的子节点，用 transform.Find 找
-            if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
-            if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
-            var tl = transform.Find("TopLeftHUD_Canvas"); if (tl != null) tl.gameObject.SetActive(visible);
-            var db = transform.Find("DecibelHUD_Canvas"); if (db != null) db.gameObject.SetActive(visible);
-            var wh = transform.Find("WeatherHUD_Canvas"); if (wh != null) wh.gameObject.SetActive(visible);
-            var ch = transform.Find("CrosshairCanvas"); if (ch != null) ch.gameObject.SetActive(visible);
+            // 隐藏 Player 下所有 Canvas 子节点（除 InventoryCanvas 外）
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("Canvas") && child.name != "InventoryCanvas")
+                    child.gameObject.SetActive(visible);
+            }
         }
 
         // ===== 固定布局辅助方法 =====
