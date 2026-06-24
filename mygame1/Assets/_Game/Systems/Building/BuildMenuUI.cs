@@ -483,11 +483,12 @@ namespace _Game.Systems.Building
                     {
                         btn.GetComponent<Image>().color = _selectedTab == tabIdx ? selectedButtonColor : normalButtonColor;
                         var lt = btn.transform.Find("Label")?.GetComponent<Text>();
-                        if (lt != null) lt.text = label;
+                        if (lt != null) lt.text = $"{label}({catalog.GetByCategory(cat).Length})";
                         continue;
                     }
                 }
 
+                int catCount = catalog.GetByCategory(cat).Length;
                 var go = new GameObject($"Tab_{tabIdx}", typeof(Image), typeof(UnityEngine.UI.Button));
                 go.transform.SetParent(_tabContent.transform, false);
                 go.GetComponent<RectTransform>().sizeDelta = new Vector2(100, 28);
@@ -498,7 +499,7 @@ namespace _Game.Systems.Building
                 var t = lblGo.GetComponent<Text>();
                 t.font = _font; t.fontSize = 12; t.fontStyle = FontStyle.Bold;
                 t.alignment = TextAnchor.MiddleCenter; t.color = Color.white; t.raycastTarget = false;
-                t.text = $"{label}({count})";
+                t.text = $"{label}({catCount})";
                 UguiSetStretch(lblGo.GetComponent<RectTransform>());
 
                 int captured = tabIdx;
