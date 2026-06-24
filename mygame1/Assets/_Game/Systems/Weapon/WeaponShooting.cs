@@ -181,9 +181,10 @@ namespace _Game.Systems.Weapon
             if (_isReloading) return;
 
             // 弹药检查：有弹药需求且弹匣为空 → 自动换弹
-            if (!string.IsNullOrEmpty(weapon.ammoItemName) && CurrentMag <= 0)
+            string ammoName = weapon.ammoItemData != null ? weapon.ammoItemData.itemName : weapon.ammoItemName;
+            if (!string.IsNullOrEmpty(ammoName) && CurrentMag <= 0)
             {
-                int inInv = CountAmmoInInventory(weapon.ammoItemName);
+                int inInv = CountAmmoInInventory(ammoName);
                 StartReload(weapon);
                 return;
             }
