@@ -205,12 +205,14 @@ namespace _Game.UI
             bool wasActive = overviewPanel.activeSelf;
             if (!wasActive)
             {
-                Open(); // UIPanelManager 入栈
+                Open();
+                SetOtherUIVisible(false);
                 ShowOverview();
             }
             else
             {
-                Close(); // UIPanelManager 出栈
+                Close();
+                SetOtherUIVisible(true);
                 if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
             }
             return true;

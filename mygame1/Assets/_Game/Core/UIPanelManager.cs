@@ -108,4 +108,48 @@ namespace _Game.Core
         public void Open() => UIPanelManager.Instance?.OpenPanel(this);
         public void Close() => UIPanelManager.Instance?.ClosePanel(this);
     }
+
+    /// <summary> 轻量面板注册 — 不强制继承 UIPanel 的组件用此辅助类 </summary>
+    public class PanelEntry
+    {
+        public System.Action onOpen;
+        public System.Action onClose;
+        public string panelId;
+        public PanelEntry parent;
+    }
+
+    public static class UIPanelManagerExtensions
+    {
+        /// <summary> 将任意 MonoBehaviour 注册为面板（不继承 UIPanel） </summary>
+        public static void OpenAsPanel(this MonoBehaviour mb, string panelId, System.Action onOpen = null, System.Action onClose = null)
+        {
+            var mgr = UIPanelManager.Instance;
+            if (mgr == null) return;
+            // 创建临时 UIPanel 代理
+            var go = mb.gameObject;
+            var proxy = go.GetComponent<UIPanelProxy>() ?? go.AddComponent<UIPanelProxy>();
+            proxy._panelId = panelId;
+            proxy._onOpen = onOpen ?? (() => go.SetActive(true));
+            proxy._onClose = onClose ?? (() => go.SetActive(false));
+            mgr.OpenPanel(proxy);
+        }
+
+        public static void CloseAsPanel(this MonoBehaviour mb)
+        {
+            var proxy = mb.GetComponent<UIPanelProxy>();
+            if (proxy != null) UIPanelManager.Instance?.ClosePanel(proxy);
+        }
+    }
+
+    /// <summary> 面板代理 — 给不想继承 UIPanel 的组件用 </summary>
+    public class UIPanelProxy : UIPanel
+    {
+        [System.NonSerialized] public string _panelId;
+        [System.NonSerialized] public System.Action _onOpen;
+        [System.NonSerialized] public System.Action _onClose;
+
+        void Start() { panelId = _panelId; }
+        public override void OnOpen() { base.OnOpen(); _onOpen?.Invoke(); }
+        public override void OnClose() { base.OnClose(); _onClose?.Invoke(); }
+    }
 }
