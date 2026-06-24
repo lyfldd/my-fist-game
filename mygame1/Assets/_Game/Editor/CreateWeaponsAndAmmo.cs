@@ -88,7 +88,7 @@ namespace _Game.Editor
             var advParts = GetItem("高级零件"); var wood = GetItem("木板");
             var lens = GetItem("光学透镜");
 
-            var m1911 = CreateItem(dir, "M1911", "M1911 手枪", ItemCategory.Weapon, 1, 2, 1.5f);
+            var m1911 = CreateItem(dir, "M1911", "M1911 手枪", ItemCategory.Equipment, 1, 2, 1.5f);
             m1911.isFirearm = true; m1911.equipSlot = EquipSlot.SidearmBelt;
             m1911.weaponDamage = 45; m1911.fireRate = 0.4f; m1911.magazineSize = 7;
             m1911.ammoItemName = ".45 ACP"; m1911.baseSpread = 2f; m1911.maxSpread = 10f;
@@ -97,7 +97,7 @@ namespace _Game.Editor
             // ammoItemData will be set after assets are created
             EditorUtility.SetDirty(m1911);
 
-            var m9 = CreateItem(dir, "M9", "M9 手枪", ItemCategory.Weapon, 1, 2, 1.3f);
+            var m9 = CreateItem(dir, "M9", "M9 手枪", ItemCategory.Equipment, 1, 2, 1.3f);
             m9.isFirearm = true; m9.equipSlot = EquipSlot.SidearmBelt;
             m9.weaponDamage = 25; m9.fireRate = 0.3f; m9.magazineSize = 15;
             m9.ammoItemName = "9mm手枪弹"; m9.baseSpread = 1.5f; m9.maxSpread = 8f;
@@ -105,7 +105,7 @@ namespace _Game.Editor
             m9.hasDurability = true; m9.maxDurability = 150;
             EditorUtility.SetDirty(m9);
 
-            var ak47 = CreateItem(dir, "AK47", "AK-47 突击步枪", ItemCategory.Weapon, 1, 4, 4.5f);
+            var ak47 = CreateItem(dir, "AK47", "AK-47 突击步枪", ItemCategory.Equipment, 1, 4, 4.5f);
             ak47.isFirearm = true; ak47.equipSlot = EquipSlot.RightHand;
             ak47.weaponDamage = 55; ak47.fireRate = 0.15f; ak47.magazineSize = 30;
             ak47.ammoItemName = "7.62mm步枪弹"; ak47.baseSpread = 3f; ak47.maxSpread = 15f;
@@ -113,7 +113,7 @@ namespace _Game.Editor
             ak47.hasDurability = true; ak47.maxDurability = 300;
             EditorUtility.SetDirty(ak47);
 
-            var m16 = CreateItem(dir, "M16A1", "M16A1 突击步枪", ItemCategory.Weapon, 1, 4, 4f);
+            var m16 = CreateItem(dir, "M16A1", "M16A1 突击步枪", ItemCategory.Equipment, 1, 4, 4f);
             m16.isFirearm = true; m16.equipSlot = EquipSlot.RightHand;
             m16.weaponDamage = 40; m16.fireRate = 0.1f; m16.magazineSize = 20;
             m16.ammoItemName = "5.56mm步枪弹"; m16.baseSpread = 2f; m16.maxSpread = 10f;
@@ -121,7 +121,7 @@ namespace _Game.Editor
             m16.hasDurability = true; m16.maxDurability = 280;
             EditorUtility.SetDirty(m16);
 
-            var sks = CreateItem(dir, "SKS", "SKS 半自动步枪", ItemCategory.Weapon, 1, 3, 3.5f);
+            var sks = CreateItem(dir, "SKS", "SKS 半自动步枪", ItemCategory.Equipment, 1, 3, 3.5f);
             sks.isFirearm = true; sks.equipSlot = EquipSlot.RightHand;
             sks.weaponDamage = 60; sks.fireRate = 0.5f; sks.magazineSize = 10;
             sks.ammoItemName = "7.62mm步枪弹"; sks.baseSpread = 1f; sks.maxSpread = 5f;
@@ -129,7 +129,7 @@ namespace _Game.Editor
             sks.hasDurability = true; sks.maxDurability = 250;
             EditorUtility.SetDirty(sks);
 
-            var rem = CreateItem(dir, "Remington870", "雷明顿 870", ItemCategory.Weapon, 1, 4, 4f);
+            var rem = CreateItem(dir, "Remington870", "雷明顿 870", ItemCategory.Equipment, 1, 4, 4f);
             rem.isFirearm = true; rem.equipSlot = EquipSlot.RightHand;
             rem.weaponDamage = 80; rem.fireRate = 1f; rem.magazineSize = 6;
             rem.ammoItemName = "12号霰弹"; rem.baseSpread = 8f; rem.maxSpread = 20f;
@@ -137,7 +137,7 @@ namespace _Game.Editor
             rem.hasDurability = true; rem.maxDurability = 250;
             EditorUtility.SetDirty(rem);
 
-            var svd = CreateItem(dir, "SVD", "SVD 狙击步枪", ItemCategory.Weapon, 1, 5, 5f);
+            var svd = CreateItem(dir, "SVD", "SVD 狙击步枪", ItemCategory.Equipment, 1, 5, 5f);
             svd.isFirearm = true; svd.equipSlot = EquipSlot.RightHand;
             svd.weaponDamage = 100; svd.fireRate = 1.5f; svd.magazineSize = 10;
             svd.ammoItemName = "7.62mm步枪弹"; svd.baseSpread = 0.5f; svd.maxSpread = 3f;
@@ -145,7 +145,7 @@ namespace _Game.Editor
             svd.hasDurability = true; svd.maxDurability = 350;
             EditorUtility.SetDirty(svd);
 
-            var uzi = CreateItem(dir, "Uzi", "乌兹冲锋枪", ItemCategory.Weapon, 1, 3, 3f);
+            var uzi = CreateItem(dir, "Uzi", "乌兹冲锋枪", ItemCategory.Equipment, 1, 3, 3f);
             uzi.isFirearm = true; uzi.equipSlot = EquipSlot.RightHand;
             uzi.weaponDamage = 20; uzi.fireRate = 0.05f; uzi.magazineSize = 32;
             uzi.ammoItemName = "9mm手枪弹"; uzi.baseSpread = 5f; uzi.maxSpread = 18f;
@@ -163,7 +163,7 @@ namespace _Game.Editor
             var cap = GetItem("电容组"); var cb = GetItem("电路板");
             var titanium = GetItem("钛合金");
 
-            var bow = CreateItem(dir, "CompoundBow", "复合弓", ItemCategory.Weapon, 1, 2, 2f);
+            var bow = CreateItem(dir, "CompoundBow", "复合弓", ItemCategory.Equipment, 1, 2, 2f);
             bow.isFirearm = false; bow.equipSlot = EquipSlot.RightHand;
             bow.weaponDamage = 35; bow.hasDurability = true; bow.maxDurability = 200;
             EditorUtility.SetDirty(bow);
