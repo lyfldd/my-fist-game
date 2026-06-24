@@ -2533,6 +2533,9 @@ namespace _Game.UI
                     child.gameObject.SetActive(visible);
                 }
             }
+            // 禁用 QuickItemBar 组件（它 Update 每帧会覆盖 Canvas 显隐）
+            var qib = GetComponent<QuickItemBar>();
+            if (qib != null) qib.enabled = visible;
         }
 
         // ===== 固定布局辅助方法 =====
