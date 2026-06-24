@@ -2866,7 +2866,7 @@ namespace _Game.UI
                 new Color(0.08f, 0.08f, 0.1f, 0.95f));
             var rt = _itemDetailPanel.GetComponent<RectTransform>();
             rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = new Vector2(280, 220);
+            rt.sizeDelta = new Vector2(300, 320);
             rt.anchoredPosition = Vector2.zero;
             rt.SetAsLastSibling();
 

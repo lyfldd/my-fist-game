@@ -17,7 +17,7 @@ MonoBehaviour:
   icon: {fileID: 0}
   description: 
   category: 7
-  requiredStation: 4
+  requiredStation: 8
   isIndustrial: 0
   productionDeviceName: 
   skillRequirements: []

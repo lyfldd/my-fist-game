@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0946ddcba871320458dd84c140608dd5, type: 3}
   m_Name: ItemGraph
   m_EditorClassIdentifier: 
-  buildTimestamp: 2026-05-29 20:25:51
-  recipeCountAtBuild: 308
+  buildTimestamp: 2026-06-24 21:44:48
+  recipeCountAtBuild: 310
   nodes:
   - itemName: ".22\u5C0F\u53E3\u5F84"
     primaryChain: 0
@@ -271,7 +271,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Building
     - Crafting
@@ -330,6 +330,7 @@ MonoBehaviour:
     - "\u9AD8\u7EA7\u96F6\u4EF6"
     downstreamItemNames:
     - "AI\u6838\u5FC3"
+    - "\u65E0\u4EBA\u673A"
     - "\u65E0\u4EBA\u673A\u5E73\u53F0\u5957\u4EF6"
     - "\u81EA\u52A8\u70AE\u5854\u5957\u4EF6"
     - "\u91CD\u72D9"
@@ -340,14 +341,15 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 9f29fe281e362bc40a5aabbc8e21681c, type: 2}
     - {fileID: 11400000, guid: 30ab633d0fe8c4b4e89fc47cb957e6c6, type: 2}
     - {fileID: 11400000, guid: 277165e6f4711034dbdc2a1a9411c584, type: 2}
-    consumerCount: 4
+    - {fileID: 11400000, guid: b1cb13e69970e6b44bed35061f55b7f7, type: 2}
+    consumerCount: 5
     autoAssignedStation: 5
     isRawMaterial: 0
     isDeadEnd: 0
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "ElectronicsAssembly(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u514D\u75AB\u589E\u5F3A\u5242"
@@ -397,7 +399,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "ElectronicsAssembly(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 0
@@ -490,7 +492,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u51C0\u6C34\u5382\u5957\u4EF6"
@@ -516,7 +518,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "ElectronicsAssembly(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5236\u836F\u53F0\u5957\u4EF6"
@@ -706,7 +708,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 0
@@ -911,7 +913,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u57FA\u56E0\u5206\u6790\u53F0\u5957\u4EF6"
@@ -936,7 +938,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "ElectronicsAssembly(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u57FA\u56E0\u6837\u672C"
@@ -1035,7 +1037,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     - Equipment
@@ -1062,7 +1064,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems:
     - Power
     allSystemsReady: 1
@@ -1232,7 +1234,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u8F66\u5E93\u5BB9\u5668(\u641C\u7D22)"
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5DE5\u5177\u8170\u5E26"
@@ -1316,7 +1318,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5E95\u706B"
@@ -1362,7 +1364,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u5F39\u836F\u5BB9\u5668(\u641C\u7D22)"
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5E9F\u91D1\u5C5E"
@@ -1402,7 +1404,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u8F66\u5E93\u5BB9\u5668(\u641C\u7D22)"
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5F29\u7BAD"
@@ -1425,7 +1427,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "Furnace(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -1472,7 +1474,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u5F39\u836F\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5F39\u5934"
@@ -1515,7 +1517,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u5F39\u836F\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5F39\u7C27"
@@ -1580,7 +1582,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u8F66\u5E93\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5F39\u836F\u88C5\u586B\u673A\u5957\u4EF6"
@@ -1606,7 +1608,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u5F39\u836F\u5BB9\u5668(\u641C\u7D22)"
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6025\u6551\u5305"
@@ -1630,7 +1632,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -2047,6 +2049,31 @@ MonoBehaviour:
     - "\u4E16\u754C\u641C\u522E"
     requiredSystems: []
     allSystemsReady: 1
+  - itemName: "\u65E0\u4EBA\u673A"
+    primaryChain: 1
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 0400000006000000
+    upstreamItemNames:
+    - "\u5149\u5B66\u900F\u955C"
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u82AF\u7247"
+    - "\u65E0\u4EBA\u673A\u673A\u4F53"
+    - "\u7535\u6C60\u7EC4"
+    downstreamItemNames: []
+    producerRecipes:
+    - {fileID: 11400000, guid: b1cb13e69970e6b44bed35061f55b7f7, type: 2}
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 5
+    isRawMaterial: 0
+    isDeadEnd: 1
+    sources: 0a000000
+    obtainActions: 04000000
+    sourceDescriptions:
+    - "AdvancedBench(\u5236\u4F5C)"
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u65E0\u4EBA\u673A\u5E73\u53F0\u5957\u4EF6"
     primaryChain: 1
     productionMode: 0
@@ -2070,6 +2097,77 @@ MonoBehaviour:
     obtainActions: 04000000
     sourceDescriptions:
     - "ElectronicsAssembly(\u5236\u4F5C)"
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u65E0\u4EBA\u673A\u64CD\u63A7\u7EC8\u7AEF"
+    primaryChain: 1
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 04000000
+    upstreamItemNames:
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u82AF\u7247"
+    - "\u7535\u5B50\u5143\u4EF6"
+    - "\u7535\u6C60\u7EC4"
+    - "\u7535\u8DEF\u677F"
+    downstreamItemNames: []
+    producerRecipes:
+    - {fileID: 11400000, guid: 3ea5985f72d435c449f5fa3dda115eb0, type: 2}
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 5
+    isRawMaterial: 0
+    isDeadEnd: 1
+    sources: 0a000000
+    obtainActions: 04000000
+    sourceDescriptions:
+    - "AdvancedBench(\u5236\u4F5C)"
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u65E0\u4EBA\u673A\u64CD\u63A7\u82AF\u7247"
+    primaryChain: 1
+    productionMode: 2
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames:
+    - "\u65E0\u4EBA\u673A"
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u7EC8\u7AEF"
+    producerRecipes: []
+    consumerRecipes:
+    - {fileID: 11400000, guid: b1cb13e69970e6b44bed35061f55b7f7, type: 2}
+    - {fileID: 11400000, guid: 3ea5985f72d435c449f5fa3dda115eb0, type: 2}
+    consumerCount: 2
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 0
+    sources: 09000000
+    obtainActions: 06000000
+    sourceDescriptions:
+    - "\u4E16\u754C\u641C\u522E"
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u65E0\u4EBA\u673A\u673A\u4F53"
+    primaryChain: 1
+    productionMode: 2
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames:
+    - "\u65E0\u4EBA\u673A"
+    producerRecipes: []
+    consumerRecipes:
+    - {fileID: 11400000, guid: b1cb13e69970e6b44bed35061f55b7f7, type: 2}
+    consumerCount: 1
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 0
+    sources: 09000000
+    obtainActions: 06000000
+    sourceDescriptions:
+    - "\u4E16\u754C\u641C\u522E"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u65E0\u70DF\u706B\u836F"
@@ -2260,7 +2358,7 @@ MonoBehaviour:
     obtainActions: 0100000004000000
     sourceDescriptions:
     - "\u6811\u6728(\u780D\u4F10)"
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6728\u76FE"
@@ -2443,7 +2541,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "ElectronicsAssembly(\u5236\u4F5C)"
     requiredSystems:
     - Power
     allSystemsReady: 1
@@ -2724,7 +2822,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6C14\u8C61\u9884\u6D4B\u4EEA"
@@ -2802,7 +2900,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6C64"
@@ -2826,7 +2924,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Campfire(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -2961,7 +3059,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "ElementFurnace(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6D88\u6BD2\u6C34"
@@ -3013,7 +3111,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 0
@@ -3039,7 +3137,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Chemistry(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7096\u83DC"
@@ -3066,7 +3164,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Campfire(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -3091,7 +3189,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u70DF\u96FE\u5F39"
@@ -3174,7 +3272,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7164\u77FF"
@@ -3253,7 +3351,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u718F\u8089"
@@ -3279,7 +3377,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "SimpleBench(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -3304,7 +3402,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Building
     - Crafting
@@ -3409,7 +3507,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "Chemistry(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -3458,7 +3556,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -3531,7 +3629,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u751F\u8089"
@@ -3580,6 +3678,7 @@ MonoBehaviour:
     - "\u94DC\u952D"
     downstreamItemNames:
     - "\u591C\u89C6\u4EEA"
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u7EC8\u7AEF"
     - "\u7535\u8DEF\u677F"
     producerRecipes:
     - {fileID: 11400000, guid: c60462f65eede6f429a237fda591d068, type: 2}
@@ -3590,7 +3689,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 85ad8b4e0807c994e895db8a4ef064b1, type: 2}
     - {fileID: 11400000, guid: 419027ed1ab126f47a2273cc0e5197bb, type: 2}
     - {fileID: 11400000, guid: c52c256eaae34eb49967bdbaaa78fcaa, type: 2}
-    consumerCount: 2
+    - {fileID: 11400000, guid: 3ea5985f72d435c449f5fa3dda115eb0, type: 2}
+    consumerCount: 3
     autoAssignedStation: 8
     isRawMaterial: 0
     isDeadEnd: 0
@@ -3622,7 +3722,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems:
     - Building
     - Crafting
@@ -3769,6 +3869,8 @@ MonoBehaviour:
     downstreamItemNames:
     - "\u591C\u89C6\u4EEA"
     - "\u5BC6\u7801\u7834\u8BD1\u5668"
+    - "\u65E0\u4EBA\u673A"
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u7EC8\u7AEF"
     - "\u7535\u5BB9\u7EC4"
     - "\u7535\u89E3\u69FD\u5957\u4EF6"
     - "\u7535\u952F"
@@ -3787,7 +3889,9 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 8df8b2b6116a0974b9ec6e13759dedcf, type: 2}
     - {fileID: 11400000, guid: 954604e28519a5b4f8517dda416f1246, type: 2}
     - {fileID: 11400000, guid: 4692f84f79c5fc44a95d088fd1862379, type: 2}
-    consumerCount: 6
+    - {fileID: 11400000, guid: b1cb13e69970e6b44bed35061f55b7f7, type: 2}
+    - {fileID: 11400000, guid: 3ea5985f72d435c449f5fa3dda115eb0, type: 2}
+    consumerCount: 8
     autoAssignedStation: 7
     isRawMaterial: 0
     isDeadEnd: 0
@@ -3902,7 +4006,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "ElectronicsAssembly(\u5236\u4F5C)"
     requiredSystems:
     - Crafting
     - Power
@@ -3929,7 +4033,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "Chemistry(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7535\u8DEF\u5370\u5237\u673A\u5957\u4EF6"
@@ -3954,7 +4058,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "ElectronicsAssembly(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7535\u8DEF\u677F"
@@ -3976,6 +4080,7 @@ MonoBehaviour:
     - "\u5BC6\u7801\u7834\u8BD1\u5668"
     - "\u5E7F\u64AD\u5854\u5957\u4EF6"
     - "\u62C9\u7EBF\u673A\u5957\u4EF6"
+    - "\u65E0\u4EBA\u673A\u64CD\u63A7\u7EC8\u7AEF"
     - "\u673A\u68B0\u52A0\u5DE5\u53F0\u5957\u4EF6"
     - "\u706B\u836F\u5382\u5957\u4EF6"
     - "\u7535\u5B50\u5143\u4EF6"
@@ -4014,13 +4119,14 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e9d742955516f1c45a92e8e341299799, type: 2}
     - {fileID: 11400000, guid: bff538311138e864081d7f2d6de47800, type: 2}
     - {fileID: 11400000, guid: 683d94d18d15f004c9822f3e3f97aa13, type: 2}
+    - {fileID: 11400000, guid: 3ea5985f72d435c449f5fa3dda115eb0, type: 2}
     - {fileID: 11400000, guid: 4752ec92a3d4c0c4792c2345d5fe7055, type: 2}
     - {fileID: 11400000, guid: 49fecbed3322ea242955dd9d5685ab80, type: 2}
     - {fileID: 11400000, guid: af7380d2898184f42980639208d5ae0b, type: 2}
     - {fileID: 11400000, guid: e226aa8ba1865e942a29d2206e04d284, type: 2}
     - {fileID: 11400000, guid: 9db5e7e5a59a6644aaa978fa1ddd5a03, type: 2}
     - {fileID: 11400000, guid: e4835a9dec9fa354f8fd5f00d0f5f113, type: 2}
-    consumerCount: 22
+    consumerCount: 23
     autoAssignedStation: 8
     isRawMaterial: 0
     isDeadEnd: 0
@@ -4172,7 +4278,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u76FE\u724C"
@@ -4222,7 +4328,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -4317,7 +4423,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -4400,7 +4506,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -4614,7 +4720,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u901A\u7528\u5BB9\u5668(\u641C\u7D22)"
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u78B3\u7EA4\u7EF4"
@@ -4642,7 +4748,7 @@ MonoBehaviour:
     obtainActions: 0100000004000000
     sourceDescriptions:
     - "\u6811\u6728(\u780D\u4F10)"
-    - "Machining(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u795E\u7ECF\u518D\u751F\u5242"
@@ -4771,7 +4877,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u901A\u7528\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7A7F\u7532\u5F39"
@@ -4819,7 +4925,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems:
     - Building
     - Crafting
@@ -4871,7 +4977,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Building
     - Crafting
@@ -4897,7 +5003,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7CBE\u5BC6\u88C5\u914D\u53F0\u5957\u4EF6"
@@ -4946,7 +5052,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7EAF\u51C0\u6C34"
@@ -5091,7 +5197,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u901A\u7528\u5BB9\u5668(\u641C\u7D22)"
-    - "SimpleBench(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u7EF3\u7D22"
@@ -5173,7 +5279,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u533B\u7597\u5BB9\u5668(\u641C\u7D22)"
-    - "Hands(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     - Survival
@@ -5314,7 +5420,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "Campfire(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -5385,7 +5491,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "Campfire(\u5236\u4F5C)"
     requiredSystems:
     - Survival
     allSystemsReady: 1
@@ -5685,7 +5791,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u89E3\u6BD2\u5242"
@@ -5736,7 +5842,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems:
     - Vehicle
     allSystemsReady: 1
@@ -5852,7 +5958,7 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u8F66\u5E93\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u9152\u7CBE"
@@ -6014,7 +6120,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u94A2\u7B4B"
@@ -6297,7 +6403,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -6322,7 +6428,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     - Equipment
@@ -6347,7 +6453,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "AdvancedBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     - Equipment
@@ -6528,7 +6634,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -6552,7 +6658,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -6610,7 +6716,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Furnace(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u94DC\u77FF\u77F3"
@@ -6793,7 +6899,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -6817,7 +6923,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "SimpleBench(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     allSystemsReady: 1
@@ -6843,7 +6949,7 @@ MonoBehaviour:
     obtainActions: 0100000004000000
     sourceDescriptions:
     - "\u6811\u6728(\u780D\u4F10)"
-    - "SimpleBench(\u5236\u4F5C)"
+    - "AdvancedBench(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u957F\u5200"
@@ -7005,7 +7111,7 @@ MonoBehaviour:
     sources: 0a000000
     obtainActions: 04000000
     sourceDescriptions:
-    - "Machining(\u5236\u4F5C)"
+    - "MediumBench(\u5236\u4F5C)"
     requiredSystems:
     - Combat
     - Equipment
@@ -7343,9 +7449,9 @@ MonoBehaviour:
     obtainActions: 0300000004000000
     sourceDescriptions:
     - "\u8F66\u5E93\u5BB9\u5668(\u641C\u7D22)"
-    - "MediumBench(\u5236\u4F5C)"
+    - "Machining(\u5236\u4F5C)"
     requiredSystems: []
     allSystemsReady: 1
-  rawMaterialCount: 63
-  deadEndCount: 162
+  rawMaterialCount: 65
+  deadEndCount: 164
   coreMaterialCount: 18
