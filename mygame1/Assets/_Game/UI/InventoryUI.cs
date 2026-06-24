@@ -2816,9 +2816,11 @@ namespace _Game.UI
         public void ShowItemDetail(ItemData item)
         {
             if (item == null) return;
+            // 校验：背包必须已打开
+            var mgr = UIPanelManager.Instance;
+            if (mgr != null && !mgr.IsPanelOpen(mgr.TopPanel)) return;
             HideItemDetail();
 
-            // 找到 overviewPanel 作为父节点
             var parent = overviewPanel != null ? overviewPanel.transform : transform;
 
             _itemDetailPanel = UGUIBuilder.CreateStretchPanel("ItemDetail", parent,
@@ -2828,6 +2830,9 @@ namespace _Game.UI
             rt.sizeDelta = new Vector2(280, 220);
             rt.anchoredPosition = Vector2.zero;
             rt.SetAsLastSibling();
+
+            // 注册为背包子面板
+            this.OpenAsPanel("itemDetail");
 
             var vlg = _itemDetailPanel.AddComponent<VerticalLayoutGroup>();
             vlg.padding = new RectOffset(10, 10, 10, 8);
@@ -2911,6 +2916,7 @@ namespace _Game.UI
 
         void HideItemDetail()
         {
+            this.CloseAsPanel();
             if (_itemDetailPanel != null) { Destroy(_itemDetailPanel); _itemDetailPanel = null; }
         }
     }
