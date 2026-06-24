@@ -1052,8 +1052,9 @@ namespace _Game.Systems.AIBot
                     {
                         itemName = slot.itemData != null ? slot.itemData.itemName : null,
                         count = slot.count,
-                        itemDurability = 0f,   // 前置A2：AIBotInventorySlot 无耐久追踪，默认0
-                        repairCount = 0,
+                        instanceId = slot.instanceId,           // 前置F
+                        itemDurability = slot.itemDurability,    // 前置F
+                        repairCount = slot.repairCount,          // 前置F
                     });
                 }
             }
@@ -1136,11 +1137,17 @@ namespace _Game.Systems.AIBot
                     {
                         slots[i].itemData = itemCatalog.Find(sd.itemName);
                         slots[i].count = sd.count;
+                        slots[i].instanceId = sd.instanceId;         // 前置F
+                        slots[i].itemDurability = sd.itemDurability; // 前置F
+                        slots[i].repairCount = sd.repairCount;       // 前置F
                     }
                     else
                     {
                         slots[i].itemData = null;
                         slots[i].count = 0;
+                        slots[i].instanceId = 0;                     // 前置F
+                        slots[i].itemDurability = 0f;                // 前置F
+                        slots[i].repairCount = 0;                    // 前置F
                     }
                 }
             }

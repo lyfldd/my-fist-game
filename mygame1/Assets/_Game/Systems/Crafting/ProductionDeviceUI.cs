@@ -56,8 +56,9 @@ namespace _Game.Systems.Crafting
 
         // 右侧状态
         private Text _powerStatusText, _fuelText;
-        private Image _fuelBar;
-        private GameObject _fuelRow;
+        private Image _fuelBar, _wearBarFill;
+        private GameObject _fuelRow, _wearBarRow;
+        private Text _wearText, _wearValueText;
         private Text _linkText;
 
         // 右侧产出
@@ -356,6 +357,39 @@ namespace _Game.Systems.Crafting
             var ffr = fuelFill.GetComponent<RectTransform>();
             ffr.anchorMin = Vector2.zero; ffr.anchorMax = new Vector2(0, 1);
             ffr.pivot = new Vector2(0, 0.5f); ffr.sizeDelta = Vector2.zero;
+            // 磨损条行（加宽 + 百分比/数值）
+            _wearBarRow = AddRightRowGo(rContent, 28);
+            _wearText = AddRightRow(rContent, "", 11, FontStyle.Normal, dimTextColor, 28);
+            _wearText.rectTransform.sizeDelta = new Vector2(100, 28);
+            // 数值文本（右侧）
+            var valGo = new GameObject("WearValue", typeof(RectTransform));
+            valGo.transform.SetParent(_wearBarRow.transform, false);
+            _wearValueText = valGo.AddComponent<Text>();
+            _wearValueText.font = UGUIBuilder.DefaultFont;
+            _wearValueText.fontSize = 11;
+            _wearValueText.alignment = TextAnchor.MiddleRight;
+            _wearValueText.color = dimTextColor;
+            var vrt = valGo.GetComponent<RectTransform>();
+            vrt.anchorMin = new Vector2(1, 0); vrt.anchorMax = new Vector2(1, 1);
+            vrt.pivot = new Vector2(1, 0.5f);
+            vrt.sizeDelta = new Vector2(80, 28);
+            vrt.anchoredPosition = new Vector2(-4, 0);
+            // 耐久条背景（加高到 10px）
+            var wearBg = new GameObject("WearBg", typeof(Image));
+            wearBg.transform.SetParent(_wearBarRow.transform, false);
+            wearBg.GetComponent<RectTransform>().sizeDelta = new Vector2(rightW - 190, 10);
+            wearBg.GetComponent<Image>().color = new Color(0.2f, 0.2f, 0.2f);
+            // Fill
+            var wearFill = new GameObject("WearFill", typeof(Image));
+            wearFill.transform.SetParent(wearBg.transform, false);
+            _wearBarFill = wearFill.GetComponent<Image>();
+            _wearBarFill.color = new Color(1f, 0.6f, 0f); // 橙色
+            var wfr = wearFill.GetComponent<RectTransform>();
+            wfr.anchorMin = Vector2.zero; wfr.anchorMax = new Vector2(0, 1);
+            wfr.pivot = new Vector2(0, 0.5f); wfr.sizeDelta = Vector2.zero;
+            _wearBarRow.SetActive(false);
+            _wearText.gameObject.SetActive(false);
+            _wearValueText.gameObject.SetActive(false);
             // 链接行
             _linkText = AddRightRow(rContent, "", 12, FontStyle.Normal, dimTextColor, 20);
 
@@ -528,6 +562,31 @@ namespace _Game.Systems.Crafting
                 float fuelPct = Mathf.Clamp01(_currentDevice.FuelRemaining / (_deviceData.fuelPerCycle * 30f));
                 var fuelBarRect = _fuelBar.GetComponent<RectTransform>();
                 fuelBarRect.anchorMax = new Vector2(fuelPct, 1);
+            }
+
+            // 磨损条（始终显示）
+            if (_currentDevice != null)
+            {
+                float wearRatio = _currentDevice.DeviceDurabilityRatio;
+                float cur = _currentDevice.DeviceDurability;
+                float max = GameConstants.PRODUCTION_DEVICE_MAX_DURABILITY;
+                _wearText.text = $"磨损: {(wearRatio * 100):F0}%";
+                _wearText.color = wearRatio > 0.5f ? Color.white : wearRatio > 0.2f ? Color.yellow : Color.red;
+                _wearValueText.text = $"{cur:F0} / {max:F0}";
+                _wearValueText.color = wearRatio > 0.5f ? dimTextColor : wearRatio > 0.2f ? Color.yellow : Color.red;
+                _wearText.gameObject.SetActive(true);
+                _wearValueText.gameObject.SetActive(true);
+                _wearBarRow.SetActive(true);
+                var wearRect = _wearBarFill.GetComponent<RectTransform>();
+                wearRect.anchorMax = new Vector2(wearRatio, 1);
+                _wearBarFill.color = wearRatio > 0.5f
+                    ? new Color(1f, 0.6f, 0f) : wearRatio > 0.2f ? Color.yellow : Color.red;
+            }
+            else
+            {
+                _wearText.gameObject.SetActive(false);
+                _wearValueText.gameObject.SetActive(false);
+                _wearBarRow.SetActive(false);
             }
 
             // 链接

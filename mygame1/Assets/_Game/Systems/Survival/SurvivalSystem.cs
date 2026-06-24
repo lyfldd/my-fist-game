@@ -99,6 +99,18 @@ namespace _Game.Systems.Survival
             EventBus.Subscribe<EquipmentChangedEvent>(OnEquipmentChanged);
             EventBus.Subscribe<PlayerDamaged>(OnPlayerDamaged);
             EventBus.Subscribe<ItemUsedEvent>(OnItemUsed);
+            EventBus.Subscribe<ItemBrokenEvent>(OnItemBroken);  // 护甲损坏→重算
+        }
+
+        void OnItemBroken(ItemBrokenEvent evt)
+        {
+            // 护甲损坏→重算护甲缓存（重新从 Inventory 读取所有装备护甲值）
+            if (evt.EquipSlot != EquipSlot.None)
+            {
+                var inv = ServiceLocator.Get<_Game.Systems.Inventory.Inventory>();
+                if (inv != null)
+                    _cachedArmor = inv.GetTotalArmor();
+            }
         }
 
         private void OnPlayerDamaged(PlayerDamaged evt)
@@ -374,6 +386,7 @@ namespace _Game.Systems.Survival
             EventBus.Unsubscribe<EquipmentChangedEvent>(OnEquipmentChanged);
             EventBus.Unsubscribe<PlayerDamaged>(OnPlayerDamaged);
             EventBus.Unsubscribe<ItemUsedEvent>(OnItemUsed);
+            EventBus.Unsubscribe<ItemBrokenEvent>(OnItemBroken);
         }
 
         #endregion

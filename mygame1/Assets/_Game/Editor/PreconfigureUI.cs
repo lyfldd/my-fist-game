@@ -37,7 +37,7 @@ namespace _Game.Editor
             created += BuildTopLeftHUD(player);
             created += BuildSurvivalHUD(player);
             created += BuildQuickItemBar(player);
-
+            created += BuildInventoryPanels(player);
             EditorSceneManager.MarkSceneDirty(UnityEngine.SceneManagement.SceneManager.GetActiveScene());
             EditorUtility.SetDirty(player);
             Debug.Log($"[PreconfigureUI] ✅ 完成！创建了 {created} 个 UI 对象到 Player");
@@ -148,8 +148,27 @@ namespace _Game.Editor
                 CreateSlotText(slot.transform, "Count", slotSize - 4, 14, 11, TextAnchor.LowerCenter,
                     new Vector2(0.5f, 0), new Vector2(slotSize / 2f, 2), Color.yellow, "");
 
-                // 前置K：耐久条（底部3px）
-                CreateDurabilityBar(slot.transform, "DurBar", slotSize - 4, 3);
+                // 耐久条（底部 3px，预建结构，运行时 RefreshAll 控制显隐）
+                var durBar = new GameObject("DurBar", typeof(RectTransform));
+                durBar.transform.SetParent(slot.transform, false);
+                var drt = durBar.GetComponent<RectTransform>();
+                drt.anchorMin = new Vector2(0, 0); drt.anchorMax = new Vector2(1, 0);
+                drt.pivot = new Vector2(0.5f, 0);
+                drt.anchoredPosition = new Vector2(0, 2); drt.sizeDelta = new Vector2(-4, 3);
+                var durBg = new GameObject("DurBG", typeof(RectTransform), typeof(Image));
+                durBg.transform.SetParent(durBar.transform, false);
+                durBg.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
+                var bgRt = durBg.GetComponent<RectTransform>();
+                bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
+                bgRt.offsetMin = Vector2.zero; bgRt.offsetMax = Vector2.zero;
+                var durFill = new GameObject("DurFill", typeof(RectTransform), typeof(Image));
+                durFill.transform.SetParent(durBar.transform, false);
+                durFill.GetComponent<Image>().color = Color.green;
+                var fillRt = durFill.GetComponent<RectTransform>();
+                fillRt.anchorMin = Vector2.zero; fillRt.anchorMax = Vector2.one;
+                fillRt.pivot = new Vector2(0, 0.5f);
+                fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
+                durBar.SetActive(false);
 
                 CreateBorder(slot.transform, slotSize);
             }
@@ -160,6 +179,119 @@ namespace _Game.Editor
             CreateArrowText(canvas.transform, "ArrowRight", ">", new Vector2(0, 0.5f),
                 new Vector2(totalWidth / 2 + 8, slotSize / 2 + 20));
             return 1;
+        }
+
+        static int BuildInventoryPanels(GameObject player)
+        {
+            var invUI = player.GetComponent<_Game.UI.InventoryUI>();
+            if (invUI == null)
+            {
+                Debug.LogWarning("[PreconfigureUI] Player 上没有 InventoryUI 组件，跳过背包面板创建");
+                return 0;
+            }
+
+            // 找或建 InventoryCanvas
+            var canvasT = player.transform.Find("InventoryCanvas");
+            Canvas canvas;
+            if (canvasT != null)
+                canvas = canvasT.GetComponent<Canvas>();
+            else
+                canvas = CreateChildCanvas(player, "InventoryCanvas", 0);
+
+            int created = 0;
+
+            // 总览面板（Tab）
+            if (invUI.overviewPanel == null && canvas.transform.Find("OverviewPanel") == null)
+            {
+                var panel = new GameObject("OverviewPanel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                panel.transform.SetParent(canvas.transform, false);
+                StretchRT(panel.GetComponent<RectTransform>());
+                panel.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.1f, 0.95f);
+
+                // TopTabBar
+                CreateTopTabBar(panel.transform, 700);
+
+                // GridContainer
+                var grid = new GameObject("GridContainer", typeof(RectTransform));
+                grid.transform.SetParent(panel.transform, false);
+                var grt = grid.GetComponent<RectTransform>();
+                grt.anchorMin = Vector2.zero; grt.anchorMax = Vector2.one;
+                grt.offsetMin = new Vector2(10, 10); grt.offsetMax = new Vector2(-10, -10);
+
+                invUI.overviewPanel = panel;
+                invUI.overviewGridContainer = grid;
+
+                // info text
+                var infoGo = CreateText(panel.transform, "OverviewInfoText", 600, 30, 16,
+                    TextAnchor.UpperCenter, new Vector2(0.5f, 1), new Vector2(0, -5));
+                invUI.overviewInfoText = infoGo;
+
+                EditorUtility.SetDirty(invUI);
+                created++;
+                Debug.Log("[PreconfigureUI] OverviewPanel 已创建");
+            }
+
+            // 快捷面板（V）
+            if (invUI.quickPanel == null && canvas.transform.Find("QuickPanel") == null)
+            {
+                var qpanel = new GameObject("QuickPanel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+                qpanel.transform.SetParent(canvas.transform, false);
+                StretchRT(qpanel.GetComponent<RectTransform>());
+                qpanel.GetComponent<Image>().color = new Color(0.05f, 0.05f, 0.08f, 0.9f);
+
+                var qgrid = new GameObject("GridContainer", typeof(RectTransform));
+                qgrid.transform.SetParent(qpanel.transform, false);
+                var qgrt = qgrid.GetComponent<RectTransform>();
+                qgrt.anchorMin = Vector2.zero; qgrt.anchorMax = Vector2.one;
+                qgrt.offsetMin = new Vector2(10, 10); qgrt.offsetMax = new Vector2(-10, -10);
+
+                invUI.quickPanel = qpanel;
+                invUI.quickGridContainer = qgrid;
+
+                created++;
+                Debug.Log("[PreconfigureUI] QuickPanel 已创建");
+            }
+
+            // 隐藏面板（Start 时由代码控制显示）
+            if (invUI.overviewPanel != null) invUI.overviewPanel.SetActive(false);
+            if (invUI.quickPanel != null) invUI.quickPanel.SetActive(false);
+
+            return created;
+        }
+
+        static void CreateTopTabBar(Transform parent, float panelW)
+        {
+            var bar = new GameObject("TopTabBar", typeof(RectTransform), typeof(Image));
+            bar.transform.SetParent(parent, false);
+            var brt = bar.GetComponent<RectTransform>();
+            brt.anchorMin = new Vector2(0, 1); brt.anchorMax = new Vector2(1, 1);
+            brt.pivot = new Vector2(0.5f, 1);
+            brt.sizeDelta = new Vector2(0, 36);
+            brt.anchoredPosition = Vector2.zero;
+            bar.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.15f, 1f);
+
+            string[] tabs = { "装备容器", "角色", "制作", "地图", "设置" };
+            float btnW = 100, btnH = 30;
+            for (int i = 0; i < tabs.Length; i++)
+            {
+                var btnGo = new GameObject($"Tab_{tabs[i]}", typeof(RectTransform), typeof(Image), typeof(Button));
+                btnGo.transform.SetParent(bar.transform, false);
+                var brt2 = btnGo.GetComponent<RectTransform>();
+                brt2.anchorMin = brt2.anchorMax = brt2.pivot = new Vector2(0, 0.5f);
+                brt2.sizeDelta = new Vector2(btnW, btnH);
+                brt2.anchoredPosition = new Vector2(10 + i * (btnW + 8), 0);
+                btnGo.GetComponent<Image>().color = i == 0
+                    ? new Color(0.2f, 0.4f, 0.6f)
+                    : new Color(0.15f, 0.15f, 0.2f);
+
+                var lblGo = new GameObject("Label", typeof(RectTransform), typeof(Text));
+                lblGo.transform.SetParent(btnGo.transform, false);
+                StretchRT(lblGo.GetComponent<RectTransform>());
+                var t = lblGo.GetComponent<Text>();
+                t.font = UGUIBuilder.DefaultFont;
+                t.fontSize = 13; t.alignment = TextAnchor.MiddleCenter;
+                t.color = Color.white; t.raycastTarget = false; t.text = tabs[i];
+            }
         }
 
         // ═══════════════════════════════════════════
@@ -329,37 +461,6 @@ namespace _Game.Editor
             return count;
         }
 
-        // 前置K：创建耐久条（编辑时预建，与 UGUIBuilder.CreateDurabilityBar 结构一致）
-        static void CreateDurabilityBar(Transform parent, string name, float slotW, float barH)
-        {
-            var barGo = new GameObject(name, typeof(RectTransform));
-            barGo.transform.SetParent(parent, false);
-            var barRt = barGo.GetComponent<RectTransform>();
-            barRt.anchorMin = new Vector2(0, 0);
-            barRt.anchorMax = new Vector2(1, 0);
-            barRt.pivot = new Vector2(0.5f, 0);
-            barRt.anchoredPosition = new Vector2(0, 2);
-            barRt.sizeDelta = new Vector2(-4, barH);
-
-            var bgGo = new GameObject("DurBG", typeof(RectTransform), typeof(Image));
-            bgGo.transform.SetParent(barGo.transform, false);
-            bgGo.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
-            // Stretch
-            var bgRt = bgGo.GetComponent<RectTransform>();
-            bgRt.anchorMin = Vector2.zero; bgRt.anchorMax = Vector2.one;
-            bgRt.offsetMin = Vector2.zero; bgRt.offsetMax = Vector2.zero;
-
-            var fillGo = new GameObject("DurFill", typeof(RectTransform), typeof(Image));
-            fillGo.transform.SetParent(barGo.transform, false);
-            fillGo.GetComponent<Image>().color = Color.green;
-            var fillRt = fillGo.GetComponent<RectTransform>();
-            fillRt.anchorMin = Vector2.zero;
-            fillRt.anchorMax = Vector2.one;
-            fillRt.pivot = new Vector2(0, 0.5f);
-            fillRt.offsetMin = Vector2.zero; fillRt.offsetMax = Vector2.zero;
-
-            barGo.SetActive(false); // 默认隐藏，RefreshAll 时按需显示
-        }
 
         // ═══════════════════════════════════════════
         // MainMenu 场景预构建

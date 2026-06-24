@@ -26,7 +26,11 @@ namespace _Game.Systems.Interaction
             EventBus.Subscribe<BuildModeExitedEvent>(OnBuildModeExited);
         }
 
-        void OnEnable() { InputRouter.BindKey(KeyCode.E, InputPriority.Action, HandleInteract, this); }
+        void OnEnable()
+        {
+            InputRouter.BindKey(KeyCode.E, InputPriority.Action, HandleInteract, this);
+            InputRouter.BindKey(KeyCode.Mouse1, InputPriority.Action, HandleRepair, this); // 前置H：右键修理
+        }
         void OnDisable() { InputRouter.UnbindAll(this); }
 
         private void OnDestroy()
@@ -51,6 +55,54 @@ namespace _Game.Systems.Interaction
             _currentTarget.OnInteract(gameObject);
             EventBus.Publish(new InteractionEvent(_currentTarget.InteractionPrompt, true));
             return true;
+        }
+
+        // 前置H：右键修理建造物
+        bool HandleRepair()
+        {
+            if (isBuildModeActive) return false;
+
+            // 找到最近的 PlacedStructure
+            PlacedStructure targetStructure = null;
+            float closestDist = float.MaxValue;
+            Collider[] colliders = Physics.OverlapSphere(transform.position, detectRadius, -1);
+            foreach (var col in colliders)
+            {
+                var ps = col.GetComponent<PlacedStructure>();
+                if (ps == null || !ps.IsInteractable) continue;
+                float dist = Vector3.Distance(transform.position, col.transform.position);
+                if (dist < closestDist) { closestDist = dist; targetStructure = ps; }
+            }
+
+            if (targetStructure == null || targetStructure.HealthPercent >= 1f) return false;
+
+            // 收集玩家背包中的材料
+            var inventory = GetComponent<Inventory.Inventory>();
+            if (inventory == null) return false;
+
+            var availableMaterials = new System.Collections.Generic.Dictionary<Config.ItemData, int>();
+            foreach (var c in inventory.containers)
+                foreach (var pi in c.placedItems)
+                    if (pi.itemData != null)
+                    {
+                        if (!availableMaterials.ContainsKey(pi.itemData))
+                            availableMaterials[pi.itemData] = 0;
+                        availableMaterials[pi.itemData] += pi.count;
+                    }
+
+            // 执行修理
+            float restored = targetStructure.Repair(availableMaterials, (item, count) =>
+            {
+                inventory.RemoveItem(item, count);
+            });
+
+            if (restored > 0f)
+            {
+                EventBus.Publish(new InteractionEvent($"修理 {targetStructure.buildableData.displayName} (+{restored:F0}HP)", true));
+                return true;
+            }
+
+            return false;
         }
 
         void DetectTarget()

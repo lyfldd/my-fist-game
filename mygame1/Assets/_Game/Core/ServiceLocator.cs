@@ -78,11 +78,29 @@ namespace _Game.Core
         }
 
         /// <summary>
-        /// 注销服务
+        /// 注销服务（按类型）
         /// </summary>
         public static void Unregister<T>() where T : class
         {
             _services.Remove(typeof(T));
+        }
+
+        /// <summary>
+        /// 注销服务（按实例）。从实例反查类型，匹配才删。
+        /// </summary>
+        public static void Unregister(object instance)
+        {
+            if (instance == null) return;
+            var targetType = instance.GetType();
+            // 遍历所有注册，找类型匹配且实例相同的
+            var keysToRemove = new List<Type>();
+            foreach (var kv in _services)
+            {
+                if (kv.Value == instance)
+                    keysToRemove.Add(kv.Key);
+            }
+            foreach (var key in keysToRemove)
+                _services.Remove(key);
         }
 
         /// <summary>

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using _Game.Config;
 using _Game.Core;
+using _Game.Systems.Inventory;
 
 namespace _Game.Systems.Weapon
 {
@@ -29,6 +30,7 @@ namespace _Game.Systems.Weapon
             EventBus.Subscribe<WeaponEquippedEvent>(OnWeaponEquipped);
             EventBus.Subscribe<WeaponUnequippedEvent>(OnWeaponUnequipped);
             EventBus.Subscribe<WeaponSlotChangedEvent>(OnSlotChanged);
+            EventBus.Subscribe<ItemBrokenEvent>(OnItemBroken);  // 武器损坏→卸下
         }
 
         void CreateHandPoint()
@@ -120,11 +122,21 @@ namespace _Game.Systems.Weapon
             _models[slot] = model;
         }
 
+        void OnItemBroken(ItemBrokenEvent evt)
+        {
+            // 武器损坏→卸下（仅处理武器槽位）
+            if (evt.EquipSlot == EquipSlot.None) return;
+            var inventory = GetComponent<Inventory.Inventory>();
+            if (inventory != null)
+                inventory.UnequipSlot(evt.EquipSlot);
+        }
+
         void OnDestroy()
         {
             EventBus.Unsubscribe<WeaponEquippedEvent>(OnWeaponEquipped);
             EventBus.Unsubscribe<WeaponUnequippedEvent>(OnWeaponUnequipped);
             EventBus.Unsubscribe<WeaponSlotChangedEvent>(OnSlotChanged);
+            EventBus.Unsubscribe<ItemBrokenEvent>(OnItemBroken);
         }
     }
 }

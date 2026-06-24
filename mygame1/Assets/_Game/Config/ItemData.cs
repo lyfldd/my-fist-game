@@ -26,10 +26,11 @@ namespace _Game.Config
         public int maxStack = GameConstants.DEFAULT_MAX_STACK;
         public float weight = GameConstants.DEFAULT_ITEM_WEIGHT;
 
-        [Header("品质 & 耐久（字段预留，耐久系统待接入）")]
+        [Header("品质 & 耐久")]
         public ItemQuality quality = ItemQuality.Scavenged;
-        public bool hasDurability;          // TODO: 耐久系统 — 武器/护甲/工具消耗耐久
+        public bool hasDurability;          // 武器/护甲/工具消耗耐久
         public float maxDurability = 100f;
+        public int maxRepairs = 8;          // 最大修理次数（0=不可修），见耐久系统.md §6.2
         public ItemMaterial itemMaterial = ItemMaterial.Default;  // 前置B：材质标签
 
         [Header("用途标签")]
@@ -38,6 +39,13 @@ namespace _Game.Config
         [Header("工作台")]
         public bool isWorkstation;
         public WorkstationTier workstationTier;
+
+        [Header("电子设备（前置C）")]
+        public ElectronicDeviceType electronicDeviceType = ElectronicDeviceType.Flashlight;
+
+        [Header("武器附件（前置D）")]
+        public AttachmentSlot attachmentSlot = AttachmentSlot.None;  // 此物品是哪种附件
+        public AttachmentSlot[] hostSlots;                            // 此物品接受哪些槽位的附件
 
         [Header("装备属性")]
         public EquipSlot equipSlot = EquipSlot.None;  // 装备位

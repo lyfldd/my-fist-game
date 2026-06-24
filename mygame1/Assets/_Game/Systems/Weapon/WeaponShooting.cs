@@ -57,6 +57,13 @@ namespace _Game.Systems.Weapon
 
         private ItemData _lastWeapon; // 跟踪武器切换，避免 OnEnable 不触发时扩散/弹匣未初始化
 
+        // 前置D：附件效果字段
+        [System.NonSerialized] public float silencerEffectiveness;  // 消音器效果 0~1（0=无消音）
+        [System.NonSerialized] public float scopeSpreadReduction;    // 瞄具散布减少 0~0.3
+        [System.NonSerialized] public float laserHipfireBonus;      // 镭射腰射精度 0~0.2
+        /// <summary> 当前手持武器 ItemData（供附件系统查询）</summary>
+        public ItemData CurrentWeaponData => _switcher != null ? _switcher.ActiveWeapon : null;
+
         void Awake()
         {
             _aiming = GetComponent<WeaponAiming>();
@@ -208,6 +215,8 @@ namespace _Game.Systems.Weapon
             // 散射：枪械专精每级减少 GUN_SKILL_SPREAD_REDUCTION + 低耐久惩罚
             int gunLevel = _playerCharacter != null ? _playerCharacter.GetSkillLevel(SkillType.枪械专精) : 0;
             float effectiveSpread = _currentSpread * (1f - gunLevel * GameConstants.GUN_SKILL_SPREAD_REDUCTION);
+            // 前置D：附件效果 — 瞄具减散布 + 镭射腰射加成
+            effectiveSpread *= (1f - scopeSpreadReduction - laserHipfireBonus);
             // 耐久 v1.0：低耐久散射惩罚
             if (weapon.hasDurability && _inventory != null)
             {

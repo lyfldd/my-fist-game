@@ -72,6 +72,12 @@ namespace _Game.Config
         [Tooltip("下车时玩家出现的偏移（车身侧面）")]
         public Vector3 exitOffset = new Vector3(-2f, 0f, 0f);
 
+        [Header("耐久（前置E）")]
+        [Tooltip("车辆最大血量，0=无敌")]
+        public float maxHealth = 500f;
+        [Tooltip("碰撞伤害系数，越高碰撞越伤")]
+        public float collisionDamageMult = 1f;
+
         [Header("模型")]
         [Tooltip("车身碰撞体中心偏移")]
         public Vector3 colliderCenter = new Vector3(0f, 0.8f, 0f);

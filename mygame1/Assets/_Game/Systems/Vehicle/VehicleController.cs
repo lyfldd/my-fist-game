@@ -36,12 +36,21 @@ namespace _Game.Systems.Vehicle
         public float CurrentSpeedKmh => _rb.velocity.magnitude * 3.6f;  // m/s → km/h
         public bool IsBoosting => _isBoosting;
 
+        // 前置E：车辆血量
+        public float CurrentHealth { get; private set; }
+        public bool IsDestroyed => _isDestroyed;
+        public float HealthPercent => vehicleData != null && vehicleData.maxHealth > 0f
+            ? Mathf.Clamp01(CurrentHealth / vehicleData.maxHealth) : 1f;
+
+
+
         private Rigidbody _rb;
         private float _currentThrottle;   // -1(满倒车) ~ 0(空档) ~ 1(满油门)
         private float _currentSteer;      // -1(满左) ~ 1(满右)
         private float _currentBrake;      // 0 ~ 1
         private bool _isEngineOn;
         private bool _isBoosting;
+        private bool _isDestroyed;         // 前置E
         private Inventory.Inventory _driverInventory;
 
         // 引擎声音 key（每辆车唯一）
@@ -78,6 +87,7 @@ namespace _Game.Systems.Vehicle
 
         void FixedUpdate()
         {
+            if (_isDestroyed) return; // 前置E
             if (!HasDriver) return;
             if (!_isEngineOn) return;
 
@@ -105,6 +115,7 @@ namespace _Game.Systems.Vehicle
                 _reverseTorque = vehicleData.reverseTorque;
                 _rb.mass = vehicleData.mass;
                 CurrentFuel = vehicleData.fuelCapacity;
+                if (CurrentHealth <= 0f) CurrentHealth = vehicleData.maxHealth;  // 前置E
             }
             else
             {
@@ -358,6 +369,44 @@ namespace _Game.Systems.Vehicle
             var suspension = wc.suspensionSpring;
             suspension.damper = damper;
             wc.suspensionSpring = suspension;
+        }
+
+        // ============================================================
+        // 前置E：碰撞伤害
+        // ============================================================
+
+        void OnCollisionEnter(Collision col)
+        {
+            if (_isDestroyed || vehicleData == null || vehicleData.maxHealth <= 0f) return;
+
+            float speed = col.relativeVelocity.magnitude;
+            if (speed < GameConstants.VEHICLE_COLLISION_MIN_SPEED) return;
+
+            float damage = speed * vehicleData.collisionDamageMult;
+            CurrentHealth -= damage;
+
+            if (CurrentHealth <= 0f)
+            {
+                CurrentHealth = 0f;
+                DisableVehicle();
+            }
+        }
+
+        void DisableVehicle()
+        {
+            if (_isDestroyed) return;
+            _isDestroyed = true;
+            _isEngineOn = false;
+
+            // 弹飞驾驶员
+            if (Driver != null)
+            {
+                var vi = Driver.GetComponent<VehicleInteraction>();
+                if (vi != null) vi.Exit();
+            }
+
+            EventBus.Publish(new VehicleDestroyedEvent(gameObject,
+                vehicleData != null ? vehicleData.vehicleName : "未知车辆"));
         }
 
     }

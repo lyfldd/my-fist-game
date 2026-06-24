@@ -16,6 +16,7 @@ namespace _Game.Systems.AIBot
         public const float MAX_WEIGHT = 200f;
 
         [SerializeField] private List<AIBotInventorySlot> slots = new List<AIBotInventorySlot>();
+        private static int _nextInstanceId = 1000000; // 前置F：与玩家背包InstanceId区分（玩家从1开始）
 
         // 属性
         public int SlotCount => slots.Count;
@@ -70,6 +71,7 @@ namespace _Game.Systems.AIBot
                     {
                         slots[i].itemData = item;
                         slots[i].count = toAdd;
+                        slots[i].instanceId = ++_nextInstanceId;  // 前置F
                         count -= toAdd;
                         OnInventoryChanged?.Invoke();
                         break;
@@ -225,5 +227,8 @@ namespace _Game.Systems.AIBot
     {
         public ItemData itemData;
         public int count;
+        public int instanceId;           // 前置F：物品实例ID（耐久系统追踪）
+        public float itemDurability;     // 前置F：当前耐久（0=满耐久/无耐久系统）
+        public int repairCount;          // 前置F：已修理次数
     }
 }

@@ -30,14 +30,25 @@ namespace _Game.Systems.Crafting
         bool _isCoalPowered;
         Inventory.Inventory _inventoryFallback;
 
+        // 前置G：设备磨损
+        float _deviceDurability;
+        bool _deviceBroken;
+
         public ProductionDeviceData Data => _data;
         public Inventory.InventoryContainer OutputSlot => _outputSlot;
         public Inventory.InventoryContainer InputSlot => _inputSlot;
         public float FuelRemaining => _fuelRemaining;
         public bool IsElectricPowered => _isElectricPowered;
         public bool IsCoalPowered => _isCoalPowered;
-        public bool IsRunning => _isElectricPowered || _isCoalPowered ||
-            (_data != null && !_data.requiresFuel && GetComponent<Power.PowerConsumer>() == null);
+        public bool IsRunning => !_deviceBroken && (_isElectricPowered || _isCoalPowered ||
+            (_data != null && !_data.requiresFuel && GetComponent<Power.PowerConsumer>() == null));
+        /// <summary> 前置G：设备是否已磨损报废 </summary>
+        public bool IsBroken => _deviceBroken;
+        /// <summary> 前置G：当前耐久 </summary>
+        public float DeviceDurability => _deviceDurability;
+        /// <summary> 前置G：耐久比（0~1） </summary>
+        public float DeviceDurabilityRatio => GameConstants.PRODUCTION_DEVICE_MAX_DURABILITY > 0f
+            ? Mathf.Clamp01(_deviceDurability / GameConstants.PRODUCTION_DEVICE_MAX_DURABILITY) : 1f;
         public ProductionDevice OutputDestination
         {
             get => _outputDestination;
@@ -79,6 +90,10 @@ namespace _Game.Systems.Crafting
 
             if (_data.requiresFuel && _data.fuelItem != null)
                 _fuelRemaining = _data.fuelPerCycle * 3f;
+
+            // 前置G：初始化设备耐久
+            if (_deviceDurability <= 0f)
+                _deviceDurability = GameConstants.PRODUCTION_DEVICE_MAX_DURABILITY;
         }
 
         /// <summary>
@@ -93,6 +108,7 @@ namespace _Game.Systems.Crafting
         void Update()
         {
             if (_data == null) return;
+            if (_deviceBroken) return; // 前置G：设备报废
 
             float interval = _data.productionInterval;
 
@@ -103,6 +119,11 @@ namespace _Game.Systems.Crafting
                 if (consumer != null)
                     interval /= consumer.electricSpeedMultiplier;
             }
+
+            // 前置H：建造物低血量时生产减速
+            var structure = GetComponent<Building.PlacedStructure>();
+            if (structure != null)
+                interval /= structure.GetPerformanceFactor();
 
             _cycleTimer += UnityEngine.Time.deltaTime;
             if (_cycleTimer >= interval)
@@ -174,6 +195,7 @@ namespace _Game.Systems.Crafting
                         PlaceOutput(recipe.output, recipe.outputCount);
                         EventBus.Publish(new ProductionCycleEvent(
                             gameObject, recipe.output, recipe.outputCount));
+                        WearDevice(); // 前置G
                         return;
                     }
                 }
@@ -184,8 +206,22 @@ namespace _Game.Systems.Crafting
                     PlaceOutput(recipe.output, recipe.outputCount);
                     EventBus.Publish(new ProductionCycleEvent(
                         gameObject, recipe.output, recipe.outputCount));
+                    WearDevice(); // 前置G
                     return;
                 }
+            }
+        }
+
+        /// <summary> 前置G：每次生产完成后磨损设备，归零时停产 </summary>
+        void WearDevice()
+        {
+            _deviceDurability -= GameConstants.PRODUCTION_DEVICE_WEAR_PER_CYCLE;
+            if (_deviceDurability <= 0f)
+            {
+                _deviceDurability = 0f;
+                _deviceBroken = true;
+                EventBus.Publish(new DeviceBrokenEvent(gameObject,
+                    _data != null ? _data.deviceName : "未知设备"));
             }
         }
 
@@ -290,6 +326,7 @@ namespace _Game.Systems.Crafting
                 deviceName = _data != null ? _data.deviceName : "",
                 fuelRemaining = _fuelRemaining,
                 cycleTimer = _cycleTimer,
+                deviceDurability = _deviceDurability,  // 前置G
             };
 
             // 输入槽物品
@@ -334,6 +371,9 @@ namespace _Game.Systems.Crafting
 
             _fuelRemaining = psd.fuelRemaining;
             _cycleTimer = psd.cycleTimer;
+            _deviceDurability = psd.deviceDurability > 0f ? psd.deviceDurability
+                : GameConstants.PRODUCTION_DEVICE_MAX_DURABILITY; // 前置G：向后兼容旧存档
+            _deviceBroken = (_deviceDurability <= 0f);            // 前置G
 
             // 恢复输入槽
             if (_inputSlot != null && !string.IsNullOrEmpty(psd.inputItemName) && itemCatalog != null)

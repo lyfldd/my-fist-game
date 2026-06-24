@@ -549,6 +549,27 @@ namespace _Game.Core
         public const float DURABILITY_WEAPON_PER_SHOT = 1f;           // 开一枪基础耐久消耗
         public const float DURABILITY_ARMOR_PER_DAMAGE = 0.05f;       // 每点伤害扣护甲耐久系数
         public const float DURABILITY_MELEE_PER_HIT = 1f;             // 近战一击基础耐久消耗
+        public const float DURABILITY_TOOL_PER_USE = 0.5f;            // 工具使用一次基础耐久消耗
+
+        // ============================================================
+        // BUILDABLE DURABILITY (前置H)
+        // ============================================================
+        public const float BUILDABLE_DAMAGE_MULTIPLY_THRESHOLD = 0.3f; // 血量低于此比例触发伤害放大
+        public const float BUILDABLE_DAMAGE_MULTIPLIER = 1.5f;         // 低血量时受到伤害倍率
+        public const float BUILDABLE_PERFORMANCE_MIN = 0.5f;           // 0%血量时性能最低系数
+        public const float BUILDABLE_REPAIR_MATERIAL_RATE = 0.3f;      // 修理材料=建造材料的比例
+
+        // ============================================================
+        // PRODUCTION DEVICE DURABILITY (前置G)
+        // ============================================================
+        public const float PRODUCTION_DEVICE_MAX_DURABILITY = 1000f;   // 生产设备默认最大耐久
+        public const float PRODUCTION_DEVICE_WEAR_PER_CYCLE = 1f;      // 每生产一轮磨损量
+
+        // ============================================================
+        // VEHICLE DURABILITY (前置E)
+        // ============================================================
+        public const float VEHICLE_COLLISION_MIN_SPEED = 3f;           // 低于此速度(m/s)的碰撞不受伤
+        public const float VEHICLE_SMOKE_THRESHOLD = 0.3f;             // 血量低于此比例开始冒烟
 
         // ============================================================
         // WEATHER SYSTEM

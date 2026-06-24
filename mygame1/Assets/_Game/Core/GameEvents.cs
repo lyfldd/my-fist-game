@@ -628,6 +628,18 @@ namespace _Game.Core
     /// <summary>
     /// 生产设备输出槽已满。
     /// </summary>
+    /// <summary>
+    /// 生产设备磨损归零，停产（前置G）。
+    /// </summary>
+    public readonly struct DeviceBrokenEvent
+    {
+        public GameObject Device { get; }
+        public string DeviceName { get; }
+
+        public DeviceBrokenEvent(GameObject device, string deviceName)
+        { Device = device; DeviceName = deviceName; }
+    }
+
     public readonly struct DeviceOutputFullEvent
     {
         public GameObject Device { get; }
@@ -897,6 +909,15 @@ namespace _Game.Core
         {
             InstanceId = instanceId; ItemData = itemData; EquipSlot = slot;
         }
+    }
+
+    /// <summary> 车辆血量归零报废（前置E）</summary>
+    public readonly struct VehicleDestroyedEvent
+    {
+        public GameObject Vehicle { get; }
+        public string VehicleName { get; }
+        public VehicleDestroyedEvent(GameObject vehicle, string name)
+        { Vehicle = vehicle; VehicleName = name; }
     }
 
     /// <summary> 物品修理完成</summary>

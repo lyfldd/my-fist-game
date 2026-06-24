@@ -258,6 +258,82 @@ namespace _Game.Systems.SaveLoad
             UnityEngine.Time.timeScale = 0f;
 
             // InputRouter 高优先级拦截所有输入
+            BlockAllInput();
+
+            try
+            {
+                EventBus.Publish(new GameLoadStarted(slotIndex));
+
+                // Phase -1: 卸载当前世界
+                yield return StartCoroutine(UnloadCurrentWorld());
+
+                // Phase 1: 读取存档
+                var saveData = SaveService.Load(slotIndex);
+                if (saveData == null)
+                {
+                    Debug.LogError($"[SaveLoadManager] 加载失败 slot={slotIndex}");
+                    EventBus.Publish(new LoadCompleted(slotIndex, false));
+                    yield break;
+                }
+
+                // 版本校验
+                if (saveData.worldGenVersion != 1)
+                {
+                    Debug.LogError($"[SaveLoadManager] 世界版本不兼容: 存档={saveData.worldGenVersion}, 当前=1。请开始新游戏。");
+                    EventBus.Publish(new LoadCompleted(slotIndex, false));
+                    yield break;
+                }
+
+                yield return null;
+
+                // Phase 2: 设置世界种子 → 触发 WorldGenerator
+                yield return null;
+
+                // Phase 3: 放置玩家
+                var player = PlayerRegistry.Transform;
+                if (player != null && saveData.player != null)
+                {
+                    player.SetPositionAndRotation(
+                        new Vector3(saveData.player.posX, saveData.player.posY, saveData.player.posZ),
+                        Quaternion.Euler(0, saveData.player.rotY, 0));
+                }
+
+                // Phase 4: 恢复玩家内部状态
+                RestorePlayerState(saveData.player);
+                RestoreInventory(saveData.inventory);
+
+                yield return null;
+
+                // Phase 5: 恢复世界实体
+                RestoreWorldEntities(saveData.world);
+
+                // 发世界实体就绪事件
+                EventBus.Publish(new WorldEntitiesRestored());
+
+                yield return null;
+
+                // Phase 6: 恢复系统实体状态
+                RestoreProductionDevices(saveData.productions);
+
+                // Phase 7: 恢复全局状态
+                RestoreTimeWeather(saveData.timeWeather);
+                RestoreResearch(saveData.research);
+
+                yield return null;
+
+                Debug.Log($"[SaveLoadManager] 加载完成 slot={slotIndex}");
+                EventBus.Publish(new LoadCompleted(slotIndex, true));
+            }
+            finally
+            {
+                // Phase 8: 无论如何都要解冻，防止 Debug 优先级输入拦截残留
+                Unfreeze();
+            }
+        }
+
+        /// <summary> 加载期间拦截所有输入，防止玩家操作干扰 </summary>
+        private void BlockAllInput()
+        {
             InputRouter.BindKey(KeyCode.F1, InputPriority.Debug, () => true, this);
             InputRouter.BindKey(KeyCode.F2, InputPriority.Debug, () => true, this);
             InputRouter.BindKey(KeyCode.F3, InputPriority.Debug, () => true, this);
@@ -282,76 +358,6 @@ namespace _Game.Systems.SaveLoad
             InputRouter.BindMouse(0, InputPriority.Debug, () => true, this);
             InputRouter.BindMouse(1, InputPriority.Debug, () => true, this);
             InputRouter.BindMouse(2, InputPriority.Debug, () => true, this);
-
-            EventBus.Publish(new GameLoadStarted(slotIndex));
-
-            // Phase -1: 卸载当前世界
-            yield return StartCoroutine(UnloadCurrentWorld());
-
-            // Phase 1: 读取存档
-            var saveData = SaveService.Load(slotIndex);
-            if (saveData == null)
-            {
-                Debug.LogError($"[SaveLoadManager] 加载失败 slot={slotIndex}");
-                Unfreeze();
-                EventBus.Publish(new LoadCompleted(slotIndex, false));
-                yield break;
-            }
-
-            // 版本校验
-            if (saveData.worldGenVersion != 1)
-            {
-                Debug.LogError($"[SaveLoadManager] 世界版本不兼容: 存档={saveData.worldGenVersion}, 当前=1。请开始新游戏。");
-                Unfreeze();
-                EventBus.Publish(new LoadCompleted(slotIndex, false));
-                yield break;
-            }
-
-            yield return null;
-
-            // Phase 2: 设置世界种子 → 触发 WorldGenerator
-            // TODO: WorldGenerator.SetSeed(saveData.worldSeed);
-            // yield return new WaitUntil(() => ... WorldGenCompleted event);
-            yield return null;
-
-            // Phase 3: 放置玩家
-            var player = PlayerRegistry.Transform;
-            if (player != null && saveData.player != null)
-            {
-                player.SetPositionAndRotation(
-                    new Vector3(saveData.player.posX, saveData.player.posY, saveData.player.posZ),
-                    Quaternion.Euler(0, saveData.player.rotY, 0));
-            }
-
-            // Phase 4: 恢复玩家内部状态
-            RestorePlayerState(saveData.player);
-            RestoreInventory(saveData.inventory);
-
-            yield return null;
-
-            // Phase 5: 恢复世界实体
-            RestoreWorldEntities(saveData.world);
-
-            // 发世界实体就绪事件
-            EventBus.Publish(new WorldEntitiesRestored());
-
-            yield return null;
-
-            // Phase 6: 恢复系统实体状态
-            RestoreProductionDevices(saveData.productions);
-            // ✅ AI 机器人已通过建筑+状态恢复（P4 已完成）
-            // TODO: P4 — 电力网/车辆/僵尸
-
-            // Phase 7: 恢复全局状态
-            RestoreTimeWeather(saveData.timeWeather);
-            RestoreResearch(saveData.research);
-
-            yield return null;
-
-            // Phase 8: 解冻
-            Unfreeze();
-            Debug.Log($"[SaveLoadManager] 加载完成 slot={slotIndex}");
-            EventBus.Publish(new LoadCompleted(slotIndex, true));
         }
 
         private void Unfreeze()

@@ -107,7 +107,11 @@ namespace _Game.UI
 
         void RefreshVehicle()
         {
-            _mainText.text = $"<color=white>车速: {_speedKmh:F0} km/h{(_isBoosting ? " [SHIFT]" : "")}\n油量: {_fuel:F1} L</color>";
+            float hpPct = _vehicle.HealthPercent;
+            float cur = _vehicle.CurrentHealth;
+            float max = _vehicle.vehicleData != null ? _vehicle.vehicleData.maxHealth : 0f;
+            string hpColor = hpPct > 0.5f ? "green" : hpPct > 0.25f ? "yellow" : "red";
+            _mainText.text = $"<color=white>车速: {_speedKmh:F0} km/h{(_isBoosting ? " [SHIFT]" : "")}\n油量: {_fuel:F1} L\n车况: <color={hpColor}>{hpPct*100:F0}%  {cur:F0}/{max:F0}</color></color>";
         }
 
         void RefreshPilot()

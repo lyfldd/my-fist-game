@@ -1,7 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
+using _Game.Config;
 using _Game.Core;
 using _Game.Systems.Combat;
+using _Game.Systems.Durability;
 using _Game.Systems.Threat;
 
 namespace _Game.Systems.AIBot
@@ -99,6 +101,10 @@ namespace _Game.Systems.AIBot
         public const string AMMO_RIFLE = "步枪子弹";
         public const string AMMO_SHOTGUN = "霰弹";
         public const string AMMO_EM_RIFLE = "电池组";
+
+        // 前置F：武器实例追踪
+        private ItemData _currentWeaponItem;
+        private int _currentWeaponInstanceId;
 
         // 驾驶模式手动武器
         [HideInInspector] public AttackPriority manualWeaponSlot = AttackPriority.Laser;
@@ -307,6 +313,8 @@ namespace _Game.Systems.AIBot
 
             _bot.ConsumeEnergyForAction(AIBot.ENERGY_LASER_PER_SHOT);
 
+            ConsumeWeaponDurability(); // 前置F：激光也消耗能量武器耐久（如果有的话）
+
             Debug.DrawLine(transform.position, targetCollider.transform.position, Color.red, 0.5f);
         }
 
@@ -335,6 +343,7 @@ namespace _Game.Systems.AIBot
             }
 
             _bot.ConsumeEnergyForAction(AIBot.ENERGY_RIGHTARM_PER_SHOT);
+            ConsumeWeaponDurability(); // 前置F
 
             switch (rightArm)
             {
@@ -455,6 +464,7 @@ namespace _Game.Systems.AIBot
         void FireLeftArm(Collider targetCollider)
         {
             _bot.ConsumeEnergyForAction(AIBot.ENERGY_LEFTARM_PER_SWING);
+            ConsumeWeaponDurability(); // 前置F：左臂武器耐久（当前解析右臂武器，TODO: 扩展解析左臂）
 
             if (leftArm == LeftArmWeapon.Knife)
             {
@@ -581,6 +591,44 @@ namespace _Game.Systems.AIBot
                 case RightArmWeapon.Shotgun: return AMMO_SHOTGUN;
                 case RightArmWeapon.ElectromagneticRifle: return AMMO_EM_RIFLE;
                 default: return null;
+            }
+        }
+
+        // ============================================================
+        // 前置F：武器实例 → 耐久消耗
+        // ============================================================
+
+        /// <summary> 从机器人背包中解析当前武器 ItemData 和 instanceId </summary>
+        void ResolveCurrentWeapon()
+        {
+            string weaponName = GetWeaponItemName(rightArm);
+            if (string.IsNullOrEmpty(weaponName)) { _currentWeaponItem = null; _currentWeaponInstanceId = 0; return; }
+
+            var inventory = GetComponent<AIBotInventory>();
+            if (inventory == null) { _currentWeaponItem = null; _currentWeaponInstanceId = 0; return; }
+
+            foreach (var slot in inventory.GetAllSlots())
+            {
+                if (slot.itemData != null && slot.itemData.itemName == weaponName)
+                {
+                    _currentWeaponItem = slot.itemData;
+                    _currentWeaponInstanceId = slot.instanceId;
+                    return;
+                }
+            }
+            _currentWeaponItem = null;
+            _currentWeaponInstanceId = 0;
+        }
+
+        /// <summary> 前置F：开火后消耗武器耐久 </summary>
+        void ConsumeWeaponDurability()
+        {
+            ResolveCurrentWeapon(); // 每次开火重新解析（武器可能被替换）
+            if (_currentWeaponInstanceId > 0 && _currentWeaponItem != null &&
+                _currentWeaponItem.hasDurability && _currentWeaponItem.maxDurability > 0f)
+            {
+                DurabilitySystem.Instance?.ConsumeDurability(_currentWeaponInstanceId,
+                    GameConstants.DURABILITY_WEAPON_PER_SHOT);
             }
         }
 
@@ -734,6 +782,7 @@ namespace _Game.Systems.AIBot
                 if (leftArm == LeftArmWeapon.Shield) return;
 
                 _bot.ConsumeEnergyForAction(AIBot.ENERGY_LEFTARM_PER_SWING);
+                ConsumeWeaponDurability(); // 前置F：左臂手动开火耐久
 
                 float range = leftArm == LeftArmWeapon.Knife ? knifeRange : chainsawRange;
                 Vector3 origin = transform.position + Vector3.up * 0.5f;

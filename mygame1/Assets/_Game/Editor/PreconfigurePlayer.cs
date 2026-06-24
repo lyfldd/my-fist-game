@@ -53,6 +53,8 @@ namespace _Game.Editor
             "_Game.Systems.Character.ProfessionApplier",
             "_Game.Systems.Vehicle.VehicleInputLock",
             "_Game.Systems.Inventory.InventoryTest",
+            "_Game.UI.InventoryUI",               // Tab 背包面板
+
         };
 
         [MenuItem("Tools/Preconfigure Player")]

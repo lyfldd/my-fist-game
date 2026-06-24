@@ -322,6 +322,15 @@ namespace _Game.Systems.Inventory
             return _equippedInstanceIds.TryGetValue(slot, out var id) ? id : 0;
         }
 
+        /// <summary> 前置A：反向查询——根据 instanceId 找到对应的装备槽（供 ItemBrokenEvent 用）</summary>
+        public EquipSlot GetSlotByInstanceId(int instanceId)
+        {
+            if (instanceId <= 0) return EquipSlot.None;
+            foreach (var kv in _equippedInstanceIds)
+                if (kv.Value == instanceId) return kv.Key;
+            return EquipSlot.None;
+        }
+
         /// <summary> 耐久 v1.0：按 instanceId 查找 PlacedItem 引用（遍历所有容器）</summary>
         public PlacedItem? FindPlacedItem(int instanceId)
         {

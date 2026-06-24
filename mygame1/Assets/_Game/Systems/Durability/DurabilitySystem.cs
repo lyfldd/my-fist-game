@@ -67,9 +67,12 @@ namespace _Game.Systems.Durability
             float newRatio = GetRatio(instanceId);
             EventBus.Publish(new DurabilityChangedEvent(instanceId, p.Value.itemData, newRatio));
 
-            // 损坏事件
+            // 损坏事件 — 反向查槽位，让订阅者知道哪个装备槽的物品坏了
             if (newRatio <= 0f)
-                EventBus.Publish(new ItemBrokenEvent(instanceId, p.Value.itemData, EquipSlot.None));
+            {
+                EquipSlot slot = inv.GetSlotByInstanceId(instanceId);
+                EventBus.Publish(new ItemBrokenEvent(instanceId, p.Value.itemData, slot));
+            }
         }
 
         /// <summary> 将伤害分担到多个护甲实例的耐久上 </summary>

@@ -199,7 +199,14 @@ namespace _Game.Systems.Building
             if (!_Game.UI.DevTools.FreeBuildEnabled)
             {
                 DeductMaterials();
-                // 前置A TODO：工具耐久消耗 → DurabilitySystem.Instance?.ConsumeDurability(toolInstanceId, ...)
+                // 前置A：工具耐久消耗
+                if (activeBuildable.requiredTool != null)
+                {
+                    int toolId = _inventory.GetEquippedInstanceId(EquipSlot.RightHand);
+                    if (toolId > 0)
+                        _Game.Systems.Durability.DurabilitySystem.Instance?.ConsumeDurability(
+                            toolId, GameConstants.DURABILITY_TOOL_PER_USE);
+                }
             }
 
             // 2. 获取放置位置

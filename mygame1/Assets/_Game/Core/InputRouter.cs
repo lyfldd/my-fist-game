@@ -22,10 +22,6 @@ namespace _Game.Core
         readonly Dictionary<KeyCode, List<KeyBinding>> _keyMap = new Dictionary<KeyCode, List<KeyBinding>>();
         readonly Dictionary<int, List<MouseBinding>> _mouseMap = new Dictionary<int, List<MouseBinding>>();
 
-        // 每帧收集待移除项，避免迭代时修改
-        readonly List<KeyBinding> _deadKeys = new List<KeyBinding>();
-        readonly List<MouseBinding> _deadMice = new List<MouseBinding>();
-
         class KeyBinding
         {
             public InputPriority priority;
@@ -118,9 +114,8 @@ namespace _Game.Core
 
         void CleanDeadBindings()
         {
-            _deadKeys.Clear();
-            _deadMice.Clear();
-
+            // 收集需要移除的 key
+            var deadKeys = new List<KeyCode>();
             foreach (var kv in _keyMap)
             {
                 var list = kv.Value;
@@ -130,9 +125,12 @@ namespace _Game.Core
                         list.RemoveAt(i);
                 }
                 if (list.Count == 0)
-                    _deadKeys.Add(null); // 标记空列表
+                    deadKeys.Add(kv.Key);
             }
+            foreach (var key in deadKeys)
+                _keyMap.Remove(key);
 
+            var deadMice = new List<int>();
             foreach (var kv in _mouseMap)
             {
                 var list = kv.Value;
@@ -141,10 +139,11 @@ namespace _Game.Core
                     if (list[i].owner == null)
                         list.RemoveAt(i);
                 }
+                if (list.Count == 0)
+                    deadMice.Add(kv.Key);
             }
-
-            // 移出外层后需要完整的键移除，这里仅清理 null owner
-            // 空列表保留也没关系，下次循环会跳过
+            foreach (var btn in deadMice)
+                _mouseMap.Remove(btn);
         }
 
         // ============================================================

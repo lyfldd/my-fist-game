@@ -62,9 +62,8 @@ namespace _Game.UI
 
         // 容器折叠状态
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
+        private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
 
-        // 前置K：装备槽耐久条
-        private Dictionary<EquipSlot, Image> _durBars = new Dictionary<EquipSlot, Image>();
 
         void Awake()
         {
@@ -83,9 +82,18 @@ namespace _Game.UI
                 esGo.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
             }
 
-            // 确保 Canvas 有 GraphicRaycaster
+            // 确保有 Canvas（兜底：Player 上没有预置 Canvas 时自动创建）
             var canvas = GetComponentInParent<Canvas>();
-            if (canvas != null && canvas.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
+            if (canvas == null)
+            {
+                var canvasGo = new GameObject("InventoryCanvas", typeof(Canvas), typeof(UnityEngine.UI.CanvasScaler));
+                canvasGo.transform.SetParent(transform, false);
+                canvas = canvasGo.GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+                canvas.sortingOrder = 0;
+                Debug.LogWarning("[InventoryUI] Canvas 缺失，已自动创建");
+            }
+            if (canvas.GetComponent<UnityEngine.UI.GraphicRaycaster>() == null)
                 canvas.gameObject.AddComponent<UnityEngine.UI.GraphicRaycaster>();
 
             // 自动创建拖拽管理器
@@ -94,6 +102,9 @@ namespace _Game.UI
                 var ddGo = new GameObject("DragDropManager", typeof(DragDropManager));
                 DontDestroyOnLoad(ddGo);
             }
+
+            // 兜底：自动创建总览面板和快捷面板（不再依赖编辑器手动赋值）
+            EnsurePanelsExist();
 
             // 查找其他 UI 对象
             _survivalHUDGo = GameObject.Find("SurvivalHUD");
@@ -117,7 +128,46 @@ namespace _Game.UI
             EventBus.Subscribe<InventoryChanged>(OnInventoryChanged);
             EventBus.Subscribe<InventoryViewChangedEvent>(OnViewChanged);
             EventBus.Subscribe<CharacterStatsChanged>(OnCharacterStatsChanged);
-            EventBus.Subscribe<DurabilityChangedEvent>(OnDurabilityChanged);  // 前置K
+            EventBus.Subscribe<DurabilityChangedEvent>(OnDurabilityChanged);
+
+        }
+
+        /// <summary> 兜底创建 UI 面板（场景丢失/编辑器未赋值时自动恢复） </summary>
+        void EnsurePanelsExist()
+        {
+            // 确定父节点：优先挂在 Canvas 下（UGUI 必须）
+            var canvas = GetComponentInParent<Canvas>();
+            var panelParent = canvas != null ? canvas.transform : transform;
+
+            if (overviewPanel == null)
+                overviewPanel = panelParent.Find("OverviewPanel")?.gameObject;
+            if (quickPanel == null)
+                quickPanel = panelParent.Find("QuickPanel")?.gameObject;
+
+            if (overviewPanel == null)
+            {
+                overviewPanel = UGUIBuilder.CreateStretchPanel("OverviewPanel", panelParent,
+                    new Color(0.08f, 0.08f, 0.1f, 0.95f));
+                overviewPanel.SetActive(false);
+                overviewGridContainer = new GameObject("GridContainer", typeof(RectTransform));
+                overviewGridContainer.transform.SetParent(overviewPanel.transform, false);
+                var grt = overviewGridContainer.GetComponent<RectTransform>();
+                grt.anchorMin = Vector2.zero; grt.anchorMax = Vector2.one;
+                grt.offsetMin = new Vector2(10, 10); grt.offsetMax = new Vector2(-10, -10);
+                Debug.LogWarning("[InventoryUI] overviewPanel 缺失，已自动创建兜底面版");
+            }
+            if (quickPanel == null)
+            {
+                quickPanel = UGUIBuilder.CreateStretchPanel("QuickPanel", panelParent,
+                    new Color(0.05f, 0.05f, 0.08f, 0.9f));
+                quickPanel.SetActive(false);
+                quickGridContainer = new GameObject("GridContainer", typeof(RectTransform));
+                quickGridContainer.transform.SetParent(quickPanel.transform, false);
+                var grt = quickGridContainer.GetComponent<RectTransform>();
+                grt.anchorMin = Vector2.zero; grt.anchorMax = Vector2.one;
+                grt.offsetMin = new Vector2(10, 10); grt.offsetMax = new Vector2(-10, -10);
+                Debug.LogWarning("[InventoryUI] quickPanel 缺失，已自动创建兜底面版");
+            }
         }
 
         void OnEnable()
@@ -146,7 +196,11 @@ namespace _Game.UI
 
         bool HandleTab()
         {
-            if (overviewPanel == null) return false;
+            if (overviewPanel == null)
+            {
+                Debug.LogWarning("[InventoryUI] HandleTab: overviewPanel 为 null，无法打开背包。请检查 EnsurePanelsExist 是否已执行。");
+                return false;
+            }
 
             // 打开背包时关闭建造模式
             ExitBuildModeIfActive();
@@ -561,11 +615,13 @@ namespace _Game.UI
             txt.resizeTextMinSize = fontSize - 3;
             txt.resizeTextMaxSize = fontSize;
 
-            // 前置K：装备槽耐久条
-            var durFill = UGUIBuilder.CreateDurabilityBar($"Dur_{slot}", rt, w);
-            _durBars[slot] = durFill;
-            // 初始状态：隐藏（未装备或满耐久不显示）
-            durFill.rectTransform.parent.gameObject.SetActive(false);
+            // 装备槽耐久条（底部 3px，默认隐藏）
+            if (!locked && slot != EquipSlot.None)
+            {
+                var durFill = UGUIBuilder.CreateDurabilityBar($"Dur_{slot}", rt, w);
+                durFill.rectTransform.parent.gameObject.SetActive(false);
+                _dollDurBars[slot] = durFill;
+            }
 
             if (locked) return;
 
@@ -1772,14 +1828,15 @@ namespace _Game.UI
                 ShowOverview();
         }
 
-        // 前置K：装备槽耐久条刷新
+        // ===== 装备耐久条刷新 =====
+
         void OnDurabilityChanged(DurabilityChangedEvent evt)
         {
             if (_inventory == null) return;
-            foreach (var kv in _durBars)
+            foreach (var kv in _dollDurBars)
             {
                 int id = _inventory.GetEquippedInstanceId(kv.Key);
-                if (id == evt.InstanceId)
+                if (id == evt.InstanceId && id > 0)
                 {
                     bool show = evt.Ratio < 1f;
                     kv.Value.rectTransform.parent.gameObject.SetActive(show);

@@ -22,9 +22,15 @@ namespace _Game.Core
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void OnAfterSceneLoad()
         {
-            // 主菜单场景没有玩家，跳过初始化
+            // 主菜单场景：自动创建 SceneContext 并跳过玩家初始化
             var sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            if (sceneName == "MainMenu") return;
+            if (sceneName == "MainMenu")
+            {
+                EnsureSceneContext(sceneName);
+                return;
+            }
+
+            EnsureSceneContext(sceneName);
 
             var player = GameObject.FindWithTag("Player")
                       ?? GameObject.Find("player")
@@ -88,6 +94,7 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.UI.DecibelHUD");
             AddIfMissing(player, "_Game.UI.WeatherHUD");
             AddIfMissing(player, "_Game.UI.TopLeftHUD");
+
             // ═══ 系统 UI（非 HUD，有独立逻辑）═══
             AddIfMissing(player, "_Game.Systems.Building.BuildMenuUI");
             AddIfMissing(player, "_Game.Systems.Building.GhostPreview");
@@ -105,6 +112,7 @@ namespace _Game.Core
             AddIfMissing(player, "_Game.Systems.Character.ProfessionApplier");
             AddIfMissing(player, "_Game.Systems.Vehicle.VehicleInputLock");
             AddIfMissing(player, "_Game.Systems.Inventory.InventoryTest");
+            AddIfMissing(player, "_Game.UI.InventoryUI");          // Tab背包面板
 
             // 设置玩家阵营
             var playerFaction = player.GetComponent<FactionComponent>();
@@ -268,9 +276,30 @@ namespace _Game.Core
             // PlacedStructureRegistry — 已放置建筑注册表
             if (go.GetComponent<_Game.Systems.SaveLoad.PlacedStructureRegistry>() == null)
                 go.AddComponent<_Game.Systems.SaveLoad.PlacedStructureRegistry>();
+            // DurabilitySystem — 耐久系统单例（必须挂载，否则所有 ?. 调用走 null 默认值）
+            if (go.GetComponent<_Game.Systems.Durability.DurabilitySystem>() == null)
+                go.AddComponent<_Game.Systems.Durability.DurabilitySystem>();
             // ProductionDeviceUI — 工业设备UI单例，挂在 Managers 上任一设备共用
             if (go.GetComponent<_Game.Systems.Crafting.ProductionDeviceUI>() == null)
                 go.AddComponent<_Game.Systems.Crafting.ProductionDeviceUI>();
+            // SceneIsolationManager — 场景切换生命周期管理
+            if (go.GetComponent<_Game.Core.SceneIsolation.SceneIsolationManager>() == null)
+                go.AddComponent<_Game.Core.SceneIsolation.SceneIsolationManager>();
+        }
+
+        static void EnsureSceneContext(string sceneName)
+        {
+            var existing = GameObject.Find("SceneContext");
+            if (existing != null) return;
+
+            var go = new GameObject("SceneContext");
+            var ctx = go.AddComponent<_Game.Core.SceneIsolation.SceneContext>();
+            // 用反射设 _sceneLabel（或直接加公开方法）
+            var field = typeof(_Game.Core.SceneIsolation.SceneContext).GetField("_sceneLabel",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (field != null) field.SetValue(ctx, sceneName);
+            UnityEngine.SceneManagement.SceneManager.MoveGameObjectToScene(
+                go, UnityEngine.SceneManagement.SceneManager.GetActiveScene());
         }
 
         static void AddIfMissing(GameObject go, string fullTypeName)
