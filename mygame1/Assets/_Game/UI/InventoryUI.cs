@@ -2817,8 +2817,7 @@ namespace _Game.UI
         {
             if (item == null) return;
             // 校验：背包必须已打开
-            var mgr = UIPanelManager.Instance;
-            if (mgr != null && !mgr.IsPanelOpen(mgr.TopPanel)) return;
+            if (overviewPanel == null || !overviewPanel.activeSelf) return;
             HideItemDetail();
 
             var parent = overviewPanel != null ? overviewPanel.transform : transform;
