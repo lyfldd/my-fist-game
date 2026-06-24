@@ -28,13 +28,22 @@ namespace _Game.Systems.Inventory
 
         GridInventory2D EnsureGrid()
         {
-            if (_grid != null && !_gridDirty) return _grid;
-            _grid = new GridInventory2D(gridWidth, gridHeight);
-            // 从 placedItems 迁移
-            foreach (var p in placedItems)
-                if (p.itemData != null)
-                    _grid.Place(p.itemData, p.count, p.gridX, p.gridY, p.rotated,
-                        p.instanceId, p.itemDurability, p.repairCount);
+            if (_grid != null && !_gridDirty)
+            {
+                // 检测 placedItems 和 grid 是否不同步（外部直接写了 placedItems）
+                if (placedItems.Count != _grid.UsedSlots)
+                {
+                    _grid = null; // 重建
+                }
+            }
+            if (_grid == null)
+            {
+                _grid = new GridInventory2D(gridWidth, gridHeight);
+                foreach (var p in placedItems)
+                    if (p.itemData != null && !p.isGhost)
+                        _grid.Place(p.itemData, p.count, p.gridX, p.gridY, p.rotated,
+                            p.instanceId, p.itemDurability, p.repairCount);
+            }
             _gridDirty = false;
             return _grid;
         }
