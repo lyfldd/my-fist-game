@@ -76,8 +76,8 @@ namespace _Game.Editor
             {
                 string stationName = node.EffectiveStation.ToString();
                 // 有 producerRecipes 时看看是不是工业设备
-                if (node.producerRecipes.Length > 0 && node.producerRecipes[0] != null && !string.IsNullOrEmpty(node.producerRecipes[0].requiredStationName))
-                    stationName = node.producerRecipes[0].requiredStationName;
+                if (node.producerRecipes.Length > 0 && node.producerRecipes[0] != null)
+                    stationName = node.producerRecipes[0].requiredStation.ToString();
                 sources.Add(ItemSourceType.Craft);
                 actions.Add(ItemObtainAction.Craft);
                 descs.Add($"{stationName}(制作)");
