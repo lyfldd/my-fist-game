@@ -114,9 +114,9 @@ public static class CreateAIBotItems
         const string F = "Ammo";
         const ItemCategory C = ItemCategory.Ammo;
 
-        CreateItem(F, "Ammo_Pistol", "手枪子弹", C, 1, 1, 0.02f, 50, ItemQuality.Professional);
-        CreateItem(F, "Ammo_Rifle", "步枪子弹", C, 1, 1, 0.04f, 40, ItemQuality.Professional);
-        CreateItem(F, "Ammo_ShotgunShell", "霰弹", C, 1, 1, 0.05f, 20, ItemQuality.Professional);
+        CreateItem(F, "Ammo_9mm", "9mm手枪弹", C, 1, 1, 0.02f, 50, ItemQuality.Professional);
+        CreateItem(F, "Ammo_762mm", "7.62mm步枪弹", C, 1, 1, 0.04f, 40, ItemQuality.Professional);
+        CreateItem(F, "Ammo_12Gauge", "12号霰弹", C, 1, 1, 0.05f, 20, ItemQuality.Professional);
     }
 
     static void CreateWeaponItems()
@@ -211,19 +211,19 @@ public static class CreateAIBotItems
 
     static void CreateAmmoRecipes()
     {
-        // 手枪子弹 — 简易工作台
-        CreateRecipe(WorkstationTier.SimpleBench, "手枪子弹",
-            RecipeCategory.Ammo, GetItem("手枪子弹"), 10, 3f, 20f,
+        // 9mm手枪弹 — 弹药装填机(工业设备，此处保留手工备用)
+        CreateRecipe(WorkstationTier.SimpleBench, "9mm手枪弹",
+            RecipeCategory.Ammo, GetItem("9mm手枪弹"), 10, 3f, 20f,
             new[] { ("弹壳", 10), ("底火", 10), ("弹头", 10), ("黑火药", 1) });
 
-        // 步枪子弹 — 简易工作台
-        CreateRecipe(WorkstationTier.SimpleBench, "步枪子弹",
-            RecipeCategory.Ammo, GetItem("步枪子弹"), 10, 4f, 25f,
+        // 7.62mm步枪弹
+        CreateRecipe(WorkstationTier.SimpleBench, "7.62mm步枪弹",
+            RecipeCategory.Ammo, GetItem("7.62mm步枪弹"), 10, 4f, 25f,
             new[] { ("弹壳", 10), ("底火", 10), ("弹头", 10), ("无烟火药", 1) });
 
-        // 霰弹 — 简易工作台
-        CreateRecipe(WorkstationTier.SimpleBench, "霰弹",
-            RecipeCategory.Ammo, GetItem("霰弹"), 8, 4f, 25f,
+        // 12号霰弹
+        CreateRecipe(WorkstationTier.SimpleBench, "12号霰弹",
+            RecipeCategory.Ammo, GetItem("12号霰弹"), 8, 4f, 25f,
             new[] { ("弹壳", 8), ("底火", 8), ("弹头", 8), ("黑火药", 1) });
     }
 

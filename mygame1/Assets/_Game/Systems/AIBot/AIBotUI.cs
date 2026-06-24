@@ -611,7 +611,7 @@ namespace _Game.Systems.AIBot
             // Weapon slots
             if (_combat != null)
             {
-                _rightArmText.text = _combat.CurrentRightArm switch { RightArmWeapon.None => "空", RightArmWeapon.Pistol => "手枪", RightArmWeapon.Rifle => "步枪", RightArmWeapon.Shotgun => "霰弹枪", RightArmWeapon.ElectromagneticRifle => "电磁步枪", _ => "?" };
+                _rightArmText.text = _combat.CurrentRightArm switch { RightArmWeapon.None => "空", RightArmWeapon.Pistol => "M1911", RightArmWeapon.Rifle => "AK-47", RightArmWeapon.Shotgun => "雷明顿870", RightArmWeapon.ElectromagneticRifle => "电磁步枪", _ => "?" };
                 _leftArmText.text = _combat.CurrentLeftArm switch { LeftArmWeapon.None => "空", LeftArmWeapon.Shield => "盾牌 (受伤-30%)", LeftArmWeapon.Chainsaw => "电锯 (15/s)", LeftArmWeapon.Knife => "短刀 (20/1.5s)", _ => "?" };
             }
 
@@ -922,9 +922,9 @@ namespace _Game.Systems.AIBot
             switch (w)
             {
                 case RightArmWeapon.None: return "空";
-                case RightArmWeapon.Pistol: return "手枪";
-                case RightArmWeapon.Rifle: return "步枪";
-                case RightArmWeapon.Shotgun: return "霰弹枪";
+                case RightArmWeapon.Pistol: return "M1911";
+                case RightArmWeapon.Rifle: return "AK-47";
+                case RightArmWeapon.Shotgun: return "雷明顿870";
                 case RightArmWeapon.ElectromagneticRifle: return "电磁步枪";
                 default: return "?";
             }

@@ -97,9 +97,9 @@ namespace _Game.Systems.AIBot
         private readonly Collider[] _hitBuffer = new Collider[32];
 
         // 弹药物品名（硬编码，向后兼容。优先读 _weaponMapping）
-        public const string AMMO_PISTOL = "手枪子弹";
-        public const string AMMO_RIFLE = "步枪子弹";
-        public const string AMMO_SHOTGUN = "霰弹";
+        public const string AMMO_PISTOL = "9mm手枪弹";
+        public const string AMMO_RIFLE = "7.62mm步枪弹";
+        public const string AMMO_SHOTGUN = "12号霰弹";
         public const string AMMO_EM_RIFLE = "电池组";
 
         [SerializeField] private AIBotWeaponMapping _weaponMapping;
@@ -642,9 +642,9 @@ namespace _Game.Systems.AIBot
         {
             switch (weapon)
             {
-                case RightArmWeapon.Pistol: return "手枪";
-                case RightArmWeapon.Rifle: return "步枪";
-                case RightArmWeapon.Shotgun: return "霰弹枪";
+                case RightArmWeapon.Pistol: return "M1911";
+                case RightArmWeapon.Rifle: return "AK-47";
+                case RightArmWeapon.Shotgun: return "雷明顿870";
                 case RightArmWeapon.ElectromagneticRifle: return "电磁步枪";
                 default: return null;
             }
@@ -665,9 +665,9 @@ namespace _Game.Systems.AIBot
         {
             switch (ammoName)
             {
-                case AMMO_PISTOL: return "手枪子弹";
-                case AMMO_RIFLE: return "步枪子弹";
-                case AMMO_SHOTGUN: return "霰弹";
+                case AMMO_PISTOL: return "9mm手枪弹";
+                case AMMO_RIFLE: return "7.62mm步枪弹";
+                case AMMO_SHOTGUN: return "12号霰弹";
                 case AMMO_EM_RIFLE: return "电池组";
                 default: return ammoName;
             }
@@ -677,9 +677,9 @@ namespace _Game.Systems.AIBot
         {
             switch (itemName)
             {
-                case "手枪": return RightArmWeapon.Pistol;
-                case "步枪": return RightArmWeapon.Rifle;
-                case "霰弹枪": return RightArmWeapon.Shotgun;
+                case "M1911": return RightArmWeapon.Pistol;
+                case "AK-47": return RightArmWeapon.Rifle;
+                case "雷明顿870": return RightArmWeapon.Shotgun;
                 case "电磁步枪": return RightArmWeapon.ElectromagneticRifle;
                 default: return RightArmWeapon.None;
             }

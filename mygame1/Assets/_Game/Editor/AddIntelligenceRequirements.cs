@@ -88,7 +88,7 @@ public static class AddIntelligenceRequirements
         { "防毒面具", 2 },
         { "碳纤维", 5 },
         { "钛合金", 5 },
-        { "猎枪", 3 },
+        // 猎枪 → SKS 半自动（已删除）
         { "消音器", 4 },
         { "半自动改造套件", 4 },
         { "全自动改造套件", 5 },

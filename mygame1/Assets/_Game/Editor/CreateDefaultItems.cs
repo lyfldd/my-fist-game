@@ -264,8 +264,7 @@ public class CreateDefaultItems
     {
         CreateItem("木棍", "WoodenStick", 1, 2, 2f, ItemCategory.Equipment, EquipSlot.RightHand, 0, 0);
         CreateItem("长刀", "LongSword", 1, 3, 3.5f, ItemCategory.Equipment, EquipSlot.RightHand, 0, 0);
-        CreateItem("沙漠之鹰", "DesertEagle", 1, 2, 2f, ItemCategory.Equipment, EquipSlot.SidearmBelt, 0, 0);
-        CreateItem("改装AK47", "AK47", 1, 4, 4.5f, ItemCategory.Equipment, EquipSlot.RightHand, 0, 0);
+        // 沙漠之鹰 → M1911 / 改装AK47 → AK-47（见 CreateWeaponsAndAmmo）
     }
 
     [MenuItem("Tools/Update Weapon Data")]

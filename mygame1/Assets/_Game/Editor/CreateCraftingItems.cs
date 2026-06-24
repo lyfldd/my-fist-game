@@ -318,30 +318,12 @@ public static class CreateCraftingItems
         MakeWeapon(F, "Bat",          "棒球棍",  1, 3, 2f,    ItemQuality.Scavenged,
             EquipSlot.RightHand, isFirearm: false, damage: 10, range: 1.8f, fireRate: 0.5f);
 
-        // 武器（远程）
+        // 武器（远程）— 旧版已删除，新版见 CreateWeaponsAndAmmo.cs
         MakeWeapon(F, "Crossbow",     "十字弓",  1, 3, 3f,    ItemQuality.Handmade,
             EquipSlot.RightHand, isFirearm: true, damage: 30, range: 40, fireRate: 1.5f);
-        MakeWeapon(F, "Shotgun",      "霰弹枪",  1, 4, 4f,    ItemQuality.Professional,
-            EquipSlot.RightHand, isFirearm: true, damage: 40, range: 15, fireRate: 1f);
-        MakeWeapon(F, "Pistol",       "手枪",    1, 2, 1.5f,  ItemQuality.Professional,
-            EquipSlot.SidearmBelt, isFirearm: true, damage: 18, range: 30, fireRate: 0.3f);
-        MakeWeapon(F, "Rifle",        "步枪",    1, 5, 5f,    ItemQuality.Professional,
-            EquipSlot.RightHand, isFirearm: true, damage: 35, range: 70, fireRate: 0.8f);
-
-        // 盾牌
-        MakeArmor(F, "WoodShield","木盾",   1, 2, 2f,   ItemQuality.Handmade, EquipSlot.LeftHand, 5f);
-        MakeArmor(F, "IronShield","铁盾",   1, 2, 4f,   ItemQuality.Professional, EquipSlot.LeftHand, 15f);
-
-        // 防具（中期-后期）
-        MakeArmor(F, "LeatherArmor",  "皮甲",   2, 3, 3f,  ItemQuality.Handmade,     EquipSlot.Tops, 8f);
-        MakeArmor(F, "IronArmor",     "铁甲",   2, 3, 6f,  ItemQuality.Professional, EquipSlot.Tops, 25f);
-        MakeArmor(F, "BulletproofVest","防弹衣", 2, 2, 3f,  ItemQuality.Professional, EquipSlot.Vest, 30f);
-
-        // 中期武器
-        MakeWeapon(F, "HuntingRifle", "猎枪",    1, 4, 3.5f,  ItemQuality.Professional,
-            EquipSlot.RightHand, isFirearm: true, damage: 40, range: 60, fireRate: 1.2f);
-        MakeWeapon(F, "HeavySniper",  "重狙",    1, 5, 7f,    ItemQuality.Professional,
-            EquipSlot.RightHand, isFirearm: true, damage: 120, range: 150, fireRate: 3f);
+        // 霰弹枪/手枪/步枪 → 已迁移到 CreateWeaponsAndAmmo (雷明顿870/M1911+M9/AK-47+M16A1)
+        // 盾牌 → 已删除（用防弹衣/插板背心替代）
+        // 皮甲/铁甲/防弹衣(旧)/猎枪/重狙 → 已删除（新装备见 CreateEquipment）
         MakeWeapon(F, "GrenadeLauncher","榴弹发射器", 1, 5, 8f, ItemQuality.Professional,
             EquipSlot.RightHand, isFirearm: true, damage: 100, range: 50, fireRate: 2.5f);
 

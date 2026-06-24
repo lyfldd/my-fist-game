@@ -259,9 +259,9 @@ namespace _Game.Systems.AIBot
             return w switch
             {
                 RightArmWeapon.None => "右臂(空)",
-                RightArmWeapon.Pistol => "手枪",
-                RightArmWeapon.Rifle => "步枪",
-                RightArmWeapon.Shotgun => "霰弹枪",
+                RightArmWeapon.Pistol => "M1911",
+                RightArmWeapon.Rifle => "AK-47",
+                RightArmWeapon.Shotgun => "雷明顿870",
                 RightArmWeapon.ElectromagneticRifle => "电磁步枪",
                 _ => "?"
             };

@@ -518,13 +518,7 @@ public static class CreateCraftingRecipes
             GetItem("Crossbow"), 1, 8f, 35f,
             new[] { M("IronIngot", 3), M("WoodPlank", 4), M("Rope", 2), M("Spring", 1) });
 
-        // 护甲
-        CreateRecipe(S, "皮甲", RecipeCategory.Armor,
-            GetItem("LeatherArmor"), 1, 6f, 25f,
-            new[] { M("Leather", 4), M("Thread", 3) });
-        CreateRecipe(S, "木盾", RecipeCategory.Armor,
-            GetItem("WoodShield"), 1, 4f, 18f,
-            new[] { M("WoodPlank", 4), M("Nails", 5) });
+        // 护甲 — 旧皮甲/木盾已删除（新装备见 CreateEquipment）
         CreateRecipe(S, "工具腰带", RecipeCategory.Armor,
             GetItem("ToolBelt"), 1, 3f, 15f,
             new[] { M("Leather", 2), M("Thread", 1), M("Nails", 3) });
@@ -633,14 +627,7 @@ public static class CreateCraftingRecipes
         // CreateRecipe(S, "步枪", RecipeCategory.Weapon, ...);
         // CreateRecipe(S, "手枪", RecipeCategory.Weapon, ...);
 
-        // 高级护甲
-        CreateRecipe(S, "铁甲", RecipeCategory.Armor,
-            GetItem("IronArmor"), 1, 10f, 45f,
-            new[] { M("IronIngot", 6), M("Leather", 3), M("Thread", 4) },
-            new[] { (SkillType.建造拆解, 3) });
-        CreateRecipe(S, "铁盾", RecipeCategory.Armor,
-            GetItem("IronShield"), 1, 6f, 30f,
-            new[] { M("IronIngot", 4), M("WoodPlank", 2) });
+        // 高级护甲 — 旧铁甲/铁盾已删除（新装备见 CreateEquipment）
         // CreateRecipe(S, "防弹衣", ...); // 已移入武器组装台（工业设备）
 
         // 高级工具
@@ -982,11 +969,7 @@ public static class CreateCraftingRecipes
             new[] { M("AluminumIngot", 3), M("IronIngot", 2) },
             new[] { (SkillType.建造拆解, 7) });
 
-        // 中期-终局武器
-        CreateRecipe(S, "猎枪", RecipeCategory.Weapon,
-            GetItem("HuntingRifle"), 1, 10f, 40f,
-            new[] { M("SteelIngot", 4), M("WoodPlank", 3), M("Spring", 2), M("IronIngot", 2) },
-            new[] { (SkillType.枪械专精, 5) });
+        // 中期-终局武器 — 旧猎枪已删除（→ SKS 半自动，见 CreateWeaponsAndAmmo）
         CreateRecipe(S, "消音器", RecipeCategory.Weapon,
             GetItem("Suppressor"), 1, 6f, 25f,
             new[] { M("SteelPipe", 1), M("CarbonFiber", 1), M("Rubber", 1) },

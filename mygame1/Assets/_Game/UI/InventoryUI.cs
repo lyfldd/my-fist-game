@@ -814,7 +814,7 @@ namespace _Game.UI
                 ("主武", EquipSlot.RightHand, false),
                 ("副武", EquipSlot.LeftHand, false),
                 ("小刀", EquipSlot.KnifeBelt, !beltEquipped),
-                ("手枪", EquipSlot.SidearmBelt, !beltEquipped)
+                ("M1911", EquipSlot.SidearmBelt, !beltEquipped)
             };
 
             for (int row = 0; row < 2; row++)
@@ -1182,7 +1182,7 @@ namespace _Game.UI
 
             DrawOneSlot(parent, "小刀", EquipSlot.KnifeBelt, view,
                 weaponStartX, curY, weaponCell, labelH, !beltEquipped);
-            DrawOneSlot(parent, "手枪", EquipSlot.SidearmBelt, view,
+            DrawOneSlot(parent, "M1911", EquipSlot.SidearmBelt, view,
                 weaponStartX + weaponCell + 4f, curY, weaponCell, labelH, !beltEquipped);
             curY -= weaponCell + labelH + gap;
 

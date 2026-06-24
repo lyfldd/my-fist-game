@@ -306,7 +306,7 @@ namespace _Game.Editor
 
             // 武器槽 4 个格子 (2×2)
             float cellSize = Mathf.Min((leftW - 2f) / 2f, 40f);
-            string[] wpnNames = { "主武", "副武", "小刀", "手枪" };
+            string[] wpnNames = { "主武", "副武", "小刀", "M1911" };
             for (int i = 0; i < 4; i++)
             {
                 int row = i / 2, col = i % 2;
