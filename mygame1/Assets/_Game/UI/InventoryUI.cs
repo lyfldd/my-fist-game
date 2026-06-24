@@ -2895,8 +2895,19 @@ namespace _Game.UI
                     ? $"伤害:{item.weaponDamage}  射速:{item.fireRate}/s  弹匣:{item.magazineSize}"
                     : $"近战伤害:{item.weaponDamage}", 12, Color.white);
 
-            // 从图谱获取产业链信息
+            // 来源与动作
             var graph = _Game.Systems.ItemGraph.ItemGraphManager.Instance;
+            if (graph != null)
+            {
+                var node = graph.GetNode(item.itemName);
+                if (node != null)
+                {
+                    if (node.sourceDescriptions != null && node.sourceDescriptions.Length > 0)
+                        AddDetailText($"来源: {string.Join(" / ", node.sourceDescriptions)}", 11, new Color(0.8f, 0.9f, 0.5f));
+                }
+            }
+
+            // 产业链信息
             if (graph != null)
             {
                 var node = graph.GetNode(item.itemName);

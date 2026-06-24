@@ -52,6 +52,16 @@ namespace _Game.Config
         [Tooltip("是否断头路（无配方消费它）")]
         public bool isDeadEnd;
 
+        [Header("获取来源与动作")]
+        [Tooltip("获取来源列表（可多个）")]
+        public ItemSourceType[] sources;
+
+        [Tooltip("对应获取动作")]
+        public ItemObtainAction[] obtainActions;
+
+        [Tooltip("来源描述（自动生成）")]
+        public string[] sourceDescriptions;
+
         [Header("功能实现追踪")]
         [Tooltip("依赖哪些系统（从 ItemData.behaviours 汇总）")]
         public string[] requiredSystems;
