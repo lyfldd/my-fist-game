@@ -132,7 +132,7 @@ namespace _Game.Systems.Inventory
         public void MoveItem(int fromX, int fromY, int toX, int toY, bool rotated)
         {
             var s = EnsureGrid().GetSlotAt(fromX, fromY);
-            if (s.HasValue) EnsureGrid().Move(s.Value.slotId, toX, toY);
+            if (s.HasValue) { EnsureGrid().Move(s.Value.slotId, toX, toY); SyncPlacedItems(); }
         }
 
         // ===== 增删 ===
@@ -141,7 +141,9 @@ namespace _Game.Systems.Inventory
         {
             if (item == null || count <= 0) return 0;
             if (CurrentWeight + count * item.weight > overloadWeight) return 0;
-            return EnsureGrid().TryAdd(item, count, overloadWeight);
+            int result = EnsureGrid().TryAdd(item, count, overloadWeight);
+            if (result > 0) SyncPlacedItems();
+            return result;
         }
 
         public bool RemoveItem(ItemData item, int count)
@@ -161,7 +163,9 @@ namespace _Game.Systems.Inventory
                 remaining -= take;
                 if (remaining <= 0) break;
             }
-            return count - remaining > 0;
+            bool changed = count - remaining > 0;
+            if (changed) SyncPlacedItems();
+            return changed;
         }
 
         public bool RemoveItemAt(int gridX, int gridY, int count)
@@ -174,6 +178,7 @@ namespace _Game.Systems.Inventory
                 EnsureGrid().SlotDict[slot.slotId] = slot;
             }
             else EnsureGrid().Remove(s.Value.slotId);
+            SyncPlacedItems();
             return true;
         }
 
