@@ -211,7 +211,13 @@ namespace _Game.Editor
                 // TopTabBar
                 CreateTopTabBar(panel.transform, 700);
 
-                // GridContainer
+                // StaticShell: 纸娃娃+武器+属性面板（预建，不随刷新销毁）
+                var shell = new GameObject("StaticShell", typeof(RectTransform));
+                shell.transform.SetParent(panel.transform, false);
+                StretchRT(shell.GetComponent<RectTransform>());
+                BuildStaticShell(shell, panelW);
+
+                // GridContainer: 动态网格内容（每次刷新重建）
                 var grid = new GameObject("GridContainer", typeof(RectTransform));
                 grid.transform.SetParent(panel.transform, false);
                 var grt = grid.GetComponent<RectTransform>();
@@ -257,6 +263,155 @@ namespace _Game.Editor
             if (invUI.quickPanel != null) invUI.quickPanel.SetActive(false);
 
             return created;
+        }
+
+        static void BuildStaticShell(Transform shellParent, float panelW)
+        {
+            float ph = 1f; // 占位——实际渲染时由 ScrollRect 控制
+            float m = 3f, leftW = panelW * 0.28f, rightW = panelW * 0.72f;
+
+            // 左面板背景
+            var leftPanel = new GameObject("LeftPanel", typeof(RectTransform), typeof(Image));
+            leftPanel.transform.SetParent(shellParent, false);
+            var lpRt = leftPanel.GetComponent<RectTransform>();
+            lpRt.anchorMin = new Vector2(0, 0); lpRt.anchorMax = new Vector2(0, 1);
+            lpRt.pivot = new Vector2(0, 0);
+            lpRt.anchoredPosition = new Vector2(m, 0);
+            lpRt.sizeDelta = new Vector2(leftW - m, 0);
+            leftPanel.GetComponent<Image>().color = new Color(0.05f, 0.05f, 0.08f, 0.6f);
+            leftPanel.GetComponent<Image>().raycastTarget = false;
+            // 隐藏整个 shell，ShowEquipTabContent 时显示
+            shellParent.gameObject.SetActive(false);
+
+            // 武器槽 2×2 标题
+            var wpnTitleGo = new GameObject("WpnTitle", typeof(RectTransform), typeof(Text));
+            wpnTitleGo.transform.SetParent(leftPanel.transform, false);
+            var wt = wpnTitleGo.GetComponent<Text>();
+            wt.text = "— 武器 —";
+            wt.fontSize = 11;
+            wt.color = new Color(0.5f, 0.6f, 0.5f);
+            wt.alignment = TextAnchor.MiddleCenter;
+            wt.font = UGUIBuilder.DefaultFont;
+            var wtrt = wpnTitleGo.GetComponent<RectTransform>();
+            wtrt.anchorMin = wtrt.anchorMax = wtrt.pivot = new Vector2(0, 1);
+            wtrt.sizeDelta = new Vector2(leftW - m * 2, 18);
+
+            // 武器槽 4 个格子 (2×2)
+            float cellSize = Mathf.Min((leftW - 2f) / 2f, 40f);
+            string[] wpnNames = { "主武", "副武", "小刀", "手枪" };
+            for (int i = 0; i < 4; i++)
+            {
+                int row = i / 2, col = i % 2;
+                var cell = new GameObject($"Wpn_{wpnNames[i]}", typeof(RectTransform), typeof(Image));
+                cell.transform.SetParent(leftPanel.transform, false);
+                var crt = cell.GetComponent<RectTransform>();
+                crt.anchorMin = crt.anchorMax = crt.pivot = new Vector2(0, 1);
+                crt.sizeDelta = new Vector2(cellSize, cellSize);
+                crt.anchoredPosition = new Vector2(m + col * (cellSize + 2f), -(20 + row * (cellSize + 2f)));
+                cell.GetComponent<Image>().color = new Color(0.06f, 0.06f, 0.08f, 0.6f);
+                cell.GetComponent<Image>().raycastTarget = true;
+
+                var lbl = new GameObject("Label", typeof(RectTransform), typeof(Text));
+                lbl.transform.SetParent(cell.transform, false);
+                var lt = lbl.GetComponent<Text>();
+                lt.text = wpnNames[i];
+                lt.fontSize = 9;
+                lt.color = new Color(0.5f, 0.5f, 0.5f);
+                lt.alignment = TextAnchor.MiddleCenter;
+                lt.font = UGUIBuilder.DefaultFont;
+                StretchRT(lbl.GetComponent<RectTransform>());
+            }
+
+            // 纸娃娃
+            float dollTop = -(20 + 2 * (cellSize + 2f) + 8);
+            float dollH = leftW * 0.7f;
+            var dollBg = new GameObject("DollBg", typeof(RectTransform), typeof(Image));
+            dollBg.transform.SetParent(leftPanel.transform, false);
+            var drt = dollBg.GetComponent<RectTransform>();
+            drt.anchorMin = drt.anchorMax = drt.pivot = new Vector2(0, 1);
+            drt.sizeDelta = new Vector2(leftW * 0.8f, dollH);
+            drt.anchoredPosition = new Vector2(leftW * 0.1f, dollTop);
+            dollBg.GetComponent<Image>().color = new Color(0.12f, 0.12f, 0.15f, 0.6f);
+            dollBg.GetComponent<Image>().raycastTarget = false;
+
+            // 7 个装备槽
+            string[] dollNames = { "头部", "胸挂", "上衣", "防弹衣", "腰带", "裤子", "背包" };
+            float slotH = (dollH - 14f) / 7f;
+            for (int i = 0; i < 7; i++)
+            {
+                var slot = new GameObject($"Doll_{dollNames[i]}", typeof(RectTransform), typeof(Image));
+                slot.transform.SetParent(dollBg.transform, false);
+                var srt = slot.GetComponent<RectTransform>();
+                srt.anchorMin = srt.anchorMax = srt.pivot = new Vector2(0, 1);
+                srt.sizeDelta = new Vector2(leftW * 0.8f - 4f, slotH - 2f);
+                srt.anchoredPosition = new Vector2(2f, -(2f + i * slotH));
+                slot.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.13f, 0.75f);
+                slot.GetComponent<Image>().raycastTarget = true;
+
+                var slbl = new GameObject("Label", typeof(RectTransform), typeof(Text));
+                slbl.transform.SetParent(slot.transform, false);
+                var slt = slbl.GetComponent<Text>();
+                slt.text = $"{dollNames[i]}: 空";
+                slt.fontSize = 10;
+                slt.color = new Color(0.45f, 0.45f, 0.45f);
+                slt.alignment = TextAnchor.MiddleCenter;
+                slt.font = UGUIBuilder.DefaultFont;
+                StretchRT(slbl.GetComponent<RectTransform>());
+            }
+
+            // 属性面板
+            float statTop = dollTop - dollH - 12;
+            var statBg = new GameObject("StatsPanel", typeof(RectTransform), typeof(Image));
+            statBg.transform.SetParent(leftPanel.transform, false);
+            var sbrt = statBg.GetComponent<RectTransform>();
+            sbrt.anchorMin = sbrt.anchorMax = sbrt.pivot = new Vector2(0, 1);
+            sbrt.sizeDelta = new Vector2(leftW - m * 2, 60);
+            sbrt.anchoredPosition = new Vector2(m, statTop);
+            statBg.GetComponent<Image>().color = new Color(0.06f, 0.06f, 0.09f, 0.5f);
+            statBg.GetComponent<Image>().raycastTarget = false;
+
+            string[] statNames = { "护甲", "保暖", "负重" };
+            for (int i = 0; i < 3; i++)
+            {
+                var labelGo = new GameObject($"StatLbl_{statNames[i]}", typeof(RectTransform), typeof(Text));
+                labelGo.transform.SetParent(statBg.transform, false);
+                var lt = labelGo.GetComponent<Text>();
+                lt.text = statNames[i];
+                lt.fontSize = 9;
+                lt.color = new Color(0.6f, 0.6f, 0.6f);
+                lt.font = UGUIBuilder.DefaultFont;
+                var lrt = labelGo.GetComponent<RectTransform>();
+                lrt.anchorMin = lrt.anchorMax = lrt.pivot = new Vector2(0, 1);
+                lrt.sizeDelta = new Vector2(30, 14);
+                lrt.anchoredPosition = new Vector2(2, -(2 + i * 18));
+
+                var barBgGo = new GameObject($"StatBg_{statNames[i]}", typeof(RectTransform), typeof(Image));
+                barBgGo.transform.SetParent(statBg.transform, false);
+                var bbg = barBgGo.GetComponent<RectTransform>();
+                bbg.anchorMin = bbg.anchorMax = bbg.pivot = new Vector2(0, 1);
+                bbg.sizeDelta = new Vector2(leftW - 70, 10);
+                bbg.anchoredPosition = new Vector2(34, -(4 + i * 18));
+                barBgGo.GetComponent<Image>().color = new Color(0.08f, 0.08f, 0.1f);
+
+                var barFillGo = new GameObject($"StatFill_{statNames[i]}", typeof(RectTransform), typeof(Image));
+                barFillGo.transform.SetParent(barBgGo.transform, false);
+                var bfr = barFillGo.GetComponent<RectTransform>();
+                bfr.anchorMin = Vector2.zero; bfr.anchorMax = new Vector2(0, 1);
+                bfr.pivot = new Vector2(0, 0.5f);
+                bfr.sizeDelta = Vector2.zero;
+                barFillGo.GetComponent<Image>().color = new Color(0.3f, 0.6f, 0.3f);
+            }
+
+            // 右面板背景
+            var rightPanel = new GameObject("RightPanel", typeof(RectTransform), typeof(Image));
+            rightPanel.transform.SetParent(shellParent, false);
+            var rpRt = rightPanel.GetComponent<RectTransform>();
+            rpRt.anchorMin = new Vector2(1, 0); rpRt.anchorMax = new Vector2(1, 1);
+            rpRt.pivot = new Vector2(1, 0);
+            rpRt.anchoredPosition = new Vector2(-m, 0);
+            rpRt.sizeDelta = new Vector2(rightW - m, 0);
+            rightPanel.GetComponent<Image>().color = new Color(0.06f, 0.06f, 0.09f, 0.6f);
+            rightPanel.GetComponent<Image>().raycastTarget = false;
         }
 
         static void CreateTopTabBar(Transform parent, float panelW)

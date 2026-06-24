@@ -565,6 +565,10 @@ namespace _Game.UI
         {
             if (_inventory == null || overviewGridContainer == null) return;
 
+            // 激活预建静态外壳（纸娃娃+武器槽+属性面板）
+            var shell = overviewGridContainer.transform.parent.Find("StaticShell");
+            if (shell != null) shell.gameObject.SetActive(true);
+
             var gridRt = overviewGridContainer.GetComponent<RectTransform>();
             float pw = gridRt.rect.width;
             float ph = gridRt.rect.height;
