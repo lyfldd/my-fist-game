@@ -281,14 +281,23 @@ namespace _Game.Systems.Vehicle
                 if (CurrentFuel <= 0)
                 {
                     CurrentFuel = 0;
-                    // 尝试从驾驶员背包自动加油
-                    if (!string.IsNullOrEmpty(fuelItemName) && _driverInventory != null)
+                    // 尝试从驾驶员背包自动加油（优先 acceptedFuels）
+                    if (_driverInventory != null)
                     {
-                        int count = _driverInventory.CountItemByName(fuelItemName);
-                        if (count > 0)
+                        float bestFuel = 0f;
+                        ItemData bestItem = null;
+                        if (vehicleData != null && vehicleData.acceptedFuels != null && vehicleData.acceptedFuels.Length > 0)
                         {
-                            _driverInventory.RemoveItemByName(fuelItemName, 1);
-                            CurrentFuel += 20f; // 1单位燃料≈20升
+                            foreach (var f in vehicleData.acceptedFuels)
+                                if (f != null && f.fuelValue > bestFuel) { bestFuel = f.fuelValue; bestItem = f; }
+                        }
+                        // fallback: 硬编码 fuelItemName
+                        if (bestItem == null && !string.IsNullOrEmpty(fuelItemName))
+                            bestItem = FindItemByName(fuelItemName);
+                        if (bestItem != null && _driverInventory.HasItem(bestItem, 1))
+                        {
+                            _driverInventory.RemoveItem(bestItem, 1);
+                            CurrentFuel += bestFuel > 0 ? bestFuel : 20f;
                             _isEngineOn = true;
                             return;
                         }
@@ -371,9 +380,14 @@ namespace _Game.Systems.Vehicle
             wc.suspensionSpring = suspension;
         }
 
-        // ============================================================
-        // 前置E：碰撞伤害
-        // ============================================================
+        ItemData FindItemByName(string name)
+        {
+            if (_driverInventory == null || string.IsNullOrEmpty(name)) return null;
+            foreach (var c in _driverInventory.containers)
+                foreach (var pi in c.placedItems)
+                    if (pi.itemData != null && pi.itemData.itemName == name) return pi.itemData;
+            return null;
+        }
 
         void OnCollisionEnter(Collision col)
         {

@@ -734,7 +734,7 @@ namespace _Game.Systems.AIBot
 
             foreach (var placed in inv.placedItems)
             {
-                if (placed.itemData != null && placed.itemData.itemName == "电池组" && placed.count > 0)
+                if (placed.itemData != null && placed.itemData.energyValue > 0 && placed.count > 0)
                 {
                     int toConsume = Mathf.Min(placed.count, 5);
                     for (int i = 0; i < toConsume; i++)
@@ -748,7 +748,7 @@ namespace _Game.Systems.AIBot
 
             foreach (var placed in inv.placedItems)
             {
-                if (placed.itemData != null && placed.itemData.itemName == "浓缩铀" && placed.count > 0)
+                if (placed.itemData != null && placed.itemData.energyValue > 0 && placed.count > 0)
                 {
                     inv.RemoveItem(placed.itemData, 1);
                     _bot.AddUraniumFuel();
@@ -764,7 +764,7 @@ namespace _Game.Systems.AIBot
 
             foreach (var placed in inv.placedItems)
             {
-                if (placed.itemData != null && placed.itemData.itemName == "高级零件" && placed.count > 0)
+                if (placed.itemData != null && placed.itemData.repairValue > 0 && placed.count > 0)
                 {
                     inv.RemoveItem(placed.itemData, 1);
                     _bot.RepairHP(50f);
@@ -774,7 +774,7 @@ namespace _Game.Systems.AIBot
 
             foreach (var placed in inv.placedItems)
             {
-                if (placed.itemData != null && placed.itemData.itemName == "铁锭" && placed.count > 0)
+                if (placed.itemData != null && placed.itemData.repairValue > 0 && placed.count > 0)
                 {
                     inv.RemoveItem(placed.itemData, 1);
                     _bot.RepairHP(25f);
@@ -954,8 +954,8 @@ namespace _Game.Systems.AIBot
             foreach (var placed in inv.placedItems)
             {
                 if (placed.itemData == null || placed.count <= 0) continue;
-                bool isSmall = placed.itemData.itemName == "聚变核心(小)";
-                bool isLarge = placed.itemData.itemName == "聚变核心(大)";
+                bool isSmall = placed.itemData.fusionCoreSize == FusionCoreSize.Small;
+                bool isLarge = placed.itemData.fusionCoreSize == FusionCoreSize.Large;
                 if (!isSmall && !isLarge) continue;
 
                 var itemRef = placed.itemData;
