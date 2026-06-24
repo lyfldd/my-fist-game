@@ -125,12 +125,10 @@ namespace _Game.Core
         {
             var mgr = UIPanelManager.Instance;
             if (mgr == null) return;
-            // 创建临时 UIPanel 代理
-            var go = mb.gameObject;
-            var proxy = go.GetComponent<UIPanelProxy>() ?? go.AddComponent<UIPanelProxy>();
+            var proxy = mb.GetComponent<UIPanelProxy>() ?? mb.gameObject.AddComponent<UIPanelProxy>();
             proxy._panelId = panelId;
-            proxy._onOpen = onOpen ?? (() => go.SetActive(true));
-            proxy._onClose = onClose ?? (() => go.SetActive(false));
+            proxy._onOpen = onOpen;
+            proxy._onClose = onClose;
             mgr.OpenPanel(proxy);
         }
 
@@ -149,7 +147,7 @@ namespace _Game.Core
         [System.NonSerialized] public System.Action _onClose;
 
         void Start() { panelId = _panelId; }
-        public override void OnOpen() { base.OnOpen(); _onOpen?.Invoke(); }
-        public override void OnClose() { base.OnClose(); _onClose?.Invoke(); }
+        public override void OnOpen() { _onOpen?.Invoke(); }
+        public override void OnClose() { _onClose?.Invoke(); }
     }
 }
