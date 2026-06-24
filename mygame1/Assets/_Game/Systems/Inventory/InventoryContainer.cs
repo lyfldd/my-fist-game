@@ -142,7 +142,6 @@ namespace _Game.Systems.Inventory
             if (item == null || count <= 0) return 0;
             if (CurrentWeight + count * item.weight > overloadWeight) return 0;
             int result = EnsureGrid().TryAdd(item, count, overloadWeight);
-            Debug.Log($"[Container] AddItem {item.itemName}×{count} result={result} gridW={gridWidth}x{gridHeight} placedCount={placedItems.Count}");
             if (result > 0) SyncPlacedItems();
             return result;
         }
