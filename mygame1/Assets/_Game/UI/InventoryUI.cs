@@ -65,6 +65,7 @@ namespace _Game.UI
         private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
         private int _lastShowOverviewFrame = -1;
         private GameObject _itemDetailPanel;
+        private GameObject _itemDetailContent;
         private Text _detailText;
 
 
