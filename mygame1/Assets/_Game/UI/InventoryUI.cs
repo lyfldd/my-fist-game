@@ -63,6 +63,7 @@ namespace _Game.UI
         // 容器折叠状态
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
         private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
+        private int _lastShowOverviewFrame = -1;
         private GameObject _itemDetailPanel;
         private Text _detailText;
 
