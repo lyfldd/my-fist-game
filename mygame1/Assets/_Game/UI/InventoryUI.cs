@@ -184,14 +184,16 @@ namespace _Game.UI
 
         bool HandleEsc()
         {
-            // 委托给 UIPanelManager 栈管理
             var mgr = UIPanelManager.Instance;
-            if (mgr != null && mgr.Count > 0)
-            {
-                mgr.CloseTopPanel();
-                return true;
-            }
-            return false;
+            if (mgr != null && mgr.Count > 0) { mgr.CloseTopPanel(); return true; }
+            // fallback 旧行为
+            bool anyOpen = false;
+            if (overviewPanel != null && overviewPanel.activeSelf)
+            { overviewPanel.SetActive(false); SetOtherUIVisible(true); anyOpen = true; }
+            if (quickPanel != null && quickPanel.activeSelf)
+            { quickPanel.SetActive(false); anyOpen = true; }
+            if (anyOpen && DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
+            return anyOpen;
         }
 
         bool HandleTab()
@@ -205,13 +207,13 @@ namespace _Game.UI
             bool wasActive = overviewPanel.activeSelf;
             if (!wasActive)
             {
-                Open();
+                if (UIPanelManager.Instance != null) Open();
                 SetOtherUIVisible(false);
                 ShowOverview();
             }
             else
             {
-                Close();
+                if (UIPanelManager.Instance != null) Close();
                 SetOtherUIVisible(true);
                 if (DragDropManager.Instance != null) DragDropManager.Instance.DeselectItem();
             }
@@ -2513,15 +2515,6 @@ namespace _Game.UI
         {
             if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
             if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
-            // 关组件 enabled 而不是关 GameObject（组件在 Player 上，关 Player 会杀全局）
-            var crafting = ServiceLocator.Get<_Game.Systems.Crafting.CraftingUI>();
-            if (crafting != null) crafting.enabled = visible;
-            var buildMenu = GetComponent<_Game.Systems.Building.BuildMenuUI>();
-            if (buildMenu != null) buildMenu.enabled = visible;
-            var prodUI = ServiceLocator.Get<_Game.Systems.Crafting.ProductionDeviceUI>();
-            if (prodUI != null) prodUI.enabled = visible;
-            var chemUI = ServiceLocator.Get<_Game.Systems.Crafting.ChemicalResearchUI>();
-            if (chemUI != null) chemUI.enabled = visible;
         }
 
         // ===== 固定布局辅助方法 =====
