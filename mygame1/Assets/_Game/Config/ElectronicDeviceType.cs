@@ -9,5 +9,6 @@ namespace _Game.Config
         Lighter    = 1,  // 打火机 — 短暂点火
         Compass    = 2,  // 指南针 — HUD方向
         Watch      = 3,  // 手表 — HUD时间
+        Battery    = 4,  // 电池 — ReplaceBattery 识别，energyValue 供能
     }
 }

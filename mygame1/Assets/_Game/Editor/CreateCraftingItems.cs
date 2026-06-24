@@ -182,7 +182,10 @@ public static class CreateCraftingItems
         // 电子/工业
         Make(F, "CircuitBoard", "电路板",     C, 1, 1, 0.2f, 10, ItemQuality.Professional);
         Make(F, "Coil",         "线圈",       C, 1, 1, 0.3f, 10, ItemQuality.Professional);
-        Make(F, "BatteryPack",  "电池组",     C, 1, 1, 0.5f, 10, ItemQuality.Professional);
+        var battery = Make(F, "BatteryPack",  "电池组",     C, 1, 1, 0.5f, 10, ItemQuality.Professional);
+        battery.electronicDeviceType = ElectronicDeviceType.Battery;
+        battery.energyValue = 10f;
+        EditorUtility.SetDirty(battery);
         Make(F, "Cable",        "电缆",       C, 1, 2, 0.5f, 20, ItemQuality.Professional);
 
         // 建材
