@@ -271,7 +271,8 @@ namespace _Game.Systems.Survival
                 ModifyHealth(item.healAmount * mult, "药品");
                 if (item.itemEffects == null || item.itemEffects.Count == 0) return;
             }
-            else if (item.itemEffects == null || item.itemEffects.Count == 0)
+            else if ((item.itemEffects == null || item.itemEffects.Count == 0)
+                     && string.IsNullOrEmpty(item.foodType))
                 return;
 
             // 药品冷却检查

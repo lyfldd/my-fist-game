@@ -177,8 +177,8 @@ namespace _Game.Systems.Inventory
             var container = GetContainer(item.equipSlot);
             if (container != null)
             {
-                container.gridWidth = item.storageWidth;
-                container.gridHeight = item.storageHeight;
+                container.gridWidth = item.storageWidth > 0 ? item.storageWidth : 1;
+                container.gridHeight = item.storageHeight > 0 ? item.storageHeight : 1;
             }
         }
 
@@ -764,6 +764,21 @@ namespace _Game.Systems.Inventory
             foreach (var c in containers)
                 total += c.GetItemCount(item);
             return total;
+        }
+
+        /// <summary> 获取背包中所有物品的总数量（供修理等遍历场景使用）</summary>
+        public Dictionary<ItemData, int> GetAllItemCounts()
+        {
+            var result = new Dictionary<ItemData, int>();
+            foreach (var c in containers)
+                foreach (var pi in c.placedItems)
+                    if (pi.itemData != null)
+                    {
+                        if (!result.ContainsKey(pi.itemData))
+                            result[pi.itemData] = 0;
+                        result[pi.itemData] += pi.count;
+                    }
+            return result;
         }
 
         /// <summary> 按物品名称统计背包中的总数量（供弹药/燃料系统使用）</summary>

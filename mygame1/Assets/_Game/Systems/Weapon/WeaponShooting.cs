@@ -98,6 +98,9 @@ namespace _Game.Systems.Weapon
 
         bool _wantsSemiFire;
 
+        /// <summary> 解析弹药名：ammoItemData 优先，fallback ammoItemName </summary>
+        string GetAmmoName(ItemData weapon) => weapon.ammoItemData != null ? weapon.ammoItemData.itemName : weapon.ammoItemName;
+
         bool OnFireButton()
         {
             _wantsSemiFire = true;
@@ -194,7 +197,7 @@ namespace _Game.Systems.Weapon
             _fireTimer = weapon.fireRate;
 
             // 扣弹匣
-            if (!string.IsNullOrEmpty(weapon.ammoItemName))
+            if (!string.IsNullOrEmpty(GetAmmoName(weapon)))
                 CurrentMag--;
 
             // 耐久 v1.0：射击消耗武器耐久
@@ -259,7 +262,7 @@ namespace _Game.Systems.Weapon
             // 发布事件（携带完整武器数据，供音效/特效/噪音系统订阅）
             EventBus.Publish(new WeaponFiredEvent(
                 weapon,
-                weapon.ammoItemName,
+                GetAmmoName(weapon),
                 weapon.gunshotSoundType,
                 weapon.muzzleFlashType,
                 muzzle,
@@ -274,7 +277,7 @@ namespace _Game.Systems.Weapon
         {
             if (_inventory == null) return;
 
-            int inInventory = CountAmmoInInventory(weapon.ammoItemName);
+            int inInventory = CountAmmoInInventory(GetAmmoName(weapon));
             if (inInventory <= 0)
             {
                 // 背包没弹药 → 空仓咔咔声
@@ -284,7 +287,7 @@ namespace _Game.Systems.Weapon
 
             int need = weapon.magazineSize - CurrentMag;
             int take = Mathf.Min(need, inInventory);
-            _inventory.RemoveItemByName(weapon.ammoItemName, take);
+            _inventory.RemoveItemByName(GetAmmoName(weapon), take);
             CurrentMag += take;
             _lastReloadTaken = take;  // 记录实际扣除数，供 FinishReload 发布
 

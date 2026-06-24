@@ -107,8 +107,8 @@ namespace _Game.Systems.Electronic
             if (_inventory == null) return false;
             foreach (var c in _inventory.containers)
                 foreach (var pi in c.placedItems)
-                    if (pi.itemData != null && pi.itemData.electronicDeviceType == ElectronicDeviceType.Flashlight
-                        && pi.itemData.itemName == "电池组" && pi.count > 0)
+                    if (pi.itemData != null && pi.itemData.electronicDeviceType == ElectronicDeviceType.Battery
+                        && pi.count > 0)
                     {
                         _inventory.RemoveItem(pi.itemData, 1);
                         currentEnergy = maxEnergy;

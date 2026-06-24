@@ -61,7 +61,8 @@ namespace _Game.Systems.Durability
 
             // 优先新网格
             var gs = inv.FindGridSlot(instanceId);
-            if (gs.HasValue && gs.Value.itemData != null && gs.Value.itemData.hasDurability)
+            if (gs.HasValue && gs.Value.itemData != null && gs.Value.itemData.hasDurability
+                && gs.Value.itemData.maxDurability > 0)
             {
                 float max = gs.Value.itemData.maxDurability;
                 float cur = gs.Value.itemDurability;
@@ -79,7 +80,8 @@ namespace _Game.Systems.Durability
 
             // fallback 旧容器
             var p = inv.FindPlacedItem(instanceId);
-            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability) return;
+            if (p == null || p.Value.itemData == null || !p.Value.itemData.hasDurability
+                || p.Value.itemData.maxDurability <= 0) return;
             float max2 = p.Value.itemData.maxDurability;
             float cur2 = p.Value.itemDurability;
             if (cur2 <= 0f) cur2 = max2;

@@ -80,15 +80,7 @@ namespace _Game.Systems.Interaction
             var inventory = GetComponent<Inventory.Inventory>();
             if (inventory == null) return false;
 
-            var availableMaterials = new System.Collections.Generic.Dictionary<Config.ItemData, int>();
-            foreach (var c in inventory.containers)
-                foreach (var pi in c.placedItems)
-                    if (pi.itemData != null)
-                    {
-                        if (!availableMaterials.ContainsKey(pi.itemData))
-                            availableMaterials[pi.itemData] = 0;
-                        availableMaterials[pi.itemData] += pi.count;
-                    }
+            var availableMaterials = inventory.GetAllItemCounts();
 
             // 执行修理
             float restored = targetStructure.Repair(availableMaterials, (item, count) =>
