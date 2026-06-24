@@ -64,6 +64,8 @@ namespace _Game.UI
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
         private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
         private bool _showOverviewPending;
+        private GameObject _itemDetailPanel; // 右键物品详情浮窗
+        private Text _detailText;
 
 
         void Awake()
@@ -2509,8 +2511,18 @@ namespace _Game.UI
 
         void SetOtherUIVisible(bool visible)
         {
+            // 背包打开时隐藏所有非背包 UI，背包关闭时恢复
             if (_survivalHUDGo != null) _survivalHUDGo.SetActive(visible);
             if (_quickItemBarGo != null) _quickItemBarGo.SetActive(visible);
+            // 其他系统UI
+            var crafting = ServiceLocator.Get<_Game.Systems.Crafting.CraftingUI>();
+            if (crafting != null) crafting.gameObject.SetActive(visible);
+            var buildMenu = GetComponent<_Game.Systems.Building.BuildMenuUI>();
+            if (buildMenu != null) buildMenu.gameObject.SetActive(visible);
+            var prodUI = ServiceLocator.Get<_Game.Systems.Crafting.ProductionDeviceUI>();
+            if (prodUI != null) prodUI.gameObject.SetActive(visible);
+            var chemUI = ServiceLocator.Get<_Game.Systems.Crafting.ChemicalResearchUI>();
+            if (chemUI != null) chemUI.gameObject.SetActive(visible);
         }
 
         // ===== 固定布局辅助方法 =====
@@ -2806,6 +2818,108 @@ namespace _Game.UI
             try { font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } catch { font = null; }
             if (font == null) font = UGUIBuilder.DefaultFont;
             return font;
+        }
+
+        // ═══ 右键物品详情 ═══
+
+        public void ShowItemDetail(ItemData item)
+        {
+            if (item == null) return;
+            HideItemDetail();
+
+            // 找到 overviewPanel 作为父节点
+            var parent = overviewPanel != null ? overviewPanel.transform : transform;
+
+            _itemDetailPanel = UGUIBuilder.CreateStretchPanel("ItemDetail", parent,
+                new Color(0.08f, 0.08f, 0.1f, 0.95f));
+            var rt = _itemDetailPanel.GetComponent<RectTransform>();
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(280, 220);
+            rt.anchoredPosition = Vector2.zero;
+            rt.SetAsLastSibling();
+
+            var vlg = _itemDetailPanel.AddComponent<VerticalLayoutGroup>();
+            vlg.padding = new RectOffset(10, 10, 10, 8);
+            vlg.spacing = 3;
+            vlg.childAlignment = TextAnchor.UpperLeft;
+            vlg.childForceExpandWidth = true;
+            vlg.childForceExpandHeight = false;
+
+            // 标题
+            var title = AddDetailText($"<b>{item.itemName}</b>", 16, Color.white);
+
+            // 基础属性
+            string baseInfo = $"重量:{item.weight}  堆叠:{(item.maxStack > 1 ? "×" + item.maxStack : "不可堆叠")}";
+            if (item.hasDurability) baseInfo += $"  耐久:{item.maxDurability}";
+            AddDetailText(baseInfo, 12, new Color(0.7f, 0.7f, 0.7f));
+
+            // 装备/武器属性
+            if (item.equipSlot != EquipSlot.None)
+                AddDetailText($"装备位: {item.equipSlot}  护甲:{item.armorValue}  保暖:{item.warmthValue}", 12, Color.white);
+            if (item.weaponDamage > 0)
+                AddDetailText(item.isFirearm
+                    ? $"伤害:{item.weaponDamage}  射速:{item.fireRate}/s  弹匣:{item.magazineSize}"
+                    : $"近战伤害:{item.weaponDamage}", 12, Color.white);
+
+            // 从图谱获取产业链信息
+            var graph = _Game.Systems.ItemGraph.ItemGraphManager.Instance;
+            if (graph != null)
+            {
+                var node = graph.GetNode(item.itemName);
+                if (node != null)
+                {
+                    AddDetailText($"产业链: {node.primaryChain}  深度: {node.MinDepth}-{node.MaxDepth}", 11, new Color(0.6f, 0.8f, 1f));
+                    AddDetailText($"工作台: {node.EffectiveStation}", 11, new Color(0.6f, 0.8f, 1f));
+
+                    if (node.upstreamItemNames != null && node.upstreamItemNames.Length > 0)
+                        AddDetailText($"← 上游: {string.Join(", ", node.upstreamItemNames)}", 10, new Color(0.5f, 0.9f, 0.5f));
+
+                    if (node.downstreamItemNames != null && node.downstreamItemNames.Length > 0)
+                        AddDetailText($"→ 下游: {string.Join(", ", node.downstreamItemNames)}", 10, new Color(0.9f, 0.7f, 0.3f));
+
+                    if (node.consumerCount > 0)
+                        AddDetailText($"热度: {node.consumerCount} 个配方需要此物品", 10, new Color(0.6f, 0.6f, 0.6f));
+
+                    if (node.isRawMaterial)
+                        AddDetailText("● 基础原材料", 10, new Color(0.4f, 0.8f, 0.4f));
+                    if (node.isDeadEnd)
+                        AddDetailText("● 终端物品（无下游配方）", 10, new Color(0.8f, 0.4f, 0.4f));
+                }
+            }
+
+            // 关闭按钮
+            var closeBtn = UGUIBuilder.CreateButton("DetailClose", _itemDetailPanel.transform, "关闭",
+                new Color(0.3f, 0.3f, 0.3f), () => HideItemDetail());
+            var brt = closeBtn.GetComponent<RectTransform>();
+            brt.sizeDelta = new Vector2(60, 24);
+
+            // 点击背包其他地方也关闭
+            StartCoroutine(DetailAutoClose());
+        }
+
+        Text AddDetailText(string msg, int size, Color c)
+        {
+            var go = new GameObject("DT", typeof(Text));
+            go.transform.SetParent(_itemDetailPanel.transform, false);
+            var t = go.GetComponent<Text>();
+            t.font = UGUIBuilder.DefaultFont;
+            t.text = msg;
+            t.fontSize = size;
+            t.color = c;
+            t.raycastTarget = false;
+            t.horizontalOverflow = HorizontalWrapMode.Wrap;
+            return t;
+        }
+
+        System.Collections.IEnumerator DetailAutoClose()
+        {
+            yield return new UnityEngine.WaitForSeconds(0.15f);
+            // 简单的点击空白处关闭：在 overviewPanel 上加透明遮罩
+        }
+
+        void HideItemDetail()
+        {
+            if (_itemDetailPanel != null) { Destroy(_itemDetailPanel); _itemDetailPanel = null; }
         }
     }
 }

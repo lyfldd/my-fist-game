@@ -197,6 +197,18 @@ namespace _Game.UI
             }
         }
 
+        /// <summary> 右键——弹出物品详情 </summary>
+        public void HandleCellRightClick(InventoryContainer container, int gridX, int gridY)
+        {
+            if (container == null) return;
+            var slot = container.GetItemAt(gridX, gridY);
+            if (slot.HasValue && slot.Value.itemData != null)
+            {
+                var ui = ServiceLocator.Get<InventoryUI>();
+                if (ui != null) ui.ShowItemDetail(slot.Value.itemData);
+            }
+        }
+
         /// <summary> 由 CellClickHandler 回调——点击移动 </summary>
         public void HandleCellClick(InventoryContainer container, int gridX, int gridY)
         {
@@ -654,8 +666,10 @@ namespace _Game.UI
 
         public void OnPointerDown(UnityEngine.EventSystems.PointerEventData eventData)
         {
-            if (eventData.button != UnityEngine.EventSystems.PointerEventData.InputButton.Left) return;
-            DragDropManager.Instance?.HandleCellClick(container, gridX, gridY);
+            if (eventData.button == UnityEngine.EventSystems.PointerEventData.InputButton.Left)
+                DragDropManager.Instance?.HandleCellClick(container, gridX, gridY);
+            else if (eventData.button == UnityEngine.EventSystems.PointerEventData.InputButton.Right)
+                DragDropManager.Instance?.HandleCellRightClick(container, gridX, gridY);
         }
     }
 }
