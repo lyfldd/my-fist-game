@@ -434,6 +434,83 @@ namespace _Game.Editor
                 "确定");
 
             Selection.activeObject = graph;
+
+            // 10. 引用完整性检验
+            ValidateReferences();
+            AssetDatabase.SaveAssets();
+        }
+
+        static void ValidateReferences()
+        {
+            int errors = 0;
+            Debug.Log("[ItemGraph] === 引用完整性检验 ===");
+
+            // 1. 配方
+            var recipeGuids = AssetDatabase.FindAssets("t:RecipeData");
+            int recipeOk = 0;
+            foreach (var guid in recipeGuids)
+            {
+                var r = AssetDatabase.LoadAssetAtPath<RecipeData>(AssetDatabase.GUIDToAssetPath(guid));
+                if (r == null) continue;
+                bool ok = true;
+                if (r.resultItem == null) { Debug.LogError($"❌ 配方产物缺失: {r.name}"); ok = false; errors++; }
+                if (r.materials != null)
+                    foreach (var m in r.materials)
+                        if (m.itemData == null) { Debug.LogError($"❌ 配方材料缺失: {r.name} ← {m.itemData?.itemName ?? "null"}"); ok = false; errors++; }
+                if (ok) recipeOk++;
+            }
+            Debug.Log($"  ✅ 配方: {recipeOk}/{recipeGuids.Length} 有效");
+
+            // 2. 武器弹药
+            var itemGuids = AssetDatabase.FindAssets("t:ItemData");
+            int weaponOk = 0, weaponErr = 0;
+            foreach (var guid in itemGuids)
+            {
+                var item = AssetDatabase.LoadAssetAtPath<ItemData>(AssetDatabase.GUIDToAssetPath(guid));
+                if (item == null || !item.isFirearm) continue;
+                if (string.IsNullOrEmpty(item.ammoItemName) && item.ammoItemData == null) { weaponOk++; continue; }
+                string ammoName = item.ammoItemData != null ? item.ammoItemData.itemName : item.ammoItemName;
+                var found = AssetDatabase.LoadAssetAtPath<ItemData>(AssetDatabase.GUIDToAssetPath(
+                    AssetDatabase.FindAssets($"t:ItemData {ammoName}").FirstOrDefault()));
+                if (found == null) { Debug.LogError($"❌ 弹药缺失: {item.itemName} → {ammoName}"); weaponErr++; errors++; }
+                else weaponOk++;
+            }
+            Debug.Log($"  ✅ 武器弹药: {weaponOk} ok, {weaponErr} 断裂");
+
+            // 3. 建造物材料
+            var buildGuids = AssetDatabase.FindAssets("t:BuildableData");
+            int buildOk = 0, buildErr = 0;
+            foreach (var guid in buildGuids)
+            {
+                var b = AssetDatabase.LoadAssetAtPath<BuildableData>(AssetDatabase.GUIDToAssetPath(guid));
+                if (b == null || b.materials == null) continue;
+                bool ok = true;
+                foreach (var m in b.materials)
+                    if (m.itemData == null) { Debug.LogError($"❌ 建造材料缺失: {b.displayName} ← null"); ok = false; buildErr++; errors++; }
+                if (ok) buildOk++;
+            }
+            Debug.Log($"  ✅ 建造物: {buildOk} ok, {buildErr} 断裂");
+
+            // 4. 生产设备
+            var devGuids = AssetDatabase.FindAssets("t:ProductionDeviceData");
+            int devOk = 0, devErr = 0;
+            foreach (var guid in devGuids)
+            {
+                var d = AssetDatabase.LoadAssetAtPath<ProductionDeviceData>(AssetDatabase.GUIDToAssetPath(guid));
+                if (d == null || d.recipes == null) continue;
+                bool ok = true;
+                foreach (var r in d.recipes)
+                {
+                    if (r.output == null) { Debug.LogError($"❌ 设备产出空: {d.deviceName}"); ok = false; devErr++; errors++; }
+                }
+                if (d.fuelItem == null && d.requiresFuel) { Debug.LogWarning($"⚠️ 设备燃料空: {d.deviceName} (requiresFuel=true)"); }
+                if (ok) devOk++;
+            }
+            Debug.Log($"  ✅ 生产设备: {devOk} ok, {devErr} 断裂");
+
+            Debug.Log(errors > 0
+                ? $"[ItemGraph] ⚠️ 引用完整性: {errors} 个断裂"
+                : "[ItemGraph] ✅ 引用完整性: 全部有效");
         }
 
         /// <summary>
