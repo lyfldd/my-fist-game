@@ -2526,11 +2526,12 @@ namespace _Game.UI
 
         void SetOtherUIVisible(bool visible)
         {
-            // 隐藏 Player 下所有 Canvas 子节点（除 InventoryCanvas 外）
             foreach (Transform child in transform)
             {
                 if (child.name.Contains("Canvas") && child.name != "InventoryCanvas")
+                {
                     child.gameObject.SetActive(visible);
+                }
             }
         }
 
