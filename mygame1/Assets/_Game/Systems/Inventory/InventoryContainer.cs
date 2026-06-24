@@ -30,11 +30,12 @@ namespace _Game.Systems.Inventory
         {
             if (_grid != null && !_gridDirty)
             {
-                // 检测 placedItems 和 grid 是否不同步（外部直接写了 placedItems）
-                if (placedItems.Count != _grid.UsedSlots)
-                {
-                    _grid = null; // 重建
-                }
+                // 尺寸变了（EquipItem/UnequipSlot 改了 gridWidth/gridHeight）
+                if (_grid.Width != gridWidth || _grid.Height != gridHeight)
+                    _grid = null;
+                // 外部直接写了 placedItems（如 DragDropManager）
+                else if (placedItems.Count != _grid.UsedSlots)
+                    _grid = null;
             }
             if (_grid == null)
             {
