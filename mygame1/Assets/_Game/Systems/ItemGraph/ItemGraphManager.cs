@@ -12,7 +12,7 @@ namespace _Game.Systems.ItemGraph
     {
         public static ItemGraphManager Instance { get; private set; }
 
-        [SerializeField] private ItemGraphAsset graphAsset;
+        [SerializeField] public ItemGraphAsset graphAsset;
         [SerializeField] private RecipeCatalog recipeCatalog;
 
         private Dictionary<string, ItemGraphNode> _nodeDict;
@@ -34,7 +34,7 @@ namespace _Game.Systems.ItemGraph
                 BuildLookup();
         }
 
-        void BuildLookup()
+        public void BuildLookup()
         {
             _nodeDict = new Dictionary<string, ItemGraphNode>();
             if (graphAsset.nodes == null) return;

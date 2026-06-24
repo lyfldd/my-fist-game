@@ -253,6 +253,15 @@ namespace _Game.Core
             // DecibelSystem — 分贝/噪音系统（僵尸感知 + 声音传播）
             if (go.GetComponent<_Game.Systems.Audio.DecibelSystem>() == null)
                 go.AddComponent<_Game.Systems.Audio.DecibelSystem>();
+            // ItemGraphManager — 物品图谱管理器
+            if (go.GetComponent<_Game.Systems.ItemGraph.ItemGraphManager>() == null)
+            {
+                var igm = go.AddComponent<_Game.Systems.ItemGraph.ItemGraphManager>();
+#if UNITY_EDITOR
+                var igAsset = UnityEditor.AssetDatabase.LoadAssetAtPath<_Game.Config.ItemGraph>("Assets/_Game/Config/ItemGraph.asset");
+                if (igAsset != null) { igm.graphAsset = igAsset; igm.BuildLookup(); }
+#endif
+            }
             // MuzzleFlashSystem — 枪口火焰 VFX
             if (go.GetComponent<_Game.Systems.VFX.MuzzleFlashSystem>() == null)
                 go.AddComponent<_Game.Systems.VFX.MuzzleFlashSystem>();
