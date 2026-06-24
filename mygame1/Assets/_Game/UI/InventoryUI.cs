@@ -345,8 +345,10 @@ namespace _Game.UI
             if (overviewGridContainer == null || _inventory == null) return;
             Transform root = overviewGridContainer.transform.parent;
             var oldBar = root.Find("TopTabBar");
-            if (oldBar != null) DestroyImmediate(oldBar.gameObject);
-            CreateTopTabBar(root);
+            if (oldBar != null)
+                UpdateTabHighlights(oldBar);
+            else
+                CreateTopTabBar(root);
             var gridRt = overviewGridContainer.GetComponent<RectTransform>();
             gridRt.offsetMax = new Vector2(gridRt.offsetMax.x, -45);
             ClearContainer(overviewGridContainer);
@@ -412,6 +414,20 @@ namespace _Game.UI
                 var btn = btnObj.GetComponent<Button>();
                 var capturedName = name;
                 btn.onClick.AddListener(() => OnTabClicked(capturedName));
+            }
+        }
+
+        void UpdateTabHighlights(Transform bar)
+        {
+            foreach (var name in TabNames)
+            {
+                var tab = bar.Find($"Tab_{name}");
+                if (tab == null) continue;
+                var img = tab.GetComponent<Image>();
+                if (img != null)
+                    img.color = name == _currentTab
+                        ? new Color(0.3f, 0.5f, 0.8f, 0.9f)
+                        : new Color(0.15f, 0.15f, 0.15f, 0.8f);
             }
         }
 
