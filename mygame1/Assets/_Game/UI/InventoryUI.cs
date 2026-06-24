@@ -2889,7 +2889,8 @@ namespace _Game.UI
 
             // 关闭按钮
             var closeBtn = UGUIBuilder.CreateButton("DetailClose", _itemDetailPanel.transform, "关闭",
-                new Color(0.3f, 0.3f, 0.3f), () => HideItemDetail());
+                new Color(0.3f, 0.3f, 0.3f), 60, 24);
+            closeBtn.onClick.AddListener(HideItemDetail);
             var brt = closeBtn.GetComponent<RectTransform>();
             brt.sizeDelta = new Vector2(60, 24);
 
