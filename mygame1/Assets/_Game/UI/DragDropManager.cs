@@ -73,7 +73,7 @@ namespace _Game.UI
                 var s = new GameObject($"s{i}", typeof(Image));
                 s.transform.SetParent(_selBorderGo.transform, false);
                 _selStrips[i] = s.GetComponent<Image>();
-                _selStrips[i].color = Color.white;
+                _selStrips[i].color = Color.white; // Color.red;
                 _selStrips[i].raycastTarget = false;
             }
         }
@@ -89,9 +89,9 @@ namespace _Game.UI
             rt.anchoredPosition = Vector2.zero;
             int bw = 2;
             Strip(_selStrips[0], 0, 0, w, bw);
-            Strip(_selStrips[1], 0, h - bw, w, bw);
-            Strip(_selStrips[2], 0, 0, bw, h);
-            Strip(_selStrips[3], w - bw, 0, bw, h);
+            Strip(_selStrips[1], 0, -(h - bw), w, bw);
+            Strip(_selStrips[2], 0, -bw, bw, h - bw * 2);
+            Strip(_selStrips[3], w - bw, -bw, bw, h - bw * 2);
             _selBorderGo.SetActive(true);
         }
 
@@ -209,7 +209,6 @@ namespace _Game.UI
             {
                 bool free = container.IsSpaceFreeFor(gridX, gridY, item.GridWidth, item.GridHeight,
                     item.gridX, item.gridY, item.GridWidth, item.GridHeight);
-                Debug.Log($"[DDM] ClickMove same src=({item.gridX},{item.gridY}) dst=({gridX},{gridY}) {item.GridWidth}x{item.GridHeight} free={free}");
                 if (free)
                 {
                     container.MoveItem(item.gridX, item.gridY, gridX, gridY, item.rotated);
@@ -220,7 +219,6 @@ namespace _Game.UI
             else
             {
                 bool free = container.IsSpaceFree(gridX, gridY, item.GridWidth, item.GridHeight);
-                Debug.Log($"[DDM] ClickMove cross dst=({gridX},{gridY}) free={free}");
                 if (free)
                 {
                     SelectedContainer.RemoveItemAt(item.gridX, item.gridY, item.count);
@@ -340,7 +338,6 @@ namespace _Game.UI
             SelectedCellX = cellX;
             SelectedCellY = cellY;
             var cellRt = overlayRt ?? FindCellRect(container, cellX, cellY);
-            Debug.Log($"[DDM] SelectItem id={item.instanceId} cellRt={cellRt != null}");
             if (cellRt != null)
                 ShowSelectionBorder(cellRt, cellRt.sizeDelta.x, cellRt.sizeDelta.y);
         }
@@ -357,7 +354,6 @@ namespace _Game.UI
         {
             if (!SelectedItem.HasValue || SelectedContainer == null) return;
             var cellRt = FindCellRect(SelectedContainer, SelectedCellX, SelectedCellY);
-            Debug.Log($"[DDM] RefreshBorder selContainer=true cellRt={cellRt != null} regions={_cellRegions.Count}");
             if (cellRt != null)
                 ShowSelectionBorder(cellRt, cellRt.sizeDelta.x, cellRt.sizeDelta.y);
         }
@@ -658,7 +654,6 @@ namespace _Game.UI
 
         public void OnPointerDown(UnityEngine.EventSystems.PointerEventData eventData)
         {
-            Debug.Log($"[CellClick] grid=({gridX},{gridY}) btn={eventData.button}");
             if (eventData.button != UnityEngine.EventSystems.PointerEventData.InputButton.Left) return;
             DragDropManager.Instance?.HandleCellClick(container, gridX, gridY);
         }
