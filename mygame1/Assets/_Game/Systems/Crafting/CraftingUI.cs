@@ -175,8 +175,6 @@ namespace _Game.Systems.Crafting
             // --- 标题栏（拖拽+关闭按钮） ---
             UIPanelManager.AddPanelTitleBar(_panelGo, "合成面板", "crafting", onClose: Close);
             _titleText = _panelGo.transform.Find("TitleBar/Label")?.GetComponent<Text>();
-            UguiMakeBtnLabel(closeGo, "✕", 14);
-
 
             // --- 分隔线 ---
             var line = new GameObject("Line", typeof(Image));
