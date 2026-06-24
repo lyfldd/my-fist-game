@@ -20,7 +20,7 @@ namespace _Game.Systems.Vehicle
     {
         [Header("配置")]
         public VehicleData vehicleData;
-        [Tooltip("燃料物品名（如 SyntheticGasoline），留空=不需要燃料")]
+        [Tooltip("燃料物品名（向后兼容，acceptedFuels 优先）")]
         public string fuelItemName = "SyntheticGasoline";
 
         [Header("车轮引用")]

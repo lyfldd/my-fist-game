@@ -230,8 +230,8 @@ namespace _Game.Systems.Inventory
                 var container = GetContainer(slot);
                 if (container != null)
                 {
-                    container.gridWidth = item.storageWidth;
-                    container.gridHeight = item.storageHeight;
+                    container.gridWidth = item.storageWidth > 0 ? item.storageWidth : 1;
+                    container.gridHeight = item.storageHeight > 0 ? item.storageHeight : 1;
 
                     if (container.placedItems.Count > 0)
                     {

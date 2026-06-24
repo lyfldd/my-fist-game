@@ -260,10 +260,19 @@ namespace _Game.Systems.Survival
         /// <summary> 物品使用（直接订阅 ItemUsedEvent，不再经过 ItemUsageSystem 中转）</summary>
         void OnItemUsed(ItemUsedEvent evt)
         {
-            if (evt.ItemData == null || evt.ItemData.itemEffects == null || evt.ItemData.itemEffects.Count == 0)
-                return;
-
             var item = evt.ItemData;
+            if (item == null) return;
+
+            // healAmount 独立处理（即使无 itemEffects）
+            if (item.healAmount > 0)
+            {
+                int medLevel = playerCharacter != null ? playerCharacter.GetSkillLevel(SkillType.医疗生存) : 0;
+                float mult = 1f + medLevel * 0.15f;
+                ModifyHealth(item.healAmount * mult, "药品");
+                if (item.itemEffects == null || item.itemEffects.Count == 0) return;
+            }
+            else if (item.itemEffects == null || item.itemEffects.Count == 0)
+                return;
 
             // 药品冷却检查
             if (item.foodType == "Medicine" && _medCooldowns.TryGetValue(item.itemName, out var cdEnd)
