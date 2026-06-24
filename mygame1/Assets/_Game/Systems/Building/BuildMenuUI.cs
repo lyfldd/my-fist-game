@@ -523,20 +523,19 @@ namespace _Game.Systems.Building
 
         void RebuildItems()
         {
-            foreach (var go in _itemBtns) { if (go != null) Destroy(go); }
-            _itemBtns.Clear();
-
             if (_itemContent == null) return;
 
             var items = GetFilteredBuildables();
             int count = items.Length;
-            if (count == 0) return;
+            if (count == 0) { foreach (var b in _itemBtns) b?.gameObject.SetActive(false); return; }
 
             string tabName = (_currentTabs.Count > 0 && _selectedTab >= 0 && _selectedTab < _currentTabs.Count)
                 ? GetCategoryName(_currentTabs[_selectedTab].cat) : "建造";
             _pageInfoText.text = $"建造 [{tabName}] ({count}个物品，滚轮浏览)";
 
-            // 创建全部物品（ScrollRect 自动裁剪可见部分）
+            // 复用已有按钮
+            while (_itemBtns.Count > count) { Destroy(_itemBtns[_itemBtns.Count - 1].gameObject); _itemBtns.RemoveAt(_itemBtns.Count - 1); }
+
             for (int itemIdx = 0; itemIdx < count; itemIdx++)
             {
                 var buildable = items[itemIdx];
@@ -544,14 +543,26 @@ namespace _Game.Systems.Building
 
                 bool isSelected = (_controller != null && _controller.activeBuildable == buildable);
                 bool canBuild = HasMaterials(buildable);
+                Color bg = isSelected
+                    ? (canBuild ? selectedButtonColor : new Color(0.6f, 0.2f, 0.2f, 0.9f))
+                    : (canBuild ? normalButtonColor : lockedButtonColor);
+
+                if (itemIdx < _itemBtns.Count)
+                {
+                    var existing = _itemBtns[itemIdx];
+                    if (existing != null)
+                    {
+                        existing.SetActive(true);
+                        existing.GetComponent<Image>().color = bg;
+                        var el = existing.transform.Find("Label")?.GetComponent<Text>();
+                        if (el != null) el.text = buildable.displayName;
+                        continue;
+                    }
+                }
 
                 var go = new GameObject($"Item_{itemIdx}", typeof(Image), typeof(UnityEngine.UI.Button));
                 go.transform.SetParent(_itemContent.transform, false);
                 go.GetComponent<RectTransform>().sizeDelta = new Vector2(120, 48);
-
-                Color bg = isSelected
-                    ? (canBuild ? selectedButtonColor : new Color(0.6f, 0.2f, 0.2f, 0.9f))
-                    : (canBuild ? normalButtonColor : lockedButtonColor);
                 go.GetComponent<Image>().color = bg;
 
                 var lblGo = new GameObject("Label", typeof(Text));
