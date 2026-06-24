@@ -51,10 +51,8 @@ namespace _Game.UI
             public EquipSlot equipSlot;
         }
 
-        // 持久白框
+        // 持久白框（直接挂格子子节点，和 QuickItemBar 一样）
         private GameObject _selBorderGo;
-        private RectTransform _selBorderRt;
-        private RectTransform _selBorderCanvasRt; // border 所属 Canvas 的 RectTransform（用于坐标转换）
         private Image[] _selStrips;
 
         private void Awake()
@@ -67,17 +65,7 @@ namespace _Game.UI
 
         void CreateSelectionBorder()
         {
-            var cGo = new GameObject("DDM_BorderCanvas", typeof(Canvas));
-            cGo.transform.SetParent(null, false); // 直接挂场景根，避免父节点偏移
-            var crt = cGo.GetComponent<RectTransform>();
-            crt.anchorMin = Vector2.zero; crt.anchorMax = Vector2.one;
-            crt.sizeDelta = Vector2.zero; crt.anchoredPosition = Vector2.zero;
-            var canvas = cGo.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = 32767;
-            _selBorderCanvasRt = crt;
             _selBorderGo = new GameObject("__SelBorder__", typeof(RectTransform));
-            _selBorderGo.transform.SetParent(canvas.transform, false);
             _selBorderGo.SetActive(false);
             _selStrips = new Image[4];
             for (int i = 0; i < 4; i++)
@@ -85,40 +73,37 @@ namespace _Game.UI
                 var s = new GameObject($"s{i}", typeof(Image));
                 s.transform.SetParent(_selBorderGo.transform, false);
                 _selStrips[i] = s.GetComponent<Image>();
-                _selStrips[i].color = Color.red;
+                _selStrips[i].color = Color.white;
                 _selStrips[i].raycastTarget = false;
             }
-            _selBorderRt = _selBorderGo.GetComponent<RectTransform>();
-            _selBorderRt.anchorMin = _selBorderRt.anchorMax = new Vector2(0, 1);
-            _selBorderRt.pivot = new Vector2(0, 1);
         }
 
         void ShowSelectionBorder(RectTransform cellRect, float w, float h)
         {
-            if (cellRect == null || _selBorderGo == null) return;
-            Vector3[] corners = new Vector3[4];
-            cellRect.GetWorldCorners(corners);
-            Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(null, corners[1]);
-            Vector2 local;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                _selBorderCanvasRt, screenPos, null, out local);
-            _selBorderRt.anchoredPosition = local;
-            _selBorderRt.sizeDelta = new Vector2(w, h);
-            int bw = 3;
-            SetStrip(_selStrips[0], 0, 0, w, bw);
-            SetStrip(_selStrips[1], 0, h - bw, w, bw);
-            SetStrip(_selStrips[2], 0, 0, bw, h);
-            SetStrip(_selStrips[3], w - bw, 0, bw, h);
+            if (_selBorderGo == null || cellRect == null) return;
+            // 和 QuickItemBar 一样：直接挂到格子上，用 local 坐标
+            _selBorderGo.transform.SetParent(cellRect, false);
+            var rt = _selBorderGo.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero; rt.anchorMax = Vector2.one;
+            rt.sizeDelta = Vector2.zero;
+            rt.anchoredPosition = Vector2.zero;
+            int bw = 2;
+            Strip(_selStrips[0], 0, 0, w, bw);
+            Strip(_selStrips[1], 0, h - bw, w, bw);
+            Strip(_selStrips[2], 0, 0, bw, h);
+            Strip(_selStrips[3], w - bw, 0, bw, h);
             _selBorderGo.SetActive(true);
         }
 
-        void HideSelectionBorder() { if (_selBorderGo != null) _selBorderGo.SetActive(false); }
+        void HideSelectionBorder()
+        {
+            if (_selBorderGo != null) _selBorderGo.SetActive(false);
+        }
 
-        void SetStrip(Image img, float x, float y, float w, float h)
+        void Strip(Image img, float x, float y, float w, float h)
         {
             var rt = img.rectTransform;
-            rt.anchorMin = rt.anchorMax = new Vector2(0, 1);
-            rt.pivot = new Vector2(0, 1);
+            rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0, 1);
             rt.sizeDelta = new Vector2(w, h);
             rt.anchoredPosition = new Vector2(x, y);
         }
@@ -248,6 +233,9 @@ namespace _Game.UI
 
         public void ClearCells()
         {
+            // 摘下白框防格子销毁时连带
+            if (_selBorderGo != null)
+                _selBorderGo.transform.SetParent(transform, false);
             HideSelectionBorder();
             _cellRegions.Clear();
         }
