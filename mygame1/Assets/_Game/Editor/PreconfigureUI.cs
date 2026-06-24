@@ -211,12 +211,6 @@ namespace _Game.Editor
                 // TopTabBar
                 CreateTopTabBar(panel.transform, 700);
 
-                // StaticShell: 纸娃娃+武器+属性面板（预建，不随刷新销毁）
-                var shell = new GameObject("StaticShell", typeof(RectTransform));
-                shell.transform.SetParent(panel.transform, false);
-                StretchRT(shell.GetComponent<RectTransform>());
-                BuildStaticShell(shell.transform, 700);
-
                 // GridContainer: 动态网格内容（每次刷新重建）
                 var grid = new GameObject("GridContainer", typeof(RectTransform));
                 grid.transform.SetParent(panel.transform, false);
@@ -256,6 +250,20 @@ namespace _Game.Editor
 
                 created++;
                 Debug.Log("[PreconfigureUI] QuickPanel 已创建");
+            }
+
+            // StaticShell（每次重建，不依赖 overviewPanel 首次创建）
+            var overviewPanel = invUI.overviewPanel;
+            if (overviewPanel != null)
+            {
+                var oldShell = overviewPanel.transform.Find("StaticShell");
+                if (oldShell != null) Object.DestroyImmediate(oldShell.gameObject);
+                var shell = new GameObject("StaticShell", typeof(RectTransform));
+                shell.transform.SetParent(overviewPanel.transform, false);
+                StretchRT(shell.GetComponent<RectTransform>());
+                BuildStaticShell(shell.transform, 700);
+                created++;
+                Debug.Log("[PreconfigureUI] StaticShell 已创建");
             }
 
             // 隐藏面板（Start 时由代码控制显示）
