@@ -187,6 +187,7 @@ public static class CreateCraftingItems
         battery.energyValue = 10f;
         EditorUtility.SetDirty(battery);
         Make(F, "Cable",        "电缆",       C, 1, 2, 0.5f, 20, ItemQuality.Professional);
+        Make(F, "MechanicalAssembly", "机械传动组件", C, 1, 2, 1.5f, 5, ItemQuality.Professional);
 
         // 建材
         Make(F, "Cement",       "水泥",       C, 1, 1, 1.5f, 15, ItemQuality.Handmade);

@@ -470,8 +470,17 @@ namespace _Game.Editor
                 if (item == null || !item.isFirearm) continue;
                 if (string.IsNullOrEmpty(item.ammoItemName) && item.ammoItemData == null) { weaponOk++; continue; }
                 string ammoName = item.ammoItemData != null ? item.ammoItemData.itemName : item.ammoItemName;
-                var found = AssetDatabase.LoadAssetAtPath<ItemData>(AssetDatabase.GUIDToAssetPath(
-                    AssetDatabase.FindAssets($"t:ItemData {ammoName}").FirstOrDefault()));
+                // 精确匹配（FindAssets 模糊搜索对特殊字符不稳定）
+                ItemData found = null;
+                if (item.ammoItemData != null) found = item.ammoItemData;
+                else
+                {
+                    foreach (var ag in itemGuids)
+                    {
+                        var maybe = AssetDatabase.LoadAssetAtPath<ItemData>(AssetDatabase.GUIDToAssetPath(ag));
+                        if (maybe != null && maybe.itemName == ammoName) { found = maybe; break; }
+                    }
+                }
                 if (found == null) { Debug.LogError($"❌ 弹药缺失: {item.itemName} → {ammoName}"); weaponErr++; errors++; }
                 else weaponOk++;
             }

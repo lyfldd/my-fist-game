@@ -28,7 +28,7 @@ MonoBehaviour:
       count: 3
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
       count: 3
-    output: {fileID: 0}
+    output: {fileID: 11400000, guid: c375aa87c468e8e428e86c0405787f9e, type: 2}
     outputCount: 1
     baseTime: 15
   - recipeId: 
@@ -41,7 +41,7 @@ MonoBehaviour:
       count: 3
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
       count: 3
-    output: {fileID: 0}
+    output: {fileID: 11400000, guid: 67d5d9816bfdec149b3dfc6d563c6976, type: 2}
     outputCount: 1
     baseTime: 18
   - recipeId: 
@@ -56,7 +56,7 @@ MonoBehaviour:
       count: 3
     - itemData: {fileID: 11400000, guid: ec2bb68afb3af7041af96a8ddff8dc0f, type: 2}
       count: 2
-    output: {fileID: 0}
+    output: {fileID: 11400000, guid: 7861ba11d96b9ec49be04b0da76b8b57, type: 2}
     outputCount: 1
     baseTime: 20
   - recipeId: 
@@ -69,7 +69,7 @@ MonoBehaviour:
       count: 6
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
       count: 6
-    output: {fileID: 0}
+    output: {fileID: 11400000, guid: d5a6bc5804d5dee49a62592ee864eaab, type: 2}
     outputCount: 1
     baseTime: 25
   - recipeId: 

@@ -21,9 +21,52 @@ namespace _Game.Editor
             created += CreateFirearms(baseDir);
             created += CreateSpecialWeapons(baseDir);
 
+            // 第二步：绑定 ammoItemData（此时弹药已全部创建）
+            BindAmmoReferences();
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             Debug.Log($"[武器装备] 全部完成，创建 {created} 个物品");
+        }
+
+        /// <summary> 所有物品创建完毕后，为火器绑定弹药直接引用 </summary>
+        static void BindAmmoReferences()
+        {
+            var allGuids = AssetDatabase.FindAssets("t:ItemData");
+            foreach (var g in allGuids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(g);
+                var item = AssetDatabase.LoadAssetAtPath<ItemData>(path);
+                if (item == null || !item.isFirearm) continue;
+                if (item.ammoItemData != null) continue; // 已绑定
+
+                string name = item.ammoItemName;
+                if (string.IsNullOrEmpty(name)) continue;
+
+                var ammo = FindItemByName(name);
+                if (ammo != null)
+                {
+                    item.ammoItemData = ammo;
+                    EditorUtility.SetDirty(item);
+                    Debug.Log($"  绑定弹药: {item.itemName} → {ammo.itemName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[武器装备] 未找到弹药: {item.itemName} 需要 '{name}'");
+                }
+            }
+        }
+
+        static ItemData FindItemByName(string name)
+        {
+            var guids = AssetDatabase.FindAssets("t:ItemData");
+            foreach (var g in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(g);
+                var item = AssetDatabase.LoadAssetAtPath<ItemData>(path);
+                if (item != null && item.itemName == name) return item;
+            }
+            return null;
         }
 
         static ItemData GetItem(string name)
