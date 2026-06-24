@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0946ddcba871320458dd84c140608dd5, type: 3}
   m_Name: ItemGraph
   m_EditorClassIdentifier: 
-  buildTimestamp: 2026-06-25 00:02:32
+  buildTimestamp: 2026-06-25 00:04:53
   recipeCountAtBuild: 295
   nodes:
   - itemName: ".22\u5C0F\u53E3\u5F84"
@@ -338,10 +338,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u4E27\u5C38\u9006\u8F6C\u75AB\u82D7"
     primaryChain: 3
@@ -593,9 +590,26 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u519B\u9774"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u51B2\u538B\u673A\u5957\u4EF6"
     primaryChain: 0
@@ -641,6 +655,25 @@ MonoBehaviour:
     consumerCount: 0
     autoAssignedStation: 7
     isRawMaterial: 0
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u51EF\u592B\u62C9"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
     isDeadEnd: 1
     sources: 
     obtainActions: 
@@ -1303,9 +1336,26 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u5C3C\u9F99"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5DE5\u4E1A\u7194\u7089\u5957\u4EF6"
     primaryChain: 0
@@ -1379,6 +1429,44 @@ MonoBehaviour:
     requiredSystems:
     - Combat
     - Equipment
+    allSystemsReady: 1
+  - itemName: "\u5DE5\u88C5\u88E4"
+    primaryChain: 3
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u5DE5\u88C5\u9774"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u5E03\u5339"
     primaryChain: 3
@@ -1711,6 +1799,25 @@ MonoBehaviour:
     requiredSystems:
     - Survival
     allSystemsReady: 1
+  - itemName: "\u6218\u6597\u5934\u76D4"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u6218\u672F\u5939\u514B"
     primaryChain: 3
     productionMode: 0
@@ -1728,10 +1835,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6218\u672F\u80CC\u5FC3"
     primaryChain: 3
@@ -1750,10 +1854,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6218\u672F\u8170\u5C01"
     primaryChain: 3
@@ -1777,6 +1878,25 @@ MonoBehaviour:
     - Equipment
     - Survival
     allSystemsReady: 1
+  - itemName: "\u6218\u672F\u8170\u5E26"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u6218\u672F\u88E4"
     primaryChain: 3
     productionMode: 0
@@ -1794,10 +1914,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u624B\u672F\u5305"
     primaryChain: 3
@@ -2014,6 +2131,25 @@ MonoBehaviour:
     sourceDescriptions: []
     requiredSystems: []
     allSystemsReady: 1
+  - itemName: "\u63D2\u677F\u80CC\u5FC3"
+    primaryChain: 3
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u6469\u6258\u8F66\u5934\u76D4"
     primaryChain: 0
     productionMode: 0
@@ -2031,10 +2167,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Vehicle
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u6539\u88C5AK47"
     primaryChain: 0
@@ -2528,9 +2661,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u68D2\u7403\u68CD"
     primaryChain: 0
@@ -2654,6 +2785,25 @@ MonoBehaviour:
     autoAssignedStation: 4
     isRawMaterial: 0
     isDeadEnd: 0
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u6A61\u80F6\u978B\u5E95"
+    primaryChain: 2
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
     sources: 
     obtainActions: 
     sourceDescriptions: []
@@ -3406,10 +3556,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u73BB\u7483\u677F"
     primaryChain: 2
@@ -4030,6 +4177,25 @@ MonoBehaviour:
     requiredSystems:
     - Survival
     allSystemsReady: 1
+  - itemName: "\u76AE\u5939\u514B"
+    primaryChain: 3
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u76AE\u5E26"
     primaryChain: 3
     productionMode: 0
@@ -4047,10 +4213,7 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
-    - Survival
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u76AE\u9769"
     primaryChain: 3
@@ -5585,6 +5748,25 @@ MonoBehaviour:
     sourceDescriptions: []
     requiredSystems: []
     allSystemsReady: 1
+  - itemName: "\u8F7B\u80CC\u5FC3"
+    primaryChain: 3
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u8F7B\u91CF\u80CC\u5FC3"
     primaryChain: 3
     productionMode: 0
@@ -5606,6 +5788,25 @@ MonoBehaviour:
     - Combat
     - Equipment
     - Survival
+    allSystemsReady: 1
+  - itemName: "\u8FD0\u52A8\u978B"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u901A\u7528\u96F6\u4EF6"
     primaryChain: 0
@@ -6622,6 +6823,25 @@ MonoBehaviour:
     - Combat
     - Equipment
     allSystemsReady: 1
+  - itemName: "\u9632\u5F39\u8863"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
+    allSystemsReady: 1
   - itemName: "\u9632\u6BD2\u9762\u5177"
     primaryChain: 2
     productionMode: 0
@@ -6643,9 +6863,26 @@ MonoBehaviour:
     sources: 
     obtainActions: 
     sourceDescriptions: []
-    requiredSystems:
-    - Combat
-    - Equipment
+    requiredSystems: []
+    allSystemsReady: 1
+  - itemName: "\u9676\u74F7\u677F"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u96F7\u660E\u987F 870"
     primaryChain: 0
@@ -6685,6 +6922,25 @@ MonoBehaviour:
     sourceDescriptions: []
     requiredSystems:
     - Survival
+    allSystemsReady: 1
+  - itemName: "\u978B\u5E26"
+    primaryChain: 0
+    productionMode: 0
+    overrideStation: 0
+    manualStation: 0
+    depths: 00000000
+    upstreamItemNames: []
+    downstreamItemNames: []
+    producerRecipes: []
+    consumerRecipes: []
+    consumerCount: 0
+    autoAssignedStation: 0
+    isRawMaterial: 1
+    isDeadEnd: 1
+    sources: 
+    obtainActions: 
+    sourceDescriptions: []
+    requiredSystems: []
     allSystemsReady: 1
   - itemName: "\u996E\u7528\u6C34"
     primaryChain: 4
@@ -6922,6 +7178,6 @@ MonoBehaviour:
     sourceDescriptions: []
     requiredSystems: []
     allSystemsReady: 1
-  rawMaterialCount: 76
-  deadEndCount: 161
+  rawMaterialCount: 91
+  deadEndCount: 176
   coreMaterialCount: 16

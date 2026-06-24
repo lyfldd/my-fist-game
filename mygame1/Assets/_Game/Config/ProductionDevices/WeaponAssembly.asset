@@ -23,19 +23,6 @@ MonoBehaviour:
     inputCount: 0
     inputs:
     - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
-      count: 6
-    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
-      count: 3
-    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 3
-    output: {fileID: 11400000, guid: c375aa87c468e8e428e86c0405787f9e, type: 2}
-    outputCount: 1
-    baseTime: 15
-  - recipeId: 
-    input: {fileID: 0}
-    inputCount: 0
-    inputs:
-    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
       count: 9
     - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
       count: 3
@@ -44,6 +31,19 @@ MonoBehaviour:
     output: {fileID: 11400000, guid: 67d5d9816bfdec149b3dfc6d563c6976, type: 2}
     outputCount: 1
     baseTime: 18
+  - recipeId: 
+    input: {fileID: 0}
+    inputCount: 0
+    inputs:
+    - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
+      count: 8
+    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+      count: 3
+    - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
+      count: 2
+    output: {fileID: 11400000, guid: 47604ed470a72914e8f6a7bb1e99143e, type: 2}
+    outputCount: 1
+    baseTime: 16
   - recipeId: 
     input: {fileID: 0}
     inputCount: 0
@@ -76,15 +76,15 @@ MonoBehaviour:
     input: {fileID: 0}
     inputCount: 0
     inputs:
-    - itemData: {fileID: 11400000, guid: a0088bae2810e0a459d8df6617cf88e1, type: 2}
-      count: 6
     - itemData: {fileID: 11400000, guid: 69ddc9ebaff103142ad05ae412f32301, type: 2}
       count: 6
+    - itemData: {fileID: 11400000, guid: eb751f280bd18ee4dba1687c7f4a7a6f, type: 2}
+      count: 2
     - itemData: {fileID: 11400000, guid: d0771149d4a01cb4e8710d98730d3331, type: 2}
-      count: 3
-    output: {fileID: 0}
+      count: 2
+    output: {fileID: 11400000, guid: 38235325395510e40bfcbefd92b34940, type: 2}
     outputCount: 1
-    baseTime: 15
+    baseTime: 14
   productionInterval: 15
   batchSize: 1
   requiresFuel: 0
