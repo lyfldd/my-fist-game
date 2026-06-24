@@ -59,6 +59,8 @@ namespace _Game.Config
         public float fuelCapacity = 40f;
         [Tooltip("每秒油耗 (L/s)")]
         public float fuelConsumptionRate = 0.02f;
+        [Tooltip("接受的燃料物品（按 fuelValue 优先级取最高）")]
+        public ItemData[] acceptedFuels;
 
         [Header("后备箱")]
         [Tooltip("后备箱格子列数")]

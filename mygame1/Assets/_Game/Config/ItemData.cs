@@ -68,10 +68,16 @@ namespace _Game.Config
         public bool isWaterproof;
         [Tooltip("食物类型：留空=非食物  Meat=荤  Vegetable=素  Drink=饮品  Medicine=药品")]
         public string foodType;
-        [Tooltip("作为燃料时的能量值（0=非燃料，汽油100/煤50/铀500）")]
+        [Tooltip("作为燃料时的能量值（0=非燃料）")]
         public float fuelValue;
-        [Tooltip("药品治疗量（>0 药品生效，医疗技能可加成），非药品填0")]
+        [Tooltip("药品治疗量（>0 药品生效，医疗技能可加成）")]
         public float healAmount;
+        [Tooltip("能量值（电池/铀/核心 → AIBot 充能）")]
+        public float energyValue;
+        [Tooltip("修理值（高级零件/铁锭 → AIBot 修理）")]
+        public float repairValue;
+        [Tooltip("聚变核心大小（None/Small/Large → AIBot 识别）")]
+        public FusionCoreSize fusionCoreSize = FusionCoreSize.None;
 
         [Header("武器属性（category==Weapon 生效）")]
         public bool isFirearm = false;        // true=枪械(远程)，false=近战
@@ -86,8 +92,10 @@ namespace _Game.Config
         public float range = GameConstants.DEFAULT_WEAPON_RANGE;  // 别名(同weaponRange, 向上兼容)
 
         [Header("武器→弹药/声音/VFX 连接")]
-        [Tooltip("消耗的弹药物品名（如 Ammo_9mm），留空=无需弹药（电磁炮/近战）")]
+        [Tooltip("消耗的弹药物品名（向后兼容，ammoItemData 优先）")]
         public string ammoItemName;
+        [Tooltip("弹药直接引用（优先于 ammoItemName，改名不中断）")]
+        public ItemData ammoItemData;
         [Tooltip("枪声音色：留空=静音  Pistol/Rifle/Shotgun/Heavy")]
         public string gunshotSoundType;
         [Tooltip("枪口火焰：留空=无火焰  Small/Medium/Large")]
