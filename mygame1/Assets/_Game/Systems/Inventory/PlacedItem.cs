@@ -42,6 +42,24 @@ namespace _Game.Systems.Inventory
             this.repairCount = 0;
         }
 
+        /// <summary> 移动/旋转时用：从原物品拷贝所有字段，仅覆盖位置和旋转 </summary>
+        public static PlacedItem CloneWithPosition(PlacedItem src, int newGridX, int newGridY, bool newRotated)
+        {
+            return new PlacedItem
+            {
+                instanceId = src.instanceId,
+                itemData = src.itemData,
+                count = src.count,
+                gridX = newGridX,
+                gridY = newGridY,
+                rotated = newRotated,
+                isGhost = src.isGhost,
+                ghostSourceSlot = src.ghostSourceSlot,
+                itemDurability = src.itemDurability,
+                repairCount = src.repairCount,
+            };
+        }
+
         /// <summary> 创建幽灵占位格（腰带武器槽容量占用）</summary>
         public static PlacedItem Ghost(int gridX, int gridY, EquipSlot sourceSlot)
         {

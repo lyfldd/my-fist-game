@@ -80,6 +80,21 @@ namespace _Game.Systems.Inventory
             return true;
         }
 
+        /// <summary> 移动物品到新位置（同容器内）</summary>
+        public void MoveItem(int fromX, int fromY, int toX, int toY, bool rotated)
+        {
+            for (int i = 0; i < placedItems.Count; i++)
+            {
+                var p = placedItems[i];
+                if (p.gridX == fromX && p.gridY == fromY && p.itemData != null)
+                {
+                    p.gridX = toX; p.gridY = toY; p.rotated = rotated;
+                    placedItems[i] = p;
+                    return;
+                }
+            }
+        }
+
         /// <summary> 检测空间是否空闲，排除指定原位置的物品（用于原地旋转）</summary>
         public bool IsSpaceFreeFor(int x, int y, int w, int h, int excludeX, int excludeY, int excludeW, int excludeH)
         {

@@ -63,6 +63,7 @@ namespace _Game.UI
         // 容器折叠状态
         private Dictionary<EquipSlot, bool> _containerCollapsed = new Dictionary<EquipSlot, bool>();
         private Dictionary<EquipSlot, Image> _dollDurBars = new Dictionary<EquipSlot, Image>(); // 纸娃娃装备槽耐久条
+        private bool _showOverviewPending;
 
 
         void Awake()
@@ -328,38 +329,40 @@ namespace _Game.UI
 
         public void ShowOverview()
         {
+            if (_showOverviewPending) return;
+            _showOverviewPending = true;
+            StartCoroutine(ShowOverviewCoroutine());
+        }
+
+        System.Collections.IEnumerator ShowOverviewCoroutine()
+        {
+            yield return null;
+            _showOverviewPending = false;
+            ShowOverviewInternal();
+        }
+
+        void ShowOverviewInternal()
+        {
             if (overviewGridContainer == null || _inventory == null) return;
-
-            // 标签栏放在 OverviewPanel 上（gridContainer 的父级）
             Transform root = overviewGridContainer.transform.parent;
-            // 移除旧的标签栏（如果存在）
             var oldBar = root.Find("TopTabBar");
-            if (oldBar != null) GameObject.DestroyImmediate(oldBar.gameObject);
-
-            // ---- 顶部标签栏（固定高度 40px） ----
+            if (oldBar != null) DestroyImmediate(oldBar.gameObject);
             CreateTopTabBar(root);
-
-            // 调整网格容器起始位置（紧挨标签栏底部）
             var gridRt = overviewGridContainer.GetComponent<RectTransform>();
-            gridRt.offsetMax = new Vector2(gridRt.offsetMax.x, -45);  // 40px 标签栏 + 5px 间距
-
-            // ---- 下方内容区（gridContainer 显示内容） ----
+            gridRt.offsetMax = new Vector2(gridRt.offsetMax.x, -45);
             ClearContainer(overviewGridContainer);
-
-            // 清空旧的拖拽格子注册
-            if (DragDropManager.Instance != null)
-                DragDropManager.Instance.ClearCells();
+            if (DragDropManager.Instance != null) DragDropManager.Instance.ClearCells();
             var glg = overviewGridContainer.GetComponent<GridLayoutGroup>();
             if (glg != null) DestroyImmediate(glg);
             var vlg = overviewGridContainer.GetComponent<VerticalLayoutGroup>();
             if (vlg != null) DestroyImmediate(vlg);
-
             switch (_currentTab)
             {
                 case "装备容器": ShowEquipTabContent(); break;
                 case "角色": ShowCharacterTabContent(); break;
                 default: ShowPlaceholderTab(_currentTab); break;
             }
+            if (DragDropManager.Instance != null) DragDropManager.Instance.RefreshSelectionBorder();
         }
 
         void CreateTopTabBar(Transform root)
@@ -2357,6 +2360,7 @@ namespace _Game.UI
 
         void ClearContainer(GameObject container)
         {
+            // 用 Destroy（非 Immediate），让 UGUI 事件系统在帧末安全清理
             foreach (Transform child in container.transform)
                 Destroy(child.gameObject);
         }

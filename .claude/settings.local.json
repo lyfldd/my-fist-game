@@ -141,7 +141,23 @@
       "Bash(cmd.exe *)",
       "Bash(echo \"PID=$!\")",
       "Bash(jobs -l)",
-      "Bash(netstat -ano)"
+      "Bash(netstat -ano)",
+      "Bash(cp 背包重构计划.md 背包重构计划.md.bak)",
+      "Bash(sed -i '65s/.*/    public void Move\\(int slotId, int toX, int toY\\);/' 背包重构计划.md)",
+      "Bash(sed -i '66a\\\\\\\\n    // === 尺寸调整 ===\\\\n    /// <summary> 缩放网格。缩小导致物品溢出时返回溢出列表供调用者处理。<\\\\/summary>\\\\n    public List<GridSlot> Resize\\(int newW, int newH\\);' 背包重构计划.md)",
+      "Bash(sed -i '71s/.*/    \\\\/\\\\/\\\\/ <summary> 空闲格数 + 同 source 幽灵格数（幽灵格可复用）<\\\\/summary>/' 背包重构计划.md)",
+      "Bash(sed -i '65s/.*/\\\\t\\\\tpublic void Move\\(int slotId, int toX, int toY\\);/' 背包重构计划.md)",
+      "Bash(sed -i '66a\\\\\\\\t\\\\t\\\\n\\\\t\\\\t// === 尺寸调整 ===\\\\n\\\\t\\\\tpublic List<GridSlot> Resize\\(int newW, int newH\\);' 背包重构计划.md)",
+      "Bash(sed -i '70s/.*/\\\\t\\\\tpublic int CountFreeForGhost\\(EquipSlot source, int needed\\);/' 背包重构计划.md)",
+      "Bash(sed -i '71s/.*/\\\\t\\\\t    \\\\/\\\\/ = 空闲格子数 + 同 source 幽灵格数/' 背包重构计划.md)",
+      "Bash(sed -i '50s/.*/\\\\t    public int TryAdd\\(ItemData item, int count, float maxWeight\\);/' 背包重构计划.md)",
+      "Bash(sed -i '51s/.*/\\\\t        \\\\/\\\\/ ① 堆叠 ② 找空位 ③ maxWeight 检查：超载截断，maxWeight 由 Inventory 传全局 overloadWeight/' 背包重构计划.md)",
+      "Bash(sed -i '54s/.*/\\\\t    public int Place\\(ItemData item, int count, int x, int y, bool rotated,/' 背包重构计划.md)",
+      "Bash(sed -i '56s/.*/\\\\t        \\\\/\\\\/ 返回 slotId。跨容器移动时先 Place 目标成功再 Remove 源（防丢失）/' 背包重构计划.md)",
+      "Bash(sed -i '196a\\\\\\\\n\\\\tSaveData.version 从 1 → 2 区分新旧格式。RestoreFromSave 检查 version<2 走旧版转换路径。' 背包重构计划.md)",
+      "Bash(sed -i '202a\\\\\\\\n\\\\tDropItem 耐久丢失同步修复：WorldItem.itemDurability/repairCount 写入存档。' 背包重构计划.md)",
+      "Bash(sed -i 's/^n\\\\tSaveData/    SaveData/' 背包重构计划.md)",
+      "Bash(sed -i 's/^tDropItem/    DropItem/' 背包重构计划.md)"
     ]
   },
   "enabledMcpjsonServers": [
