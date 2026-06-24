@@ -2533,9 +2533,13 @@ namespace _Game.UI
                     child.gameObject.SetActive(visible);
                 }
             }
-            // 禁用 QuickItemBar 组件（它 Update 每帧会覆盖 Canvas 显隐）
-            var qib = GetComponent<QuickItemBar>();
-            if (qib != null) qib.enabled = visible;
+            // 禁用有 Update 自动恢复逻辑的 HUD 组件
+            var qib = GetComponent<QuickItemBar>(); if (qib != null) qib.enabled = visible;
+            var sh = GetComponent<SurvivalHUD>(); if (sh != null) sh.enabled = visible;
+            var dh = GetComponent<DecibelHUD>(); if (dh != null) dh.enabled = visible;
+            var wh = GetComponent<WeatherHUD>(); if (wh != null) wh.enabled = visible;
+            var tl = GetComponent<TopLeftHUD>(); if (tl != null) tl.enabled = visible;
+            var ch = GetComponent<CrosshairUI>(); if (ch != null) ch.enabled = visible;
         }
 
         // ===== 固定布局辅助方法 =====
