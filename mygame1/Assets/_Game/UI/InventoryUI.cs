@@ -333,7 +333,10 @@ namespace _Game.UI
         {
             if (_showOverviewPending) return;
             _showOverviewPending = true;
-            StartCoroutine(ShowOverviewCoroutine());
+            if (gameObject.activeInHierarchy)
+                StartCoroutine(ShowOverviewCoroutine());
+            else
+                ShowOverviewInternal();
         }
 
         System.Collections.IEnumerator ShowOverviewCoroutine()
