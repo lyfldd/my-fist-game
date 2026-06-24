@@ -21,8 +21,9 @@ namespace _Game.Systems.AIBot
         public float outputRate;      // 铀产出/h
 
         public bool IsEmpty => string.IsNullOrEmpty(itemName) || burnRemaining <= 0f;
-        public bool IsSmall => itemName == "聚变核心(小)";
-        public bool IsLarge => itemName == "聚变核心(大)";
+        public FusionCoreSize coreSize;
+        public bool IsSmall => coreSize == FusionCoreSize.Small || itemName == "聚变核心(小)";
+        public bool IsLarge => coreSize == FusionCoreSize.Large || itemName == "聚变核心(大)";
     }
 
     /// <summary>

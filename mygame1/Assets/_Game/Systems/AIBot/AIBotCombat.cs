@@ -96,11 +96,17 @@ namespace _Game.Systems.AIBot
         // 碰撞检测缓存
         private readonly Collider[] _hitBuffer = new Collider[32];
 
-        // 弹药物品名
+        // 弹药物品名（硬编码，向后兼容。优先读 _weaponMapping）
         public const string AMMO_PISTOL = "手枪子弹";
         public const string AMMO_RIFLE = "步枪子弹";
         public const string AMMO_SHOTGUN = "霰弹";
         public const string AMMO_EM_RIFLE = "电池组";
+
+        [SerializeField] private AIBotWeaponMapping _weaponMapping;
+
+        // 映射表辅助（映射表有值时优先读 ItemData，否则 fallback 到 Inspector 字段）
+        float MapDamage(RightArmWeapon w) { var e = _weaponMapping != null ? _weaponMapping.GetRight(w) : null; if (e?.weaponItem != null) return e.weaponItem.weaponDamage; return w switch { RightArmWeapon.Pistol => pistolDamage, RightArmWeapon.Rifle => rifleDamage, RightArmWeapon.Shotgun => shotgunDamage, RightArmWeapon.ElectromagneticRifle => emRifleDamage, _ => 10f }; }
+        float MapCooldown(RightArmWeapon w) { var e = _weaponMapping != null ? _weaponMapping.GetRight(w) : null; if (e?.weaponItem != null && e.weaponItem.fireRate > 0) return e.weaponItem.fireRate; return w switch { RightArmWeapon.Pistol => pistolCooldown, RightArmWeapon.Rifle => rifleCooldown, RightArmWeapon.Shotgun => shotgunCooldown, RightArmWeapon.ElectromagneticRifle => emRifleCooldown, _ => 1f }; }
 
         // 前置F：武器实例追踪
         private ItemData _currentWeaponItem;
