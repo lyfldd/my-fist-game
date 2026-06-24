@@ -504,8 +504,9 @@ namespace _Game.UI
 
                 // 拖拽处理器
                 var drag = overlayRt.gameObject.AddComponent<ItemDragHandler>();
-                var placedItem = new PlacedItem(slot.itemData != null ? FindItemData(slot.itemName) : null, slot.count, slot.x, slot.y);
-                drag.Setup(placedItem, GetContainer(view.equipSlot), slot.x, slot.y, overlayRt);
+                var itemData = FindItemData(slot.itemName);
+                var placedItem = new PlacedItem(itemData, slot.count, slot.x, slot.y);
+                drag.Setup(placedItem, _inventory.GetContainer(view.equipSlot), slot.x, slot.y, overlayRt);
 
                 // 注册到 DragDropManager
                 for (int sy = 0; sy < slot.h; sy++)
@@ -518,7 +519,7 @@ namespace _Game.UI
                         var cellImg = cellRt.gameObject.AddComponent<Image>();
                         cellImg.color = new Color(0.15f, 0.3f, 0.2f, 0.9f);
                         cellImg.raycastTarget = true;
-                        var c = GetContainer(view.equipSlot);
+                        var c = _inventory.GetContainer(view.equipSlot);
                         if (c != null && DragDropManager.Instance != null)
                             DragDropManager.Instance.RegisterCellRect(cellRt, c, slot.x + sx, slot.y + sy);
                     }
