@@ -528,7 +528,20 @@ namespace _Game.Systems.Inventory
         {
             float total = 0;
             foreach (var kv in equipped)
-                if (kv.Value != null) total += kv.Value.warmthValue;
+            {
+                if (kv.Value == null) continue;
+                // 耐久衰减：0% 耐久衣物保暖也衰减（与护甲一致）
+                if (kv.Value.hasDurability && _equippedInstanceIds.TryGetValue(kv.Key, out var id))
+                {
+                    float ratio = _Game.Systems.Durability.DurabilitySystem.Instance?.GetRatio(id) ?? 1f;
+                    if (ratio <= 0f) continue;
+                    total += kv.Value.warmthValue * ratio;
+                }
+                else
+                {
+                    total += kv.Value.warmthValue;
+                }
+            }
             return total;
         }
 
@@ -799,6 +812,12 @@ namespace _Game.Systems.Inventory
         /// </summary>
         public void DropItem(ItemData item, int count = 1)
         {
+            // 先读取耐久数据再移除（RemoveItem 后会丢失）
+            float dur = 0f; int rp = 0;
+            foreach (var c in containers)
+                foreach (var pi in c.placedItems)
+                    if (pi.itemData == item) { dur = pi.itemDurability; rp = pi.repairCount; break; }
+
             if (!RemoveItem(item, count)) return;
 
             var worldItem = new GameObject($"World_{item.itemName}");
@@ -807,6 +826,8 @@ namespace _Game.Systems.Inventory
             var wi = worldItem.AddComponent<_Game.Systems.WorldContainer.WorldItem>();
             wi.itemData = item;
             wi.count = count;
+            wi.itemDurability = dur;    // 保留耐久状态
+            wi.repairCount = rp;        // 保留修理次数
 
             EventBus.Publish(new InventoryChanged("removed", item.itemName, count));
         }

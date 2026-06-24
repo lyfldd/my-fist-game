@@ -2145,7 +2145,14 @@ namespace _Game.UI
             var phObj = new GameObject("Placeholder", typeof(Text));
             phObj.transform.SetParent(overviewGridContainer.transform, false);
             var phText = phObj.GetComponent<Text>();
-            phText.text = $"<color=grey><b>{tabName}</b> 开发中...</color>";
+            string msg = tabName switch
+            {
+                "制作" => "请靠近工作台按 E 打开制作面板",
+                "地图" => "地图功能尚未开放",
+                "设置" => "设置功能尚未开放",
+                _ => $"<b>{tabName}</b> 开发中..."
+            };
+            phText.text = $"<color=grey>{msg}</color>";
             phText.fontSize = 18;
             phText.alignment = TextAnchor.MiddleCenter;
             phText.color = Color.gray;
@@ -2336,7 +2343,7 @@ namespace _Game.UI
             if (quickInfoText != null)
             {
                 string info = $"<b>{container.containerName}</b>  ({container.UsedCells}/{container.TotalCells})\n";
-                info += $"负重: {_inventory.CurrentWeight:F1}/{_inventory.maxWeight}";
+                info += $"负重: {_inventory.CurrentWeight:F1}/{_inventory.EffectiveMaxWeight}";
                 if (_inventory.IsOverloaded)
                     info += $" <color=yellow>({_inventory.OverloadRatio * 100f:F0}%)</color>";
                 quickInfoText.text = info;
