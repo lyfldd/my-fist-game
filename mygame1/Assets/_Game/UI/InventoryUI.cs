@@ -110,8 +110,8 @@ namespace _Game.UI
             EnsurePanelsExist();
 
             // 查找其他 UI 对象
-            _survivalHUDGo = GameObject.Find("SurvivalHUD");
-            _quickItemBarGo = GameObject.Find("QuickItemBar");
+            _survivalHUDGo = GameObject.Find("SurvivalHUD_Canvas") ?? GameObject.Find("SurvivalHUD");
+            _quickItemBarGo = GameObject.Find("QuickItemBar_Canvas") ?? GameObject.Find("QuickItemBar");
 
             // 禁用 ScrollRect（与物品拖拽冲突）
             if (overviewPanel != null)
